@@ -1,0 +1,28 @@
+version: '3'
+
+services:
+  contoso-api:
+    container_name: "contoso-api"
+    ports:
+      - '8080:8080'
+      - '5000:5000'
+      - '5001:5001'
+    volumes:
+      - ./:/src/app
+    build:
+      context: .
+      dockerfile: "Deployments/App/Dockerfile"
+    depends_on:
+      - contoso-db
+    links:
+      - contoso-db
+  contoso-db:
+    container_name: "contoso-db"
+    build:
+      context: .
+      dockerfile: "Deployments/Db/Dockerfile"
+    ports:
+      - '1433'
+    environment:
+      SA_PASSWORD: "Your_password123"
+      ACCEPT_EULA: "Y"
