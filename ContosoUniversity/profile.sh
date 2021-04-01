@@ -1,5 +1,7 @@
 #!/bin/bash
 
+CONTOSO_UNIVERSITY_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
+
 alias ct="contoso"
 # Use: view/edit documentation
 contoso () {
@@ -17,18 +19,18 @@ Options:
     ;;
     'start')
       case "${2}" in
-        'api') docker-compose up --build contoso-api ;;
-        'db') docker-compose up -d contoso-db ;;
-        'all'|'') docker-compose up ;;
+        'api') docker-compose -f "${CONTOSO_UNIVERSITY_DIR}/docker-compose.yml" up --build contoso-api ;;
+        'db') docker-compose -f "${CONTOSO_UNIVERSITY_DIR}/docker-compose.yml" up -d contoso-db ;;
+        'all'|'') docker-compose -f "${CONTOSO_UNIVERSITY_DIR}/docker-compose.yml" up ;;
       esac
       echo "STARTING contoso services"
     ;;
     'stop')
       echo "STOPPING contoso services"
       case "${2}" in
-        'api') docker-compose down api ;;
-        'db') docker-compose down db ;;
-        'all'|'') docker-compose down ;;
+        'api') docker-compose -f "${CONTOSO_UNIVERSITY_DIR}/docker-compose.yml" down api ;;
+        'db') docker-compose -f "${CONTOSO_UNIVERSITY_DIR}/docker-compose.yml" down db ;;
+        'all'|'') docker-compose -f "${CONTOSO_UNIVERSITY_DIR}/docker-compose.yml" down ;;
       esac
     ;;
     'restart')
@@ -39,12 +41,12 @@ Options:
       esac
     ;;
     'purge')
-      ${FUNCNAME[0]} stop
+      docker stop $(docker ps -q)
       docker system prune --all --force --filter=label=base=true
     ;;
     'reset')
       ${FUNCNAME[0]} purge
-      docker-compose build
+      docker-compose -f "${CONTOSO_UNIVERSITY_DIR}/docker-compose.yml" build
     ;;
     *)
       echo -e "ERROR: invalid option. Try..\n$ ${FUNCNAME[0]} help"
