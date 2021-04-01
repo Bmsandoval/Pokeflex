@@ -9,6 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using ContosoUniversity.Data;
+using ContosoUniversity.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace ContosoUniversity
@@ -31,6 +32,8 @@ namespace ContosoUniversity
             services.AddDatabaseDeveloperPageExceptionFilter();
 
             services.AddControllersWithViews();
+            
+            services.AddTransient<StudentService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
