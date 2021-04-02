@@ -19,6 +19,7 @@ namespace ControllerTests
         [Fact]
         public async Task Index_ReturnsListOfStudents()
         {
+            // Test Data
             var sessions = new List<Student>();
             sessions.Add(new Student()
             {
@@ -28,6 +29,7 @@ namespace ControllerTests
                 ID = default,
                 LastName = default
             });
+            
             // Arrange
             var mockRepo = new Mock<StudentService>(new SchoolContext(new DbContextOptionsBuilder<SchoolContext>().Options));
             mockRepo.Setup(repo => repo.List()).ReturnsAsync(sessions);
@@ -39,9 +41,6 @@ namespace ControllerTests
             // Assert
             var apiResult = Assert.IsType<OkObjectResult>(result);
             Assert.Equal(sessions, apiResult.Value);
-            // var models = Assert.IsAssignableFrom<IEnumerable<Student>>(apiResult);
-            // var model = Assert.IsAssignableFrom<IEnumerable<StormSessionViewModel>>(
-            //     viewResult.ViewData.Model);
         }
         
         // // GET: Students
