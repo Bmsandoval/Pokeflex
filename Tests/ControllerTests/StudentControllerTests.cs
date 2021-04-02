@@ -26,7 +26,7 @@ namespace ControllerTests
                 EnrollmentDate = default,
                 Enrollments = default,
                 FirstMidName = default,
-                ID = default,
+                Id = default,
                 LastName = default
             });
             

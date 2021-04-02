@@ -4,6 +4,7 @@ using System.Linq;
 using ContosoUniversity.Data;
 using ContosoUniversity.Models;
 using ContosoUniversity.Services;
+using EntityFrameworkCoreMock;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 using Moq;
@@ -12,37 +13,36 @@ namespace ServiceTests
 {
     public class UnitTest1
     {
+        public DbContextOptions<SchoolContext> DummyOptions { get; } = new DbContextOptionsBuilder<SchoolContext>().Options;
+
+        
         [Fact]
         public void Test1()
         {
             Assert.True(true);
         }
 
-        // [Fact]
-        // public async void TestyTest()
-        // {
-        //     var options = new DbContextOptionsBuilder<SchoolContext>()
-        //         .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
-        //         .Options;
-        //     var databaseContext = new SchoolContext(options);
-        //     databaseContext.Database.EnsureCreated();
-        //     if (await databaseContext.Students.CountAsync() <= 0)
-        //     {
-        //         for (int i = 1; i <= 10; i++)
-        //         {
-        //             databaseContext.Students.Add(new Student(){
-        //                 EnrollmentDate = default,
-        //                 Enrollments = default,
-        //                 FirstMidName = default,
-        //                 ID = default,
-        //                 LastName = default
-        //                 
-        //             });
-        //             await databaseContext.SaveChangesAsync();
-        //         }
-        //     }
-        //     
-        //     var studentService = new StudentService(databaseContext);
-        // }
+        [Fact]
+        public void TestyTest()
+        {
+            var students = new List<Student>() {
+                new Student(){
+                    EnrollmentDate = default,
+                    Enrollments = default,
+                    FirstMidName = default,
+                    Id = default,
+                    LastName = default
+                },
+            };
+        
+            var dbContextMock = new DbContextMock<SchoolContext>(DummyOptions);
+            var usersDbSetMock = dbContextMock.CreateDbSetMock(x => x.Students, students.ToArray());
+            
+            var studentService = new StudentService(dbContextMock.Object);
+
+            var result = studentService.List().Result;
+            
+            Assert.Equal(students, result);
+        }
     }
 }
