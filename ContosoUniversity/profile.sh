@@ -15,7 +15,8 @@ Options:
 - restart: stop contoso-api and start of contoso's docker container(s) that aren't running [[WARNING: RESETS DATABASE]]
 - restart-all: stop and start all of contoso's docker container(s) [[WARNING: RESETS DATABASE]]
 - purge: stop containers and purge all remnants [[WARNING: EVEN WORSE THAN RESET]]
-- reset: purges and rebuilds contoso's docker container(s) [[WARNING: RESETS DATABASE]]"
+- reset: purges and rebuilds contoso's docker container(s) [[WARNING: RESETS DATABASE]]
+- test: runs xunit tests"
     ;;
     'start')
       case "${2}" in
@@ -47,6 +48,9 @@ Options:
     'reset')
       ${FUNCNAME[0]} purge
       docker-compose -f "${CONTOSO_UNIVERSITY_DIR}/docker-compose.yml" build
+    ;;
+    'test')
+      find -d "${CONTOSO_UNIVERSITY_DIR}/../Tests" -name "*.csproj"| xargs -L 1 dotnet test --nologo --verbosity quiet
     ;;
     *)
       echo -e "ERROR: invalid option. Try..\n$ ${FUNCNAME[0]} help"
