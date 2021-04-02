@@ -35,14 +35,8 @@ namespace ServiceTests
 
             var result = studentService.List().Result;
 
-            for (var i = 0; i < students.Count; i++)
-            {
-                Assert.Equal(students[i].Id, result[i].Id);
-                Assert.Equal(students[i].EnrollmentDate, result[i].EnrollmentDate);
-                Assert.Equal(students[i].Enrollments, result[i].Enrollments);
-                Assert.Equal(students[i].FirstMidName, result[i].FirstMidName);
-                Assert.Equal(students[i].LastName, result[i].LastName);
-            }
+            // List assert equal fails for some reason
+            Assert.Equal(students, result);
         }
     }
 }
