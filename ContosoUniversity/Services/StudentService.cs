@@ -12,7 +12,7 @@ namespace ContosoUniversity.Services
         public StudentService(SchoolContext databaseContext) {
             this._context = databaseContext;
         }
-        public StudentService() {}
+        // public StudentService() {}
         public virtual async Task<List<Student>> List()
         {
             return await _context.Students.ToListAsync();

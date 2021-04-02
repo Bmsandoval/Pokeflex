@@ -9,6 +9,8 @@ using Microsoft.AspNetCore.Mvc;
 using Xunit;
 using Moq;
 using ContosoUniversity;
+using ContosoUniversity.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace ControllerTests
 {
@@ -27,7 +29,7 @@ namespace ControllerTests
                 LastName = default
             });
             // Arrange
-            var mockRepo = new Mock<StudentService>();
+            var mockRepo = new Mock<StudentService>(new SchoolContext(new DbContextOptionsBuilder<SchoolContext>().Options));
             mockRepo.Setup(repo => repo.List()).ReturnsAsync(sessions);
             var controller = new StudentsController(mockRepo.Object);
         
