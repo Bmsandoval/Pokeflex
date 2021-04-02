@@ -11,11 +11,12 @@ namespace ContosoUniversity.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        // private readonly ILogger<HomeController> _logger;
+        // public HomeController(ILogger<HomeController> logger) { _logger = logger; }
 
-        public HomeController(ILogger<HomeController> logger)
+        public IActionResult Health()
         {
-            _logger = logger;
+            return StatusCode(200);
         }
 
         public IActionResult Index()

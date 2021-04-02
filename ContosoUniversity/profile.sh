@@ -22,7 +22,8 @@ Options:
       case "${2}" in
         'api') docker-compose -f "${CONTOSO_UNIVERSITY_DIR}/docker-compose.yml" up --build contoso-api ;;
         'db') docker-compose -f "${CONTOSO_UNIVERSITY_DIR}/docker-compose.yml" up -d contoso-db ;;
-        'all'|'') docker-compose -f "${CONTOSO_UNIVERSITY_DIR}/docker-compose.yml" up ;;
+        'all') docker-compose -f "${CONTOSO_UNIVERSITY_DIR}/docker-compose.yml" up ;;
+        '') echo "'api', 'db', or 'all'"
       esac
       echo "STARTING contoso services"
     ;;
@@ -31,14 +32,16 @@ Options:
       case "${2}" in
         'api') docker-compose -f "${CONTOSO_UNIVERSITY_DIR}/docker-compose.yml" down api ;;
         'db') docker-compose -f "${CONTOSO_UNIVERSITY_DIR}/docker-compose.yml" down db ;;
-        'all'|'') docker-compose -f "${CONTOSO_UNIVERSITY_DIR}/docker-compose.yml" down ;;
+        'all') docker-compose -f "${CONTOSO_UNIVERSITY_DIR}/docker-compose.yml" down ;;
+        '') echo "'api', 'db', or 'all'"
       esac
     ;;
     'restart')
       case "${2}" in
         'api') ${FUNCNAME[0]} down api && ${FUNCNAME[0]} start api ;;
         'db') ${FUNCNAME[0]} down db && ${FUNCNAME[0]} start db ;;
-        'all'|'') ${FUNCNAME[0]} down && ${FUNCNAME[0]} start ;;
+        'all') ${FUNCNAME[0]} down && ${FUNCNAME[0]} start ;;
+        '') echo "'api', 'db', or 'all'"
       esac
     ;;
     'purge')
@@ -50,7 +53,8 @@ Options:
       docker-compose -f "${CONTOSO_UNIVERSITY_DIR}/docker-compose.yml" build
     ;;
     'test')
-      find -d "${CONTOSO_UNIVERSITY_DIR}/../Tests" -name "*.csproj"| xargs -L 1 dotnet test --nologo --verbosity quiet
+#      find -d "${CONTOSO_UNIVERSITY_DIR}/../Tests" -name "*.csproj"| xargs -L 1 dotnet test --nologo --verbosity quiet
+      find -d "${CONTOSO_UNIVERSITY_DIR}/../Tests" -name "*.csproj"| xargs -L 1 dotnet test --nologo
     ;;
     *)
       echo -e "ERROR: invalid option. Try..\n$ ${FUNCNAME[0]} help"
