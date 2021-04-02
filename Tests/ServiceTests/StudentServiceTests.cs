@@ -11,19 +11,12 @@ using Moq;
 
 namespace ServiceTests
 {
-    public class UnitTest1
+    public class StudentServiceTests
     {
         public DbContextOptions<SchoolContext> DummyOptions { get; } = new DbContextOptionsBuilder<SchoolContext>().Options;
 
-        
         [Fact]
-        public void Test1()
-        {
-            Assert.True(true);
-        }
-
-        [Fact]
-        public void TestyTest()
+        public void TestBasicListFunctionality()
         {
             var students = new List<Student>() {
                 new Student(){
@@ -41,8 +34,15 @@ namespace ServiceTests
             var studentService = new StudentService(dbContextMock.Object);
 
             var result = studentService.List().Result;
-            
-            Assert.Equal(students, result);
+
+            for (var i = 0; i < students.Count; i++)
+            {
+                Assert.Equal(students[i].Id, result[i].Id);
+                Assert.Equal(students[i].EnrollmentDate, result[i].EnrollmentDate);
+                Assert.Equal(students[i].Enrollments, result[i].Enrollments);
+                Assert.Equal(students[i].FirstMidName, result[i].FirstMidName);
+                Assert.Equal(students[i].LastName, result[i].LastName);
+            }
         }
     }
 }
