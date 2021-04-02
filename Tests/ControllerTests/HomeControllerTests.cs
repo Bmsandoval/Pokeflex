@@ -13,21 +13,11 @@ namespace ControllerTests
     public class HomeControllerTests 
     {
         [Fact]
-        public void TestingPOC()
-        {
-            Assert.True(true);
-        }
-        
-        [Fact]
         public void HealthCheckWorks()
         {
             // Arrange
-            var controller = new HomeController();
-        
             // Act
-            var result = controller.Health();
-            var statusCode=Assert.IsType<StatusCodeResult>(result);
-            Assert.Equal(200, statusCode.StatusCode);
+            Assert.IsType<OkResult>((new HomeController()).Health());
         }
     }
 }

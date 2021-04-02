@@ -15,35 +15,31 @@ namespace ControllerTests
     public class StudentControllerTests 
     {
         [Fact]
-        public void TestingPOC()
+        public async Task Index_ReturnsListOfStudents()
         {
-            Assert.True(true);
-        }
-        
-            // // Arrange
-            // var controller = new HomeController();
-            //
-            // // Act
-            // var result = controller.Health();
-            // var statusCode=Assert.IsType<StatusCodeResult>(result);
-            // Assert.Equal(200, statusCode.StatusCode);
-        [Fact]
-        public async Task Index_ReturnsAViewResult_WithAListOfBrainstormSessions()
-        {
+            var sessions = new List<Student>();
+            sessions.Add(new Student()
+            {
+                EnrollmentDate = default,
+                Enrollments = default,
+                FirstMidName = default,
+                ID = default,
+                LastName = default
+            });
             // Arrange
             var mockRepo = new Mock<StudentService>();
-            mockRepo.Setup(repo => repo.List()).ReturnsAsync(GetTestSessions());
+            mockRepo.Setup(repo => repo.List()).ReturnsAsync(sessions);
             var controller = new StudentsController(mockRepo.Object);
         
             // Act
             var result = await controller.Index();
         
             // Assert
-            var viewResult = Assert.IsType<List<Student>>(result);
-            var models = Assert.IsAssignableFrom<IEnumerable<Student>>(viewResult);
+            var apiResult = Assert.IsType<OkObjectResult>(result);
+            Assert.Equal(sessions, apiResult.Value);
+            // var models = Assert.IsAssignableFrom<IEnumerable<Student>>(apiResult);
             // var model = Assert.IsAssignableFrom<IEnumerable<StormSessionViewModel>>(
             //     viewResult.ViewData.Model);
-            Assert.Equal(2, models.Count());
         }
         
         // // GET: Students
@@ -69,21 +65,5 @@ namespace ControllerTests
         //         viewResult.ViewData.Model);
         //     Assert.Equal(2, model.Count());
         // }
-        
-        #region snippet_GetTestSessions
-        private List<Student> GetTestSessions()
-        {
-            var sessions = new List<Student>();
-            sessions.Add(new Student()
-            {
-                EnrollmentDate = default,
-                Enrollments = default,
-                FirstMidName = default,
-                ID = default,
-                LastName = default
-            });
-            return sessions;
-        }
-        #endregion
     }
 }
