@@ -55,7 +55,7 @@ Options:
     ;;
     'test')
       local start=$(date +%s)
-      dotnet test ../Tests/ContosoTests.csproj
+      dotnet test ../Tests/Tests.csproj
       local end=$(date +%s)
       echo ""
       echo "Testing completed after $((end-start)) seconds"
