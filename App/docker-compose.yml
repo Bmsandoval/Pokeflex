@@ -1,0 +1,26 @@
+version: '3'
+
+services:
+  pokeflex-api:
+    container_name: "pokeflex-api"
+    ports:
+      - '5001:5001'
+    volumes:
+      - ./:/src/app
+    build:
+      context: .
+      dockerfile: "Deployments/App/Dockerfile"
+    depends_on:
+      - pokeflex-db
+    links:
+      - pokeflex-db
+  pokeflex-db:
+    container_name: "pokeflex-db"
+    build:
+      context: .
+      dockerfile: "Deployments/Db/Dockerfile"
+    ports:
+      - '1433'
+    environment:
+      SA_PASSWORD: "Your_password123"
+      ACCEPT_EULA: "Y"

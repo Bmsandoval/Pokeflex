@@ -19,7 +19,7 @@ namespace Tests.ServiceTests
         [Fact]
         public void TestBasicListFunctionality()
         {
-            var students = new List<Pokemon>()
+            var pokemons = new List<Pokemon>()
             {
                 new Pokemon()
                 {
@@ -31,20 +31,20 @@ namespace Tests.ServiceTests
             };
 
             var dbContextMock = new DbContextMock<PokeflexContext>(DummyOptions);
-            var usersDbSetMock = dbContextMock.CreateDbSetMock(x => x.Pokemons, students.ToArray());
+            var usersDbSetMock = dbContextMock.CreateDbSetMock(x => x.Pokemons, pokemons.ToArray());
 
-            var studentService = new PokemonService(dbContextMock.Object);
+            var pokemonService = new PokemonService(dbContextMock.Object);
 
-            var result = studentService.List().Result;
+            var result = pokemonService.List().Result;
 
             // List assert equal fails for some reason
-            Assert.Equal(students, result);
+            Assert.Equal(pokemons, result);
         }
 
         // [Fact]
         // public void TestCanGetEFSql()
         // {
-        //     var students = new List<Pokemon>()
+        //     var pokemons = new List<Pokemon>()
         //     {
         //         new Pokemon()
         //         {
@@ -56,20 +56,20 @@ namespace Tests.ServiceTests
         //     };
         //
         //     var dbContextMock = new DbContextMock<PokeflexContext>(DummyOptions);
-        //     var usersDbSetMock = dbContextMock.CreateDbSetMock(x => x.Pokemons, students.ToArray());
+        //     var usersDbSetMock = dbContextMock.CreateDbSetMock(x => x.Pokemons, pokemons.ToArray());
         //
-        //     var studentService = new PokemonService(dbContextMock.Object);
+        //     var pokemonService = new PokemonService(dbContextMock.Object);
         //
-        //     var result = studentService.Test();
+        //     var result = pokemonService.Test();
         //
         //     // List assert equal fails for some reason
-        //     Assert.Equal("select * from students where id = 1;", result);
+        //     Assert.Equal("select * from pokemons where id = 1;", result);
         // }
         //
         // [Fact]
         // public void TestCanStillGetEFSql()
         // {
-        //     var students = new List<Pokemon>()
+        //     var pokemons = new List<Pokemon>()
         //     {
         //         new Pokemon()
         //         {
@@ -81,14 +81,14 @@ namespace Tests.ServiceTests
         //     };
         //
         //     var dbContextMock = new DbContextMock<PokeflexContext>(DummyOptions);
-        //     var usersDbSetMock = dbContextMock.CreateDbSetMock(x => x.Pokemons, students.ToArray());
+        //     var usersDbSetMock = dbContextMock.CreateDbSetMock(x => x.Pokemons, pokemons.ToArray());
         //
-        //     var studentService = new PokemonService(dbContextMock.Object);
+        //     var pokemonService = new PokemonService(dbContextMock.Object);
         //
-        //     var result = studentService.Test();
+        //     var result = pokemonService.Test();
         //
         //     // List assert equal fails for some reason
-        //     Assert.Equal("select * from students where id = 1;", result);
+        //     Assert.Equal("select * from pokemons where id = 1;", result);
         // }
     }
 }

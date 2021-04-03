@@ -45,7 +45,7 @@ namespace Tests.ControllerTests
         // // GET: Pokemons
         // public async Task<IActionResult> Index()
         // {
-        //     return View(await _studentService.List());
+        //     return View(await _pokemonService.List());
         // }
         
         // [Fact]
