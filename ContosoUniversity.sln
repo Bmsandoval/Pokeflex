@@ -5,9 +5,7 @@ VisualStudioVersion = 16.0.809.3
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ContosoUniversity", "ContosoUniversity\ContosoUniversity.csproj", "{D34BAD70-6CBF-4933-A216-CDCEAD8BA258}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ControllerTests", "Tests\ControllerTests\ControllerTests.csproj", "{9DCA9CD3-FB95-4600-B2DA-AE75D985668B}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceTests", "Tests\ServiceTests\ServiceTests.csproj", "{A6F8B228-E5FC-44FE-A049-28590CEE507B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\ContosoTests.csproj", "{A6F8B228-E5FC-44FE-A049-28590CEE507B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -19,10 +17,6 @@ Global
 		{D34BAD70-6CBF-4933-A216-CDCEAD8BA258}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D34BAD70-6CBF-4933-A216-CDCEAD8BA258}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D34BAD70-6CBF-4933-A216-CDCEAD8BA258}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9DCA9CD3-FB95-4600-B2DA-AE75D985668B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9DCA9CD3-FB95-4600-B2DA-AE75D985668B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9DCA9CD3-FB95-4600-B2DA-AE75D985668B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9DCA9CD3-FB95-4600-B2DA-AE75D985668B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A6F8B228-E5FC-44FE-A049-28590CEE507B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A6F8B228-E5FC-44FE-A049-28590CEE507B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A6F8B228-E5FC-44FE-A049-28590CEE507B}.Release|Any CPU.ActiveCfg = Release|Any CPU

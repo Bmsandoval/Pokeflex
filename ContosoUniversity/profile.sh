@@ -53,16 +53,9 @@ Options:
       ${FUNCNAME[0]} purge
       docker-compose -f "${CONTOSO_UNIVERSITY_DIR}/docker-compose.yml" build
     ;;
-    'test-long')
+    'test')
       local start=$(date +%s)
-      # ensure recent build so test runners don't have to build
-      echo "Rebuilding project"
-      dotnet build "${CONTOSO_UNIVERSITY_DIR}" --nologo -v quiet >/dev/null
-      # find all test projects
-      local _csTests=($(find -d "${CONTOSO_UNIVERSITY_DIR}/../Tests" -name "*.csproj"))
-      for _csTest in ${_csTests[*]}; do
-        dotnet test --no-build "${_csTest}" 
-      done; unset _csTest
+      dotnet test ../Tests/ContosoTests.csproj
       local end=$(date +%s)
       echo ""
       echo "Testing completed after $((end-start)) seconds"
