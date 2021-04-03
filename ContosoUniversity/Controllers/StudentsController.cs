@@ -23,6 +23,7 @@ namespace ContosoUniversity.Controllers
         // GET: Students
         public async Task<IActionResult> Index()
         {
+            _studentService.Test();
             return Ok(await _studentService.List());
         }
 
