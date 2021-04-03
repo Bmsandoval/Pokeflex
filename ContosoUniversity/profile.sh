@@ -53,15 +53,31 @@ Options:
       ${FUNCNAME[0]} purge
       docker-compose -f "${CONTOSO_UNIVERSITY_DIR}/docker-compose.yml" build
     ;;
-    'test')
+    'test-long')
+      local start=$(date +%s)
       # ensure recent build so test runners don't have to build
-      echo "Ensuring up-to-date build"
-      dotnet build "${CONTOSO_UNIVERSITY_DIR}" --nologo -v quiet
+      echo "Rebuilding project"
+      dotnet build "${CONTOSO_UNIVERSITY_DIR}" --nologo -v quiet >/dev/null
       # find all test projects
       local _csTests=($(find -d "${CONTOSO_UNIVERSITY_DIR}/../Tests" -name "*.csproj"))
+      for _csTest in ${_csTests[*]}; do
+        dotnet test --no-build "${_csTest}" 
+      done; unset _csTest
+      local end=$(date +%s)
+      echo ""
+      echo "Testing completed after $((end-start)) seconds"
+    ;;
+    'test')
       local start=$(date +%s)
+      # ensure recent build so test runners don't have to build
+      echo "Rebuilding project"
+      dotnet build "${CONTOSO_UNIVERSITY_DIR}" --nologo -v quiet >/dev/null
+      # find all test projects
+      local _csTests=($(find -d "${CONTOSO_UNIVERSITY_DIR}/../Tests" -name "*.csproj"))
       local _resultsDir="${CONTOSO_UNIVERSITY_DIR}/../Tests/Results"
       local _jobPids=()
+      echo "Beginning tests"
+      echo ""
       for _csTest in ${_csTests[*]}; do
         local _testName="$(basename $_csTest)"
         local _resultsFile="${_resultsDir}/${_testName%.*}"
@@ -69,13 +85,27 @@ Options:
         touch "${_resultsFile}.stdout"
         $(dotnet test --no-build --nologo "${_csTest}" -v quiet -l:"trx;LogFileName=${_resultsFile}" 1>"${_resultsFile}.stdout") &
         _jobPids+=($!)
-      done
-      tail -f -q ${_resultsDir}/*.stdout | perl -ne 'print if /(Passed|Failed)/' 1>/dev/tty &
+      done; unset _csTest
+      tail -f -q ${_resultsDir}/*.stdout \
+        | perl -ne 'print "[$1] $5 -- f:$2, p:$3, d:$4\n" if /^(Passed|Failed).+Failed:\s+([0-9]+).+Passed:\s+([0-9]+).+Duration:\s+([0-9]+\s+[a-z]+).+\/(.+)\.dll \(.+\)/' \
+        | while read -r line; do
+            local _name=$(echo "${line}" | perl -ne 'print $1 if /\[Failed\] ([^\s]+)/')
+            echo "$line"
+            echo "$_name"
+            cat "${resultsDir}/$_name"
+            perl -ne 'if (/<ErrorInfo>/../<\/ErrorInfo>/) {print unless /<ErrorInfo>/ or /<\/ErrorInfo>/}' \
+              "${resultsDir}/$_name"
+          done 1>/dev/tty &
+#        | perl -ne 'print "[$1] $5 -- f:$2, p:$3, d:$4\n" if /^(Passed|Failed).+Failed:\s+([0-9]+).+Passed:\s+([0-9]+).+Duration:\s+([0-9]+\s+[a-z]+).+\/(.+)\.dll \(.+\)/' 1>/dev/tty &
       local _tailPids=($(ps | perl -ne 'print "$1\n" if /^[ ]?([0-9]+) [^ ]+\s+[^ ]+ tail -f -q/'))
       wait "${_jobPids[@]}"
       disown && kill -9 "${_tailPids[@]}"
       wait "${_tailPids[@]}" 2/dev/null
+      
+#      perl -ne 'if (/<ErrorInfo>/../<\/ErrorInfo>/) {print unless /<ErrorInfo>/ or /<\/ErrorInfo>/}'
+      
       local end=$(date +%s)
+      echo ""
       echo "Testing completed after $((end-start)) seconds"
     ;;
     *)
