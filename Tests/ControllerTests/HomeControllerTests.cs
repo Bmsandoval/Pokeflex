@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using ContosoUniversity.Controllers;
-using ContosoUniversity.Models;
-using ContosoUniversity.Services;
+using App.Controllers;
+using App.Models;
+using App.Services;
 using Microsoft.AspNetCore.Mvc;
 using Xunit;
 using Moq;

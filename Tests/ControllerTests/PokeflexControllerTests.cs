@@ -2,14 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using ContosoUniversity.Controllers;
-using ContosoUniversity.Models;
-using ContosoUniversity.Services;
+using App.Controllers;
+using App.Models;
+using App.Services;
 using Microsoft.AspNetCore.Mvc;
 using Xunit;
 using Moq;
-using ContosoUniversity;
-using ContosoUniversity.Data;
+using App;
+using App.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace Tests.ControllerTests

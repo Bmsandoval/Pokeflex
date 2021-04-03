@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using ContosoUniversity.Data;
-using ContosoUniversity.Models;
-using ContosoUniversity.Services;
+using App.Data;
+using App.Models;
+using App.Services;
 using EntityFrameworkCoreMock;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
