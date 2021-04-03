@@ -14,26 +14,25 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Tests.ControllerTests
 {
-    public class StudentControllerTests 
+    public class PokemonControllerTests 
     {
         [Fact]
-        public async Task Index_ReturnsListOfStudents()
+        public async Task Index_ReturnsListOfPokemons()
         {
             // Test Data
-            var sessions = new List<Student>();
-            sessions.Add(new Student()
+            var sessions = new List<Pokemon>();
+            sessions.Add(new Pokemon()
             {
                 EnrollmentDate = default,
-                Enrollments = default,
                 FirstMidName = default,
                 Id = default,
                 LastName = default
             });
             
             // Arrange
-            var mockRepo = new Mock<StudentService>(new SchoolContext(new DbContextOptionsBuilder<SchoolContext>().Options));
+            var mockRepo = new Mock<PokemonService>(new PokeflexContext(new DbContextOptionsBuilder<PokeflexContext>().Options));
             mockRepo.Setup(repo => repo.List()).ReturnsAsync(sessions);
-            var controller = new StudentsController(mockRepo.Object);
+            var controller = new PokemonsController(mockRepo.Object);
         
             // Act
             var result = await controller.Index();
@@ -43,7 +42,7 @@ namespace Tests.ControllerTests
             Assert.Equal(sessions, apiResult.Value);
         }
         
-        // // GET: Students
+        // // GET: Pokemons
         // public async Task<IActionResult> Index()
         // {
         //     return View(await _studentService.List());
@@ -53,9 +52,9 @@ namespace Tests.ControllerTests
         // public async Task Index_ReturnsAViewResult_WithAListOfBrainstormSessions()
         // {
         //     // Arrange
-        //     var mockRepo = new Mock<StudentService>();
+        //     var mockRepo = new Mock<PokemonService>();
         //     mockRepo.Setup(repo => repo.List()).ReturnsAsync(GetTestSessions());
-        //     var controller = new StudentsController(mockRepo.Object);
+        //     var controller = new PokemonsController(mockRepo.Object);
         //
         //     // Act
         //     var result = await controller.Index();

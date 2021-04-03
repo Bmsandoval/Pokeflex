@@ -22,10 +22,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ContosoUniversity\ContosoUniversity.csproj" />
+    <ProjectReference Include="..\App\Pokeflex.csproj" />
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="ControllerTests" />
     <Folder Include="ServiceTests" />
   </ItemGroup>
 

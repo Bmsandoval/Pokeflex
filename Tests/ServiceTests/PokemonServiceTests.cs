@@ -11,30 +11,29 @@ using Moq;
 
 namespace Tests.ServiceTests
 {
-    public class StudentServiceTests
+    public class PokemonServiceTests
     {
-        public DbContextOptions<SchoolContext> DummyOptions { get; } =
-            new DbContextOptionsBuilder<SchoolContext>().Options;
+        public DbContextOptions<PokeflexContext> DummyOptions { get; } =
+            new DbContextOptionsBuilder<PokeflexContext>().Options;
 
         [Fact]
         public void TestBasicListFunctionality()
         {
-            var students = new List<Student>()
+            var students = new List<Pokemon>()
             {
-                new Student()
+                new Pokemon()
                 {
                     EnrollmentDate = default,
-                    Enrollments = default,
                     FirstMidName = default,
                     Id = default,
                     LastName = default
                 },
             };
 
-            var dbContextMock = new DbContextMock<SchoolContext>(DummyOptions);
-            var usersDbSetMock = dbContextMock.CreateDbSetMock(x => x.Students, students.ToArray());
+            var dbContextMock = new DbContextMock<PokeflexContext>(DummyOptions);
+            var usersDbSetMock = dbContextMock.CreateDbSetMock(x => x.Pokemons, students.ToArray());
 
-            var studentService = new StudentService(dbContextMock.Object);
+            var studentService = new PokemonService(dbContextMock.Object);
 
             var result = studentService.List().Result;
 
@@ -45,22 +44,21 @@ namespace Tests.ServiceTests
         // [Fact]
         // public void TestCanGetEFSql()
         // {
-        //     var students = new List<Student>()
+        //     var students = new List<Pokemon>()
         //     {
-        //         new Student()
+        //         new Pokemon()
         //         {
         //             EnrollmentDate = default,
-        //             Enrollments = default,
         //             FirstMidName = default,
         //             Id = default,
         //             LastName = default
         //         },
         //     };
         //
-        //     var dbContextMock = new DbContextMock<SchoolContext>(DummyOptions);
-        //     var usersDbSetMock = dbContextMock.CreateDbSetMock(x => x.Students, students.ToArray());
+        //     var dbContextMock = new DbContextMock<PokeflexContext>(DummyOptions);
+        //     var usersDbSetMock = dbContextMock.CreateDbSetMock(x => x.Pokemons, students.ToArray());
         //
-        //     var studentService = new StudentService(dbContextMock.Object);
+        //     var studentService = new PokemonService(dbContextMock.Object);
         //
         //     var result = studentService.Test();
         //
@@ -71,22 +69,21 @@ namespace Tests.ServiceTests
         // [Fact]
         // public void TestCanStillGetEFSql()
         // {
-        //     var students = new List<Student>()
+        //     var students = new List<Pokemon>()
         //     {
-        //         new Student()
+        //         new Pokemon()
         //         {
         //             EnrollmentDate = default,
-        //             Enrollments = default,
         //             FirstMidName = default,
         //             Id = default,
         //             LastName = default
         //         },
         //     };
         //
-        //     var dbContextMock = new DbContextMock<SchoolContext>(DummyOptions);
-        //     var usersDbSetMock = dbContextMock.CreateDbSetMock(x => x.Students, students.ToArray());
+        //     var dbContextMock = new DbContextMock<PokeflexContext>(DummyOptions);
+        //     var usersDbSetMock = dbContextMock.CreateDbSetMock(x => x.Pokemons, students.ToArray());
         //
-        //     var studentService = new StudentService(dbContextMock.Object);
+        //     var studentService = new PokemonService(dbContextMock.Object);
         //
         //     var result = studentService.Test();
         //
