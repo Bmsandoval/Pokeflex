@@ -35,7 +35,7 @@ namespace Tests.ControllerTests
             var basemons = new List<Basemon>();
             basemons.Add(new Basemon()
             {
-                ApiSource = "homegrown",
+                ApiSource = "controller test",
                 Number = 42,
                 Name = "saltyboi",
             });
@@ -43,6 +43,7 @@ namespace Tests.ControllerTests
             // Arrange
             Mock<PokeflexService> mockPokeflexService = NewMockPokeflex();
             mockPokeflexService.Setup(repo => repo.GetByNumber(42)).Returns(default(Pokemon));
+            mockPokeflexService.Setup(repo => repo.InsertPokemon((Pokemon)basemons[0])).Returns((Pokemon)basemons[0]);
 
             Mock<ExtPokeApiServiceFactoryProduct> mockExtPokeApisService = NewMockExtApis();
             mockExtPokeApisService.Setup(repo => repo.GetByNumber(42)).Returns(basemons[0]);
@@ -55,7 +56,6 @@ namespace Tests.ControllerTests
             // Assert
             var apiResult = Assert.IsType<OkObjectResult>(result);
             Assert.Equal((Pokemon)basemons[0], apiResult.Value);
-            Console.WriteLine("end of controller tests");
         }
         
         // // GET: Pokemons

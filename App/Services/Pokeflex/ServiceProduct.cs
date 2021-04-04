@@ -29,12 +29,10 @@ namespace App.Services.Pokeflex
             return query.FirstOrDefault();
         }
         
-        public Pokemon InsertPokemon(Pokemon pokemon)
+        public virtual Pokemon InsertPokemon(Pokemon pokemon)
         {
             _dbContext.Pokemons.Add(pokemon);
-
             _dbContext.SaveChanges();
-            
             return pokemon;
         }
         //
