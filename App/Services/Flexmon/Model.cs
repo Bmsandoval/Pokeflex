@@ -1,8 +1,8 @@
 using App.Services.PokeBase;
 
-namespace App.Services.TargetModel
+namespace App.Services.Flexmon
 {
-    public class Pokemon : Base
+    public sealed class Flexmon : Base
     {
         public int id { get; set; }
         public string source { get; set; }
@@ -10,11 +10,11 @@ namespace App.Services.TargetModel
         public override string apiSource { get; set; }
         public override string name { get; set; }
 
-        public Pokemon() { }
+        public Flexmon() { }
 
-        public Pokemon(Base copy) : base(copy)
+        public Flexmon(TargetModel.Pokemon copy) : base(copy)
         {
-            source = "PokemonTable";
+            source = "FlexmonTable";
         }
     }
 }

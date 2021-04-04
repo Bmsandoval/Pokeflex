@@ -12,6 +12,7 @@ using App.Data;
 using App.Services;
 using App.Services.PokeBase;
 using Microsoft.EntityFrameworkCore;
+using FlexmonService = App.Services.Flexmon.FlexmonService;
 
 namespace App
 {
@@ -35,6 +36,7 @@ namespace App
             services.AddControllersWithViews();
             
             services.AddTransient<PokemonServiceFactoryProduct>(s => PokemonServiceFactory.PokemonService());
+            services.AddTransient<FlexmonService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

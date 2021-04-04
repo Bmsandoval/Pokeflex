@@ -10,16 +10,19 @@ using App.Services;
 using App.Services.PokeBase;
 using App.Services.TargetModel;
 using Microsoft.Extensions.Logging;
+using FlexmonService = App.Services.Flexmon.FlexmonService;
 
 namespace App.Controllers
 {
     public class PokemonsController : Controller
     {
-        private PokemonServiceFactoryProduct _pokemonService;
+        private PokemonServiceFactoryProduct _svcExtPokemonApi;
+        private FlexmonService _svcFlexmonDb;
      
-        public PokemonsController(PokemonServiceFactoryProduct pokemonService)
+        public PokemonsController(PokemonServiceFactoryProduct extPokemonApi, FlexmonService flexmonDb)
         {
-            _pokemonService = pokemonService;
+            _svcExtPokemonApi = extPokemonApi;
+            _svcFlexmonDb = flexmonDb;
         }
      
         // // GET: Pokemons
@@ -33,13 +36,19 @@ namespace App.Controllers
         // [HttpGet]
         public  IActionResult Index()
         {
-            Base basePokemon = _pokemonService.GetByNumber(200);
-            if(basePokemon is null)
+            Pokemon pokemon = _svcFlexmonDb.GetByNumber(200);
+            if (pokemon is null)
             {
-                return StatusCode(400);
+                Base basePokemon = _svcExtPokemonApi.GetByNumber(200);
+                if(basePokemon is null)
+                {
+                    return StatusCode(400);
+                }
+         
+                pokemon = new Pokemon(basePokemon);
+
+                _svcFlexmonDb.InsertPokemon(pokemon);
             }
-     
-            Pokemon pokemon = new Pokemon(basePokemon);
      
             return Ok(pokemon);
         }
