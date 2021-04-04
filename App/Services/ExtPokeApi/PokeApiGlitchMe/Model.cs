@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using Newtonsoft.Json;
-using App.Services.PokeBase;
+using App.Services.ExtPokeApi.ApiFactoryBase;
 
-namespace App.Services.PokeApiGlitchMe
+namespace App.Services.ExtPokeApi.PokeApiGlitchMe
 {
     public class Abilities
     {
@@ -17,11 +17,11 @@ namespace App.Services.PokeApiGlitchMe
         public List<string> evolutionLine { get; set; }
     }
 
-    public class Root : Base
+    public class Glitchmon : Basemon
     {
-        public override string apiSource { get; set; }
-        public override int number { get; set; }
-        public override string name { get; set; }
+        public override string ApiSource { get; set; }
+        public override int Number { get; set; }
+        public override string Name { get; set; }
         public string species { get; set; }
         public List<string> types { get; set; }
         public Abilities abilities { get; set; }

@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using Newtonsoft.Json;
-using App.Services.PokeBase;
+using App.Services.ExtPokeApi.ApiFactoryBase;
 
-namespace App.Services.PokeApiCo
+namespace App.Services.ExtPokeApi.PokeApiCo
 {
     public class Ability2
     {
@@ -356,11 +356,11 @@ namespace App.Services.PokeApiCo
         public Type type { get; set; }
     }
 
-    public class Root : Base
+    public class Pcomon : Basemon
     {
-        public override string apiSource { get; set; }
-        [JsonProperty("id")] public override int number { get; set; }
-        public override string name { get; set; }
+        public override string ApiSource { get; set; }
+        [JsonProperty("id")] public override int Number { get; set; }
+        public override string Name { get; set; }
         public List<Ability> abilities { get; set; }
         public int base_experience { get; set; }
         public List<Form> forms { get; set; }

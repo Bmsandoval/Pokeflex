@@ -18,50 +18,50 @@ namespace App.Migrations
                 .HasAnnotation("ProductVersion", "5.0.4")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("App.Services.Flexmon.Flexmon", b =>
+            modelBuilder.Entity("App.Services.Pokeflex.Flexmon", b =>
                 {
-                    b.Property<int>("id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("apiSource")
+                    b.Property<string>("ApiSource")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("name")
+                    b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("number")
+                    b.Property<int>("Number")
                         .HasColumnType("int");
 
-                    b.Property<string>("source")
+                    b.Property<string>("Source")
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("id");
+                    b.HasKey("Id");
 
                     b.ToTable("Flexmons");
                 });
 
-            modelBuilder.Entity("App.Services.TargetModel.Pokemon", b =>
+            modelBuilder.Entity("App.Services.Pokeflex.Pokemon", b =>
                 {
-                    b.Property<int>("id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("apiSource")
+                    b.Property<string>("ApiSource")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("name")
+                    b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("number")
+                    b.Property<int>("Number")
                         .HasColumnType("int");
 
-                    b.Property<string>("source")
+                    b.Property<string>("Source")
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("id");
+                    b.HasKey("Id");
 
                     b.ToTable("Pokemons");
                 });

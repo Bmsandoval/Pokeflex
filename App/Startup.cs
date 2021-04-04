@@ -10,9 +10,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using App.Data;
 using App.Services;
-using App.Services.PokeBase;
+using App.Services.ExtPokeApi.ApiFactoryBase;
+using App.Services.Pokeflex;
 using Microsoft.EntityFrameworkCore;
-using FlexmonService = App.Services.Flexmon.FlexmonService;
 
 namespace App
 {
@@ -35,8 +35,8 @@ namespace App
 
             services.AddControllersWithViews();
             
-            services.AddTransient<PokemonServiceFactoryProduct>(s => PokemonServiceFactory.PokemonService());
-            services.AddTransient<FlexmonService>();
+            services.AddTransient<PokeflexServiceFactoryProduct>(s => PokeflexServiceFactory.PokemonService());
+            services.AddTransient<PokeflexService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

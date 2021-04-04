@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using App.Controllers;
-using App.Models;
 using App.Services;
 using Microsoft.AspNetCore.Mvc;
 using Xunit;
 using Moq;
 using App;
 using App.Data;
+using App.Services.Pokeflex;
 using Microsoft.EntityFrameworkCore;
 
 namespace Tests.ControllerTests
@@ -20,26 +20,30 @@ namespace Tests.ControllerTests
         public async Task Index_ReturnsListOfPokemons()
         {
             // Test Data
-            var sessions = new List<Pokemon>();
-            sessions.Add(new Pokemon()
+            var pokemons = new List<Pokemon>();
+            pokemons.Add(new Pokemon()
             {
-                EnrollmentDate = default,
-                FirstMidName = default,
-                Id = default,
-                LastName = default
+                ApiSource = "homegrown",
+                Id = 0,
+                Name = "saltyboi",
+                Number = 42,
+                Source = "PokemonTable"
             });
             
             // Arrange
-            var mockRepo = new Mock<PokemonService>(new PokeflexContext(new DbContextOptionsBuilder<PokeflexContext>().Options));
-            mockRepo.Setup(repo => repo.List()).ReturnsAsync(sessions);
-            var controller = new PokemonsController(mockRepo.Object);
+            var mockPokeflexService = new Mock<PokeflexService>(new PokeflexContext(new DbContextOptionsBuilder<PokeflexContext>().Options));
+            mockPokeflexService.Setup(repo => repo.GetByNumber(200)).Returns(default(Pokemon));
+            
+            var mockExtPokeApiService = new Mock<PokeflexService>(new PokeflexContext(new DbContextOptionsBuilder<PokeflexContext>().Options));
+            mockExtPokeApiService.Setup(repo => repo.GetByNumber(200)).Returns(pokemons[0]);
+            var controller = new PokemonsController(mockPokeflexService.Object, mockExtPokeApiService.Object);
         
             // Act
-            var result = await controller.Index();
+            var result = controller.Index();
         
             // Assert
             var apiResult = Assert.IsType<OkObjectResult>(result);
-            Assert.Equal(sessions, apiResult.Value);
+            Assert.Equal(pokemons[0], apiResult.Value);
         }
         
         // // GET: Pokemons

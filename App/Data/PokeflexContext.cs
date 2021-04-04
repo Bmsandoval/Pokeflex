@@ -1,5 +1,4 @@
-﻿using App.Services.Flexmon;
-using App.Services.TargetModel;
+﻿using App.Services.Pokeflex;
 using Microsoft.EntityFrameworkCore;
 
 namespace App.Data

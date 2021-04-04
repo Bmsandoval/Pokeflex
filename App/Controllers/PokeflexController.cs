@@ -7,22 +7,21 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using App.Data;
 using App.Services;
-using App.Services.PokeBase;
-using App.Services.TargetModel;
+using App.Services.ExtPokeApi.ApiFactoryBase;
+using App.Services.Pokeflex;
 using Microsoft.Extensions.Logging;
-using FlexmonService = App.Services.Flexmon.FlexmonService;
 
 namespace App.Controllers
 {
     public class PokemonsController : Controller
     {
-        private PokemonServiceFactoryProduct _svcExtPokemonApi;
-        private FlexmonService _svcFlexmonDb;
+        private PokeflexServiceFactoryProduct _svcExtPokeflexApi;
+        private PokeflexService _svcPokeflexDb;
      
-        public PokemonsController(PokemonServiceFactoryProduct extPokemonApi, FlexmonService flexmonDb)
+        public PokemonsController(PokeflexServiceFactoryProduct extPokeflexApi, PokeflexService pokeflexDb)
         {
-            _svcExtPokemonApi = extPokemonApi;
-            _svcFlexmonDb = flexmonDb;
+            _svcExtPokeflexApi = extPokeflexApi;
+            _svcPokeflexDb = pokeflexDb;
         }
      
         // // GET: Pokemons
@@ -36,18 +35,21 @@ namespace App.Controllers
         // [HttpGet]
         public  IActionResult Index()
         {
-            Pokemon pokemon = _svcFlexmonDb.GetByNumber(200);
-            if (pokemon is null)
+            Basemon basemon = _svcPokeflexDb.GetByNumber(200);
+            Pokemon pokemon;
+            if (basemon == default(Basemon))
             {
-                Base basePokemon = _svcExtPokemonApi.GetByNumber(200);
-                if(basePokemon is null)
+                basemon = _svcExtPokeflexApi.GetByNumber(200);
+                if(basemon == default(Basemon))
                 {
                     return StatusCode(400);
                 }
          
-                pokemon = new Pokemon(basePokemon);
-
-                _svcFlexmonDb.InsertPokemon(pokemon);
+                pokemon = _svcPokeflexDb.InsertPokemon(basemon);
+            }
+            else
+            {
+                pokemon = new Pokemon(basemon);
             }
      
             return Ok(pokemon);

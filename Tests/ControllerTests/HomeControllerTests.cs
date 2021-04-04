@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using App.Controllers;
-using App.Models;
 using App.Services;
 using Microsoft.AspNetCore.Mvc;
 using Xunit;
@@ -17,7 +16,7 @@ namespace Tests.ControllerTests
         {
             // Arrange
             // Act
-            Assert.IsType<OkResult>((new HomeController()).Health());
+            Assert.IsType<OkResult>((new HomeController()).Index());
         }
     }
 }
