@@ -1,12 +1,12 @@
 using App.Data;
-using App.Services.ExtPokeApi.PokeApiCo;
-using App.Services.ExtPokeApi.PokeApiGlitchMe;
+using App.Services.ExtPokeApis.PokeApiCo;
+using App.Services.ExtPokeApis.PokeApiGlitchMe;
 
-namespace App.Services.ExtPokeApi.ApiFactoryBase
+namespace App.Services.ExtPokeApis.ApiFactoryBase
 {
-    class PokeflexServiceFactory
+    class ExtPokeApiServiceFactory
     {
-        public static PokeflexServiceFactoryProduct PokemonService() {
+        public static ExtPokeApiServiceFactoryProduct PokemonService() {
             var service = "pokeapi.co";
             switch (service)
             {
@@ -19,7 +19,7 @@ namespace App.Services.ExtPokeApi.ApiFactoryBase
             }
         }
 
-        private PokeflexServiceFactory()
+        private ExtPokeApiServiceFactory()
         {
         }
     }

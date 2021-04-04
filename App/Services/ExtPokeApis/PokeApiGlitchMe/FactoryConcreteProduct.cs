@@ -1,24 +1,29 @@
 using System;
 using System.IO;
 using System.Net;
+using App.Models;
 using Newtonsoft.Json.Linq;
-using App.Services.ExtPokeApi.ApiFactoryBase;
+using App.Services.ExtPokeApis.ApiFactoryBase;
 
-namespace App.Services.ExtPokeApi.PokeApiCo
+namespace App.Services.ExtPokeApis.PokeApiGlitchMe
 {
-    class PokeapiCoService : PokeflexServiceFactoryProduct
+    class PokeApiGlitchService : ExtPokeApiServiceFactoryProduct
     {
-        public readonly string apiSource = "pokeapi.co";
+        public readonly string apiSource = "pokeapi.glitch.me";
         
         public override Basemon GetByNumber(int id)
         {
             System.Console.WriteLine("requesting from " + apiSource);
-            string url = "https://pokeapi.co/api/v2/pokemon/" + id;
+            string url = "https://pokeapi.glitch.me/v1/pokemon/" + id;
             // Create a request for the URL.
             WebRequest request = WebRequest.Create(url);
+            System.Console.WriteLine(request.Method);
+            System.Console.WriteLine(request.Headers);
 
             // Get the response.
             WebResponse response = request.GetResponse();
+            // Display the status.
+            Console.WriteLine(((HttpWebResponse)response).StatusDescription);
 
             // Get the stream containing content returned by the server.
             // The using block ensures the stream is automatically closed.
@@ -38,7 +43,7 @@ namespace App.Services.ExtPokeApi.PokeApiCo
             // Close the response.
             response.Close();
 
-            Pcomon obj = JToken.Parse(responseFromServer).ToObject<Pcomon>();
+            Glitchmon obj = JToken.Parse(responseFromServer).ToObject<Glitchmon>();
             if (obj is null)
             {
                 return null;

@@ -1,4 +1,5 @@
-﻿using App.Services.Pokeflex;
+﻿using App.Models;
+using App.Services.Pokeflex;
 using Microsoft.EntityFrameworkCore;
 
 namespace App.Data

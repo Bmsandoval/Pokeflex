@@ -6,21 +6,22 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using App.Data;
+using App.Models;
 using App.Services;
-using App.Services.ExtPokeApi.ApiFactoryBase;
+using App.Services.ExtPokeApis.ApiFactoryBase;
 using App.Services.Pokeflex;
 using Microsoft.Extensions.Logging;
 
 namespace App.Controllers
 {
-    public class PokemonsController : Controller
+    public class PokeflexController : Controller
     {
-        private PokeflexServiceFactoryProduct _svcExtPokeflexApi;
+        private ExtPokeApiServiceFactoryProduct _svcExtExtPokeApiApi;
         private PokeflexService _svcPokeflexDb;
      
-        public PokemonsController(PokeflexServiceFactoryProduct extPokeflexApi, PokeflexService pokeflexDb)
+        public PokeflexController(ExtPokeApiServiceFactoryProduct extExtPokeApiApi, PokeflexService pokeflexDb)
         {
-            _svcExtPokeflexApi = extPokeflexApi;
+            _svcExtExtPokeApiApi = extExtPokeApiApi;
             _svcPokeflexDb = pokeflexDb;
         }
      
@@ -35,23 +36,14 @@ namespace App.Controllers
         // [HttpGet]
         public  IActionResult Index()
         {
-            Basemon basemon = _svcPokeflexDb.GetByNumber(200);
-            Pokemon pokemon;
-            if (basemon == default(Basemon))
-            {
-                basemon = _svcExtPokeflexApi.GetByNumber(200);
-                if(basemon == default(Basemon))
-                {
-                    return StatusCode(400);
-                }
+            Pokemon pokemon = _svcPokeflexDb.GetByNumber(42);
+            if (pokemon!=null) { return Ok(pokemon); }
+
+            pokemon = (Pokemon)_svcExtExtPokeApiApi.GetByNumber(42);
+            if(pokemon.Equals(default(Pokemon))) { return StatusCode(400); }
          
-                pokemon = _svcPokeflexDb.InsertPokemon(basemon);
-            }
-            else
-            {
-                pokemon = new Pokemon(basemon);
-            }
-     
+            pokemon = _svcPokeflexDb.InsertPokemon(pokemon);
+
             return Ok(pokemon);
         }
         

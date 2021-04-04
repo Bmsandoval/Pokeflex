@@ -18,6 +18,7 @@
   <ItemGroup>
     <Folder Include="Data\" />
     <Folder Include="Migrations" />
+    <Folder Include="Services\ExtPokeApis" />
   </ItemGroup>
   <ItemGroup>
     <_ContentIncludedByDefault Remove="wwwroot\css\site.css" />

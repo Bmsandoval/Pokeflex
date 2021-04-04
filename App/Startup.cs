@@ -10,7 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using App.Data;
 using App.Services;
-using App.Services.ExtPokeApi.ApiFactoryBase;
+using App.Services.ExtPokeApis.ApiFactoryBase;
 using App.Services.Pokeflex;
 using Microsoft.EntityFrameworkCore;
 
@@ -35,7 +35,7 @@ namespace App
 
             services.AddControllersWithViews();
             
-            services.AddTransient<PokeflexServiceFactoryProduct>(s => PokeflexServiceFactory.PokemonService());
+            services.AddTransient<ExtPokeApiServiceFactoryProduct>(s => ExtPokeApiServiceFactory.PokemonService());
             services.AddTransient<PokeflexService>();
         }
 

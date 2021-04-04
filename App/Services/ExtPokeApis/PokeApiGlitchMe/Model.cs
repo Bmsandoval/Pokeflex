@@ -1,8 +1,9 @@
 using System.Collections.Generic;
+using App.Models;
 using Newtonsoft.Json;
-using App.Services.ExtPokeApi.ApiFactoryBase;
+using App.Services.ExtPokeApis.ApiFactoryBase;
 
-namespace App.Services.ExtPokeApi.PokeApiGlitchMe
+namespace App.Services.ExtPokeApis.PokeApiGlitchMe
 {
     public class Abilities
     {

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using App.Controllers;
 using App.Services;
@@ -9,41 +10,52 @@ using Xunit;
 using Moq;
 using App;
 using App.Data;
+using App.Models;
+using App.Services.ExtPokeApis.ApiFactoryBase;
 using App.Services.Pokeflex;
 using Microsoft.EntityFrameworkCore;
 
 namespace Tests.ControllerTests
 {
-    public class PokemonControllerTests 
+    public class PokemonControllerTests
     {
+        public static DbContextOptions<PokeflexContext> DummyOptions { get; } =
+            new DbContextOptionsBuilder<PokeflexContext>().Options;
+        
+        public Func<Mock<PokeflexService>> NewMockPokeflex { get; }= () =>
+            new Mock<PokeflexService>(new PokeflexContext(DummyOptions));
+
+        public Func<Mock<ExtPokeApiServiceFactoryProduct>> NewMockExtApis { get; }= () =>
+            new Mock<ExtPokeApiServiceFactoryProduct>();
+            
         [Fact]
         public async Task Index_ReturnsListOfPokemons()
         {
             // Test Data
-            var pokemons = new List<Pokemon>();
-            pokemons.Add(new Pokemon()
+            var basemons = new List<Basemon>();
+            basemons.Add(new Basemon()
             {
                 ApiSource = "homegrown",
-                Id = 0,
-                Name = "saltyboi",
                 Number = 42,
-                Source = "PokemonTable"
+                Name = "saltyboi",
             });
             
             // Arrange
-            var mockPokeflexService = new Mock<PokeflexService>(new PokeflexContext(new DbContextOptionsBuilder<PokeflexContext>().Options));
-            mockPokeflexService.Setup(repo => repo.GetByNumber(200)).Returns(default(Pokemon));
+            Mock<PokeflexService> mockPokeflexService = NewMockPokeflex();
+            mockPokeflexService.Setup(repo => repo.GetByNumber(42)).Returns(default(Pokemon));
+
+            Mock<ExtPokeApiServiceFactoryProduct> mockExtPokeApisService = NewMockExtApis();
+            mockExtPokeApisService.Setup(repo => repo.GetByNumber(42)).Returns(basemons[0]);
             
-            var mockExtPokeApiService = new Mock<PokeflexService>(new PokeflexContext(new DbContextOptionsBuilder<PokeflexContext>().Options));
-            mockExtPokeApiService.Setup(repo => repo.GetByNumber(200)).Returns(pokemons[0]);
-            var controller = new PokemonsController(mockPokeflexService.Object, mockExtPokeApiService.Object);
+            var controller = new PokeflexController(mockExtPokeApisService.Object, mockPokeflexService.Object);
         
             // Act
             var result = controller.Index();
         
             // Assert
             var apiResult = Assert.IsType<OkObjectResult>(result);
-            Assert.Equal(pokemons[0], apiResult.Value);
+            Assert.Equal((Pokemon)basemons[0], apiResult.Value);
+            Console.WriteLine("end of controller tests");
         }
         
         // // GET: Pokemons

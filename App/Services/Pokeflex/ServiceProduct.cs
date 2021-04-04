@@ -7,11 +7,12 @@ using Newtonsoft.Json.Linq;
 using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 using App.Data;
-using App.Services.ExtPokeApi.ApiFactoryBase;
+using App.Models;
+using App.Services.ExtPokeApis.ApiFactoryBase;
 
 namespace App.Services.Pokeflex
 {
-    public class PokeflexService : PokeflexServiceFactoryProduct
+    public class PokeflexService
     {
         private PokeflexContext _dbContext;
 
@@ -20,24 +21,16 @@ namespace App.Services.Pokeflex
             _dbContext = dbContext;
         }
         
-        public override Basemon GetByNumber(int number)
+        public virtual Pokemon GetByNumber(int number)
         {
-            System.Console.WriteLine("requesting from DB");
-            // var query = from pk in _dbContext.Pokemons
-            //     where pk.number == number
-            //     select pk;
-            //
-            // return query.FirstOrDefault<Pokemon>();
-            
             var query = from pk in _dbContext.Pokemons
                 where pk.Number.Equals(number)
                 select pk;
             return query.FirstOrDefault();
         }
         
-        public Pokemon InsertPokemon(Basemon basemon)
+        public Pokemon InsertPokemon(Pokemon pokemon)
         {
-            Pokemon pokemon = new Pokemon(basemon);
             _dbContext.Pokemons.Add(pokemon);
 
             _dbContext.SaveChanges();
