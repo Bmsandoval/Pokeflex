@@ -15,7 +15,7 @@ namespace App.Controllers
         // public HomeController(ILogger<HomeController> logger) { _logger = logger; }
 
         // [HttpGet("health")]
-        public IActionResult Health()
+        public IActionResult Index()
         {
             return Ok();
         }

@@ -6,7 +6,7 @@ namespace App.Services.PokeBase
 {
     class PokemonServiceFactory
     {
-        public static PokemonServiceFactoryProduct PokemonService(PokeflexContext databaseContext) {
+        public static PokemonServiceFactoryProduct PokemonService() {
             var service = "pokeapi.co";
             switch (service)
             {
