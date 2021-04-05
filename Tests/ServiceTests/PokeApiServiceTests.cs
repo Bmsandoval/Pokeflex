@@ -52,7 +52,7 @@ namespace Tests.ServiceTests
             };
             
             var pcApiService = new MockPokeApiWebRequestSender();
-            var streamData = IPokemon.ToJsonStream(pocomon);
+            var streamData = StreamHelpers.ToJsonStream(pocomon);
             pcApiService.AddResponse(HttpStatusCode.OK, streamData);
             Pokemon resultmon = pcApiService.GetByNumber(42);
             Assert.Equal(pocomon, resultmon);

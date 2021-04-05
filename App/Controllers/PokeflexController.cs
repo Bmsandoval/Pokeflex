@@ -10,6 +10,7 @@ using App.Models;
 using App.Services;
 using App.Services.ExtPokeApis.ApiFactoryBase;
 using App.Services.Pokeflex;
+using App.Shared;
 using Microsoft.Extensions.Logging;
 
 namespace App.Controllers
@@ -52,45 +53,9 @@ namespace App.Controllers
             
             pokemon = _svcPokeflexDb.InsertPokemon(pokemon);
             
-            return Ok(IPokemon.ToJsonString(pokemon));
+            return Ok(StreamHelpers.ToJsonString(pokemon));
         }
         
-        // //GET api/pokemon/id
-        // [HttpGet("{id}")]
-        // public ActionResult<Base> GetById(int id)
-        // {
-        //     Pokemon pokemon = PokeDBService.GetByNumber(id);
-        //     if(pokemon is null)
-        //     {
-        //         Base uncachedPokemon = PokemonService.GetByNumber(id);
-        //         if(uncachedPokemon is null)
-        //         {
-        //             return StatusCode(400);
-        //         }
-        //
-        //         pokemon = PokeDBService.InsertPokemon(new Pokemon(uncachedPokemon));
-        //         if(pokemon is null)
-        //         {
-        //             return StatusCode(400);
-        //         }
-        //     }
-        //     
-        //     return new ActionResult<Base>(pokemon);
-        // }
-        
-        // //GET api/pokemon/local
-        // [HttpGet("list/local")]
-        // public ActionResult<IEnumerable<Pokemon>> ListLocal()
-        // {
-        //     var pokemon = PokeDBService.ListLocal();
-        //     if(!pokemon.Any())
-        //     {
-        //         return StatusCode(400);
-        //
-        //     }
-        //     return new ActionResult<IEnumerable<Pokemon>>(pokemon);
-        // }
-     
      //    // GET: Pokemons/Details/5
      //    public async Task<IActionResult> Details(int? id)
      //    {

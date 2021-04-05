@@ -4,6 +4,7 @@ using System.Net;
 using App.Models;
 using Newtonsoft.Json.Linq;
 using App.Services.ExtPokeApis.ApiFactoryBase;
+using App.Shared;
 
 namespace App.Services.ExtPokeApis.PokeApiCo
 {
@@ -38,7 +39,7 @@ namespace App.Services.ExtPokeApis.PokeApiCo
             // Close the response.
             response.Close();
             
-            var obj = IPokemon.FromJsonString<Pocomon>(responseFromServer);
+            var obj = StreamHelpers.FromJsonString<Pocomon>(responseFromServer);
 
             obj.ApiSource = apiSource;
             

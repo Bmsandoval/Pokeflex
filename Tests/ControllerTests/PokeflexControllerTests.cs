@@ -14,6 +14,7 @@ using App.Models;
 using App.Services.ExtPokeApis.ApiFactoryBase;
 using App.Services.ExtPokeApis.PokeApiCo;
 using App.Services.Pokeflex;
+using App.Shared;
 using Microsoft.EntityFrameworkCore;
 
 namespace Tests.ControllerTests
@@ -55,7 +56,7 @@ namespace Tests.ControllerTests
         
             // Assert
             var apiResult = Assert.IsType<OkObjectResult>(result);
-            Pokemon resultmon = IPokemon.FromJsonString<Pokemon>((string)apiResult.Value);
+            Pokemon resultmon = StreamHelpers.FromJsonString<Pokemon>((string)apiResult.Value);
             Assert.Equal(pokemon, resultmon);
         }
         
