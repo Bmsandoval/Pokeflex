@@ -2,9 +2,9 @@ using App.Services.ExtPokeApis.ApiFactoryBase;
 
 namespace App.Services.ExtPokeApis.PokeApiCo
 {
-    class PokeapiCoServiceFactory : ExtPokeApiServiceFactoryCreator
+    class PokeapiCoServiceFactory : IExtPokeApiServiceFactoryCreator
     {
-        public override ExtPokeApiServiceFactoryProduct GetPokemonService()
+        public ExtPokeApiServiceFactoryProduct GetPokemonService()
         {
             return new PokeapiCoService();
         }

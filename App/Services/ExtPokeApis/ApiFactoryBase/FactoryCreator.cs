@@ -1,7 +1,7 @@
 namespace App.Services.ExtPokeApis.ApiFactoryBase
 {
-    abstract class ExtPokeApiServiceFactoryCreator
+    interface IExtPokeApiServiceFactoryCreator
     {
-        public abstract ExtPokeApiServiceFactoryProduct GetPokemonService();
+        public ExtPokeApiServiceFactoryProduct GetPokemonService();
     }
 }

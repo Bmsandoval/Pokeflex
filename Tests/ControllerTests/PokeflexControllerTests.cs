@@ -12,6 +12,7 @@ using App;
 using App.Data;
 using App.Models;
 using App.Services.ExtPokeApis.ApiFactoryBase;
+using App.Services.ExtPokeApis.PokeApiCo;
 using App.Services.Pokeflex;
 using Microsoft.EntityFrameworkCore;
 

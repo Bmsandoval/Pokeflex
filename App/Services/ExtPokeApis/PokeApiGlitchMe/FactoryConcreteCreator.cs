@@ -2,9 +2,9 @@ using App.Services.ExtPokeApis.ApiFactoryBase;
 
 namespace App.Services.ExtPokeApis.PokeApiGlitchMe
 {
-    class PokeGlitchServiceFactory : ExtPokeApiServiceFactoryCreator
+    class PokeGlitchServiceFactory : IExtPokeApiServiceFactoryCreator
     {
-        public override ExtPokeApiServiceFactoryProduct GetPokemonService()
+        public ExtPokeApiServiceFactoryProduct GetPokemonService()
         {
             return new PokeApiGlitchService();
         }
