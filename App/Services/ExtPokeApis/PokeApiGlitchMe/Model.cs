@@ -18,7 +18,7 @@ namespace App.Services.ExtPokeApis.PokeApiGlitchMe
         public List<string> evolutionLine { get; set; }
     }
 
-    public class Glitchmon : Basemon
+    public class Glitchmon : Pokemon
     {
         public override string ApiSource { get; set; }
         public override int Number { get; set; }

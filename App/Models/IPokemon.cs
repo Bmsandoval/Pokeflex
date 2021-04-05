@@ -14,20 +14,20 @@ namespace App.Models
 {
     public interface IPokemon
     {
-        public int Id { get; set; }
-        public string Name { get; set; }
-
         public int GetHashCode();
 
         #nullable enable
         public bool Equals(object? obj);
         #nullable disable
         
-        public Stream ToJsonStream<T>() where T: IPokemon
+        public MemoryStream ToJsonStream<T>() where T: IPokemon
         {
-            return StreamHelpers.SerializeToStream(
-                JsonConvert.SerializeObject(
-                    (T)this, new BinaryConverter()));
+            return StreamHelpers.SerializeToStream(ToJsonString<T>());
+        }
+
+        public string ToJsonString<T>() where T: IPokemon
+        {
+            return JsonConvert.SerializeObject((T) this, new BinaryConverter());
         }
 
         public static T FromJsonStream<T>(MemoryStream stream)

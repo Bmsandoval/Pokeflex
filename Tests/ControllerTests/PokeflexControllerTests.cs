@@ -32,7 +32,7 @@ namespace Tests.ControllerTests
         public async Task Index_ReturnsPokemonByNumber()
         {
             // Test Data
-            Basemon basemon = new()
+            Pokemon pokemon = new()
             {
                 ApiSource = "controller test",
                 Number = 42,
@@ -42,10 +42,10 @@ namespace Tests.ControllerTests
             // Arrange
             Mock<PokeflexService> mockPokeflexService = NewMockPokeflex();
             mockPokeflexService.Setup(repo => repo.GetByNumber(42)).Returns(default(Pokemon));
-            mockPokeflexService.Setup(repo => repo.InsertPokemon((Pokemon)basemon)).Returns((Pokemon)basemon);
+            mockPokeflexService.Setup(repo => repo.InsertPokemon((Pokemon)pokemon)).Returns((Pokemon)pokemon);
 
             Mock<ExtPokeApiServiceFactoryProduct> mockExtPokeApisService = NewMockExtApis();
-            mockExtPokeApisService.Setup(repo => repo.GetByNumber(42)).Returns(basemon);
+            mockExtPokeApisService.Setup(repo => repo.GetByNumber(42)).Returns(pokemon);
             
             var controller = new PokeflexController(mockExtPokeApisService.Object, mockPokeflexService.Object);
         
@@ -54,7 +54,7 @@ namespace Tests.ControllerTests
         
             // Assert
             var apiResult = Assert.IsType<OkObjectResult>(result);
-            Assert.Equal((Pokemon)basemon, apiResult.Value);
+            Assert.Equal((Pokemon)pokemon, apiResult.Value);
         }
         
         
@@ -65,7 +65,7 @@ namespace Tests.ControllerTests
             // Test Data
             List<Pokemon> pokemons = new()
             {
-                new() {
+                new Pokemon() {
                     ApiSource = "controller test",
                     Number = 42,
                     Name = "saltyboi",

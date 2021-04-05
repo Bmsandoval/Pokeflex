@@ -357,7 +357,7 @@ namespace App.Services.ExtPokeApis.PokeApiCo
         public Type type { get; set; }
     }
 
-    public class Pocomon : Basemon
+    public class Pocomon : Pokemon
     {
         public override string ApiSource { get; set; }
         [JsonProperty("id")] public override int Number { get; set; }

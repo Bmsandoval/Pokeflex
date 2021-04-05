@@ -39,25 +39,5 @@ namespace App.Models
                    Name == testmon.Name;
         }
         #nullable disable
-        
-        public static explicit operator Flexmon(Basemon basemon)
-        {
-            return new ()
-            {
-                ApiSource = basemon.ApiSource,
-                Name = basemon.Name,
-                Number = basemon.Number
-            };
-        }
-        
-        public static explicit operator Flexmon(Pokemon pokemon)
-        {
-            return new ()
-            {
-                ApiSource = pokemon.ApiSource,
-                Name = pokemon.Name,
-                Number = pokemon.Number
-            };
-        }
     }
 }

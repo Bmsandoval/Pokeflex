@@ -14,10 +14,10 @@ namespace App.Models
     public class Pokemon : IPokemon
     {
         public string Source { get; set; }
-        public string ApiSource { get; set; }
-        public int Number { get; set; }
-        public int Id { get; set; }
-        public string Name { get; set; }
+        public virtual string ApiSource { get; set; }
+        public virtual int Number { get; set; }
+        public virtual int Id { get; set; }
+        public virtual string Name { get; set; }
 
         public Pokemon()
         {
@@ -44,15 +44,5 @@ namespace App.Models
                    Name == testmon.Name;
         }
         #nullable disable
-        
-        public static explicit operator Pokemon(Basemon basemon)
-        {
-            return new ()
-            {
-                ApiSource = basemon.ApiSource,
-                Name = basemon.Name,
-                Number = basemon.Number
-            };
-        }
     }
 }
