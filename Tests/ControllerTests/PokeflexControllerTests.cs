@@ -51,7 +51,7 @@ namespace Tests.ControllerTests
             var controller = new PokeflexController(mockExtPokeApisService.Object, mockPokeflexService.Object);
         
             // Act
-            var result = controller.Index();
+            var result = controller.Index("42");
         
             // Assert
             var apiResult = Assert.IsType<OkObjectResult>(result);

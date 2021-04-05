@@ -33,13 +33,16 @@ namespace App.Controllers
         // }
         
         //GET api/pokemon/id
-        // [HttpGet]
-        public  IActionResult Index()
+        [Route("Pokemons/{id}")]
+        public  IActionResult Index(string id)
         {
-            Pokemon pokemon = _svcPokeflexDb.GetByNumber(42);
+            int _id;
+            if (! int.TryParse(id, out _id)) { return BadRequest(default); }
+
+            Pokemon pokemon = _svcPokeflexDb.GetByNumber(_id);
             if (pokemon!=null) { return Ok(pokemon); }
 
-            pokemon = (Pokemon)_svcExtExtPokeApiApi.GetByNumber(42);
+            pokemon = (Pokemon)_svcExtExtPokeApiApi.GetByNumber(_id);
             if(pokemon.Equals(default(Pokemon))) { return StatusCode(400); }
          
             pokemon = _svcPokeflexDb.InsertPokemon(pokemon);
