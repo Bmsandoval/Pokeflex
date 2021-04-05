@@ -10,13 +10,19 @@ using Newtonsoft.Json.Linq;
 
 namespace App.Models
 {
+    [DataContract]
     [Serializable]
     public class Pokemon : IPokemon
     {
+        [DataMember]
         public string Source { get; set; }
+        [DataMember]
         public virtual string ApiSource { get; set; }
+        [DataMember]
         public virtual int Number { get; set; }
+        [DataMember]
         public virtual int Id { get; set; }
+        [DataMember]
         public virtual string Name { get; set; }
 
         public Pokemon()

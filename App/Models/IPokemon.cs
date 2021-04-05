@@ -20,14 +20,14 @@ namespace App.Models
         public bool Equals(object? obj);
         #nullable disable
         
-        public MemoryStream ToJsonStream<T>() where T: IPokemon
+        public static MemoryStream ToJsonStream<T>(T obj) where T: IPokemon
         {
-            return StreamHelpers.SerializeToStream(ToJsonString<T>());
+            return StreamHelpers.SerializeToStream(ToJsonString(obj));
         }
 
-        public string ToJsonString<T>() where T: IPokemon
+        public static string ToJsonString<T>(T obj) where T: IPokemon
         {
-            return JsonConvert.SerializeObject((T) this, new BinaryConverter());
+            return JsonConvert.SerializeObject(obj, new BinaryConverter());
         }
 
         public static T FromJsonStream<T>(MemoryStream stream)

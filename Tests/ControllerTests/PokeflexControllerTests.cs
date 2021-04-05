@@ -55,7 +55,8 @@ namespace Tests.ControllerTests
         
             // Assert
             var apiResult = Assert.IsType<OkObjectResult>(result);
-            Assert.Equal(pokemon, apiResult.Value);
+            Pokemon resultmon = IPokemon.FromJsonString<Pokemon>((string)apiResult.Value);
+            Assert.Equal(pokemon, resultmon);
         }
         
         

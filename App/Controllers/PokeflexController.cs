@@ -46,13 +46,13 @@ namespace App.Controllers
 
             Pokemon pokemon = _svcPokeflexDb.GetByNumber(_id);
             if (pokemon!=null) { return Ok(pokemon); }
-
+            
             pokemon = _svcExtExtPokeApiApi.GetByNumber(_id);
             if(pokemon.Equals(default(Pokemon))) { return StatusCode(400); }
-         
+            
             pokemon = _svcPokeflexDb.InsertPokemon(pokemon);
-
-            return Ok(pokemon);
+            
+            return Ok(IPokemon.ToJsonString(pokemon));
         }
         
         // //GET api/pokemon/id

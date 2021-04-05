@@ -43,15 +43,16 @@ namespace Tests.ServiceTests
         [Fact]
         public void TestCanPullFromWeb()
         {
-            IPokemon pocomon = new Pocomon()
+            Pocomon pocomon = new()
             {
+                height = 2,
                 ApiSource = "pokeapi.co",
                 Number = 42,
                 Name = "saltyboi",
             };
             
             var pcApiService = new MockPokeApiWebRequestSender();
-            var streamData = pocomon.ToJsonStream<Pokemon>();
+            var streamData = IPokemon.ToJsonStream(pocomon);
             pcApiService.AddResponse(HttpStatusCode.OK, streamData);
             Pokemon resultmon = pcApiService.GetByNumber(42);
             Assert.Equal(pocomon, resultmon);
