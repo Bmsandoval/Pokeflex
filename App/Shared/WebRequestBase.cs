@@ -47,14 +47,16 @@ namespace App.Shared
                     // Construct a response.
                     if (responseObject != null)
                     {
-                        byte[] buffer = responseObject.ToArray();
+                        // byte[] buffer = responseObject.ToArray();
 
                         // Get a response stream and write the response to it.
-                        Stream output = response.OutputStream;
-                        output.Write(buffer, 0, buffer.Length);
+                        responseObject.CopyToAsync(response.OutputStream);
+                        // Stream output = response.OutputStream;
+                        // output.Write(buffer, 0, buffer.Length);
                     }
-
+                    Console.WriteLine(responseObject.Length);
                     response.Close();
+                    Console.WriteLine(response.ContentLength64);
                 }, null);
 
                 WebClient client = new WebClient();

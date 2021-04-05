@@ -6,7 +6,9 @@ using App.Services.ExtPokeApis.ApiFactoryBase;
 using App.Services.ExtPokeApis.PokeApiCo;
 using App.Shared;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
+using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace App.Models
 {
@@ -21,18 +23,21 @@ namespace App.Models
         public bool Equals(object? obj);
         #nullable disable
         
-        public MemoryStream ToJsonStream<T>() where T: IPokemon
+        public Stream ToJsonStream<T>() where T: IPokemon
         {
             return StreamHelpers.SerializeToStream(
                 JsonConvert.SerializeObject(
-                    (T)this));
+                    (T)this, new BinaryConverter()));
         }
 
         public static T FromJsonStream<T>(MemoryStream stream)
         {
-            return JToken.Parse(
-                (string)StreamHelpers.DeserializeFromStream(stream)
-                ).ToObject<T>();
+            return FromJsonString<T>(StreamHelpers.DeserializeFromStream(stream));
+        }
+
+        public static T FromJsonString<T>(string json)
+        {
+            return JToken.Parse(json).ToObject<T>();
         }
     }
 }

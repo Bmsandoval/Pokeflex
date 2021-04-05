@@ -17,7 +17,6 @@ namespace App.Services.ExtPokeApis.PokeApiCo
             string url = "https://pokeapi.co/api/v2/pokemon/" + id;
             // Create a request for the URL.
             WebRequest request = WebRequest.Create(url);
-
             // Get the response.
             WebResponse response = SendRequest(request);
 
@@ -38,14 +37,9 @@ namespace App.Services.ExtPokeApis.PokeApiCo
 
             // Close the response.
             response.Close();
+            
+            var obj = IPokemon.FromJsonString<Pocomon>(responseFromServer);
 
-            Pocomon obj = JToken.Parse(responseFromServer).ToObject<Pocomon>();
-            if (obj is null)
-            {
-                return null;
-            }
-
-            // Root obj = objs[0];
             obj.ApiSource = apiSource;
             
             return obj;

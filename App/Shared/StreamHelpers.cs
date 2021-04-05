@@ -6,19 +6,21 @@ using Newtonsoft.Json;
 namespace App.Shared
 {
     public class StreamHelpers {
-        public static MemoryStream SerializeToStream(object obj)
+        public static MemoryStream SerializeToStream(string data)
         {
-            MemoryStream stream = new MemoryStream();
-            IFormatter formatter = new BinaryFormatter();
-            formatter.Serialize(stream, obj);
+            
+            MemoryStream stream = new();
+            StreamWriter writer = new(stream);
+            writer.WriteLine(data);
+            writer.Flush();
+            stream.Position = 0;
             return stream;
         }
 
-        public static object DeserializeFromStream(MemoryStream stream)
+        public static string DeserializeFromStream(MemoryStream stream)
         {
-            IFormatter formatter = new BinaryFormatter();
-            stream.Seek(0, SeekOrigin.Begin);
-            return formatter.Deserialize(stream);
+            StreamReader reader = new(stream);
+            return reader.ReadToEnd();
         }
     } 
 }

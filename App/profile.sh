@@ -55,7 +55,7 @@ Options:
     ;;
     'test')
       local start=$(date +%s)
-      dotnet test ../Tests/Tests.csproj
+      dotnet test ${POKEFLEX_APP_DIR}/../Tests/Tests.csproj
       local end=$(date +%s)
       echo ""
       echo "Testing completed after $((end-start)) seconds"

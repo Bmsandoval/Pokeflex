@@ -27,7 +27,10 @@ namespace Tests.ServiceTests
         }
         public void AddResponse(HttpStatusCode httpStatusCode, MemoryStream stream)
         {
-            _responses.Enqueue( MockedWebResponseBuilder.MakeResponse( httpStatusCode, stream ) );
+            Mock<WebResponse> mockResponse = new();
+            mockResponse.Setup(repo => repo.GetResponseStream()).Returns(stream);
+            // var response = MockedWebResponseBuilder.MakeResponse(httpStatusCode, stream);
+            _responses.Enqueue( mockResponse.Object );
         }
     }
     
@@ -40,34 +43,21 @@ namespace Tests.ServiceTests
         [Fact]
         public void TestCanPullFromWeb()
         {
-            // var pocomons = new List<Pocomon>()
-            // {
-            //     new Pocomon()
-            //     {
-            //         Number = 42,
-            //         Name = "saltyboi",
-            //     }
-            // };
-            //
-            // var pcApiService = new MockPokeApiWebRequestSender();
-            // var streamData = pocomons[0].ToJsonStream<Pocomon>();
-            // pcApiService.AddResponse(HttpStatusCode.OK, streamData);
-            // pcApiService.AddResponse(HttpStatusCode.OK, streamData);
-            // var response = pcApiService.SendRequest(null);
-            // Console.WriteLine("before");
-            // Console.WriteLine(response);
-            // Console.WriteLine(response.ContentLength);
-            // Console.WriteLine("after");
-            //
-            // Basemon resultmon = pcApiService.GetByNumber(42);
-            //
-            // if (resultmon == default(Basemon))
-            // {
-            //     throw new Exception("unexpected default result returned");
-            // }
-            //
-            // // List assert equal fails for some reason
-            // Assert.Equal(pocomons[0], (Pocomon)resultmon);
+            var pocomons = new List<Pocomon>()
+            {
+                new ()
+                {
+                    ApiSource = "pokeapi.co",
+                    Number = 42,
+                    Name = "saltyboi",
+                }
+            };
+            
+            var pcApiService = new MockPokeApiWebRequestSender();
+            var streamData = pocomons[0].ToJsonStream<Basemon>();
+            pcApiService.AddResponse(HttpStatusCode.OK, streamData);
+            Basemon resultmon = pcApiService.GetByNumber(42);
+            Assert.Equal(pocomons[0], resultmon);
         }
 
         // [Fact]
