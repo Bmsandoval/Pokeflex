@@ -41,7 +41,7 @@ namespace Tests.ServiceTests
             new DbContextOptionsBuilder<PokeflexContext>().Options;
 
         [Fact]
-        public void TestCanPullFromWeb()
+        public void TestCanPullPocomonFromWeb()
         {
             Pocomon pocomon = new()
             {

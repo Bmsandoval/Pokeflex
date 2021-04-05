@@ -43,8 +43,6 @@ namespace Tests.ServiceTests
                 throw new Exception("unexpected default result returned");
             }
 
-            // Pokemon pokemon = new Pokemon(resultmon);
-            //
             // List assert equal fails for some reason
             Assert.Equal(pokemons[0], resultmon);
         }
