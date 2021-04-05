@@ -9,19 +9,20 @@
 			"name": "Pokemons",
 			"item": [
 				{
-					"name": "Index",
+					"name": "ByNumber",
 					"request": {
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "https://localhost:5001/Pokemons",
+							"raw": "https://localhost:5001/pokemons/10",
 							"protocol": "https",
 							"host": [
 								"localhost"
 							],
 							"port": "5001",
 							"path": [
-								"Pokemons"
+								"pokemons",
+								"10"
 							]
 						}
 					},
@@ -35,14 +36,14 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "https://localhost:5001/Health",
+					"raw": "https://localhost:5001/health",
 					"protocol": "https",
 					"host": [
 						"localhost"
 					],
 					"port": "5001",
 					"path": [
-						"Health"
+						"health"
 					]
 				}
 			},

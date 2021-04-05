@@ -31,9 +31,14 @@ namespace App.Controllers
         //     _pokemonService.Test();
         //     return Ok(await _pokemonService.List());
         // }
+        [Route("pokemons/local")]
+        public IActionResult List()
+        {
+            return Ok(_svcPokeflexDb.ListLocal());
+        }
         
         //GET api/pokemon/id
-        [Route("Pokemons/{id}")]
+        [Route("pokemons/{id}")]
         public  IActionResult Index(string id)
         {
             int _id;

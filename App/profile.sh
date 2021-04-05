@@ -23,7 +23,7 @@ Options:
       case "${2}" in
         'api') docker-compose -f "${POKEFLEX_APP_DIR}/docker-compose.yml" up --build pokeflex-api ;;
         'db') docker-compose -f "${POKEFLEX_APP_DIR}/docker-compose.yml" up -d pokeflex-db ;;
-        'all') docker-compose -f "${POKEFLEX_APP_DIR}/docker-compose.yml" up ;;
+        'all') ${FUNCNAME[0]} start db && ${FUNCNAME[0]} start api ;;
         ''|*) echo "'api', 'db', or 'all'"
       esac
       echo "STARTING pokeflex services"
@@ -39,9 +39,9 @@ Options:
     ;;
     'restart')
       case "${2}" in
-        'api') ${FUNCNAME[0]} down api && ${FUNCNAME[0]} start api ;;
-        'db') ${FUNCNAME[0]} down db && ${FUNCNAME[0]} start db ;;
-        'all') ${FUNCNAME[0]} down && ${FUNCNAME[0]} start ;;
+        'api') ${FUNCNAME[0]} stop api && ${FUNCNAME[0]} start api ;;
+        'db') ${FUNCNAME[0]} stop db && ${FUNCNAME[0]} start db ;;
+        'all') ${FUNCNAME[0]} stop all && ${FUNCNAME[0]} start all ;;
         ''|*) echo "'api', 'db', or 'all'"
       esac
     ;;

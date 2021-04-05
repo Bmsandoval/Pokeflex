@@ -29,24 +29,23 @@ namespace Tests.ControllerTests
             new Mock<ExtPokeApiServiceFactoryProduct>();
             
         [Fact]
-        public async Task Index_ReturnsListOfPokemons()
+        public async Task Index_ReturnsPokemonByNumber()
         {
             // Test Data
-            var basemons = new List<Basemon>();
-            basemons.Add(new Basemon()
+            Basemon basemon = new()
             {
                 ApiSource = "controller test",
                 Number = 42,
                 Name = "saltyboi",
-            });
+            };
             
             // Arrange
             Mock<PokeflexService> mockPokeflexService = NewMockPokeflex();
             mockPokeflexService.Setup(repo => repo.GetByNumber(42)).Returns(default(Pokemon));
-            mockPokeflexService.Setup(repo => repo.InsertPokemon((Pokemon)basemons[0])).Returns((Pokemon)basemons[0]);
+            mockPokeflexService.Setup(repo => repo.InsertPokemon((Pokemon)basemon)).Returns((Pokemon)basemon);
 
             Mock<ExtPokeApiServiceFactoryProduct> mockExtPokeApisService = NewMockExtApis();
-            mockExtPokeApisService.Setup(repo => repo.GetByNumber(42)).Returns(basemons[0]);
+            mockExtPokeApisService.Setup(repo => repo.GetByNumber(42)).Returns(basemon);
             
             var controller = new PokeflexController(mockExtPokeApisService.Object, mockPokeflexService.Object);
         
@@ -55,7 +54,38 @@ namespace Tests.ControllerTests
         
             // Assert
             var apiResult = Assert.IsType<OkObjectResult>(result);
-            Assert.Equal((Pokemon)basemons[0], apiResult.Value);
+            Assert.Equal((Pokemon)basemon, apiResult.Value);
+        }
+        
+        
+        
+        [Fact]
+        public async Task List_ReturnsListOfLocalPokemons()
+        {
+            // Test Data
+            List<Pokemon> pokemons = new()
+            {
+                new() {
+                    ApiSource = "controller test",
+                    Number = 42,
+                    Name = "saltyboi",
+                }
+            };
+            
+            // Arrange
+            Mock<PokeflexService> mockPokeflexService = NewMockPokeflex();
+            mockPokeflexService.Setup(repo => repo.ListLocal()).Returns(pokemons.ToArray());
+
+            Mock<ExtPokeApiServiceFactoryProduct> mockExtPokeApisService = NewMockExtApis();
+            
+            var controller = new PokeflexController(mockExtPokeApisService.Object, mockPokeflexService.Object);
+        
+            // Act
+            var result = controller.List();
+        
+            // Assert
+            var apiResult = Assert.IsType<OkObjectResult>(result);
+            Assert.Equal(pokemons, apiResult.Value);
         }
         
         // // GET: Pokemons

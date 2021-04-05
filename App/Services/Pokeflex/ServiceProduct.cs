@@ -35,25 +35,14 @@ namespace App.Services.Pokeflex
             _dbContext.SaveChanges();
             return pokemon;
         }
-        //
-        // public Pokemon[] ListLocal()
-        // {
-        //     List<Pokemon> pokemons = new List<Pokemon>();
-        //     foreach (KeyValuePair<int, Pokemon> pokemon in PokemonTable)
-        //     {
-        //         if (FlexmonTable.ContainsKey(pokemon.Value.number))
-        //         {
-        //             pokemons.Add(FlexmonTable[pokemon.Value.number]);
-        //         }
-        //         else
-        //         {
-        //             pokemons.Add(pokemon.Value);
-        //         }
-        //     }
-        //
-        //     return pokemons.ToArray();
-        // }
-        //
+        
+        public virtual Pokemon[] ListLocal()
+        {
+            List<Pokemon> pokemons = _dbContext.Pokemons.ToList();
+        
+            return pokemons.ToArray();
+        }
+        
         // public Flexmon InsertFlexmon(TargetModel.Pokemon pokemon)
         // {
         //     // int id = FlexmonTable.Count == 0 ? 0 : FlexmonTable.Keys.Max() + 1;
