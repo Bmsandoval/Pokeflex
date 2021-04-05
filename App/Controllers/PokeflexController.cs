@@ -47,7 +47,7 @@ namespace App.Controllers
             Pokemon pokemon = _svcPokeflexDb.GetByNumber(_id);
             if (pokemon!=null) { return Ok(pokemon); }
 
-            pokemon = (Pokemon)_svcExtExtPokeApiApi.GetByNumber(_id);
+            pokemon = _svcExtExtPokeApiApi.GetByNumber(_id);
             if(pokemon.Equals(default(Pokemon))) { return StatusCode(400); }
          
             pokemon = _svcPokeflexDb.InsertPokemon(pokemon);

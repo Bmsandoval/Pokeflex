@@ -42,7 +42,7 @@ namespace Tests.ControllerTests
             // Arrange
             Mock<PokeflexService> mockPokeflexService = NewMockPokeflex();
             mockPokeflexService.Setup(repo => repo.GetByNumber(42)).Returns(default(Pokemon));
-            mockPokeflexService.Setup(repo => repo.InsertPokemon((Pokemon)pokemon)).Returns((Pokemon)pokemon);
+            mockPokeflexService.Setup(repo => repo.InsertPokemon(pokemon)).Returns(pokemon);
 
             Mock<ExtPokeApiServiceFactoryProduct> mockExtPokeApisService = NewMockExtApis();
             mockExtPokeApisService.Setup(repo => repo.GetByNumber(42)).Returns(pokemon);
@@ -54,7 +54,7 @@ namespace Tests.ControllerTests
         
             // Assert
             var apiResult = Assert.IsType<OkObjectResult>(result);
-            Assert.Equal((Pokemon)pokemon, apiResult.Value);
+            Assert.Equal(pokemon, apiResult.Value);
         }
         
         
