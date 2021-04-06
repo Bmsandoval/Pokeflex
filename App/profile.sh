@@ -12,9 +12,10 @@ pokeflex () {
 Options:
 - help: show this menu
 - start: launch pokeflex's docker container(s). Optionally specify specific one
-- stop: stop pokeflex's docker container(s) [[WARNING: RESETS DATABASE]]
-- purge: stop containers and purge all remnants [[WARNING: EVEN WORSE THAN RESET]]
+- stop: stop pokeflex's docker container(s)
+- rebuild: force rebuild. probably don't need to do this, it's built into the start and reset commands
 - reset: purges and rebuilds pokeflex's docker container(s) [[WARNING: RESETS DATABASE]]
+- purge: stop containers and purge all remnants [[WARNING: EVEN WORSE THAN RESET]]
 - test: runs xunit tests"
     ;;
     'start')
