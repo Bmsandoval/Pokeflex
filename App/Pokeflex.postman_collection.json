@@ -14,7 +14,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "https://localhost:5001/pokemons/10",
+							"raw": "https://localhost:5001/pokemons/11",
 							"protocol": "https",
 							"host": [
 								"localhost"
@@ -22,7 +22,36 @@
 							"port": "5001",
 							"path": [
 								"pokemons",
-								"10"
+								"11"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:5001/pokemons?offset=0&limit=5",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "5001",
+							"path": [
+								"pokemons"
+							],
+							"query": [
+								{
+									"key": "offset",
+									"value": "0"
+								},
+								{
+									"key": "limit",
+									"value": "5"
+								}
 							]
 						}
 					},

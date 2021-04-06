@@ -26,43 +26,39 @@ namespace App.Controllers
             _svcPokeflexDb = pokeflexDb ?? throw new ArgumentNullException(nameof(pokeflexDb));
         }
      
-        // // GET: Pokemons
-        // public async Task<IActionResult> Index()
-        // {
-        //     _pokemonService.Test();
-        //     return Ok(await _pokemonService.List());
-        // }
-        [Route("pokemons/local")]
-        public IActionResult List()
+        [Route("pokemons/")]
+        public async Task<IActionResult> List([FromQuery]int offset=0, [FromQuery]int limit=1)
         {
-            List<Pokemon> pokemons = new();
-            foreach(Pokemon pokemon in _svcPokeflexDb.GetRange(0, 10))
+            List<Pokemon> pokemons = await _svcPokeflexDb.GetRange(offset, limit);
+            if (pokemons.Count == limit) { return Ok(pokemons); }
+            HashSet<int> numbers = (from pk in pokemons select pk.Number).ToHashSet();
+            for(int num=offset+1;num<=offset+limit;num++)
             {
-                pokemons.Add(pokemon);
-                Console.WriteLine(StreamHelpers.ToJsonString(pokemon));
+                if (! numbers.Contains(num))
+                {
+                    IPokemon querymon = _svcExtExtPokeApiApi.GetByNumber(num);
+                    if (querymon == null) { return NoContent(); }
+                    
+                    Pokemon pokemon = new Pokemon(querymon);
+                    _svcPokeflexDb.InsertPokemon(pokemon);
+                    pokemons.Add(pokemon);
+                }
             }
-            // return Ok(_svcPokeflexDb.ListLocal());
             return Ok(pokemons);
         }
         
-        //GET api/pokemon/id
-        [Route("pokemons/{id}")]
-        public  IActionResult Index(string id)
+        [Route("pokemons/{num}")]
+        public  IActionResult Index(string num)
         {
-            int _id;
-            if (! int.TryParse(id, out _id)) { return BadRequest(); }
-
-            Pokemon pokemon = _svcPokeflexDb.GetByNumber(_id);
+            int _num;
+            if (! int.TryParse(num, out _num)) { return BadRequest(); }
+            Pokemon pokemon = _svcPokeflexDb.GetByNumber(_num);
             if (pokemon == null)
             {
-                IPokemon querymon = _svcExtExtPokeApiApi.GetByNumber(_id);
-                if (querymon == null)
-                {
-                    return NoContent();
-                }
-
-                pokemon = new Pokemon(querymon);
+                IPokemon querymon = _svcExtExtPokeApiApi.GetByNumber(_num);
+                if (querymon == null) { return NoContent(); }
                 
+                pokemon = new Pokemon(querymon);
                 _svcPokeflexDb.InsertPokemon(pokemon);
             }
 

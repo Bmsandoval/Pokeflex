@@ -6,9 +6,11 @@ using System.Net;
 using Newtonsoft.Json.Linq;
 using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Threading.Tasks;
 using App.Data;
 using App.Models;
 using App.Services.ExtPokeApis.ApiFactoryBase;
+using Microsoft.EntityFrameworkCore;
 
 namespace App.Services.Pokeflex
 {
@@ -36,15 +38,17 @@ namespace App.Services.Pokeflex
             return pokemon;
         }
         
-        public virtual IQueryable<Pokemon> GetRange(int offset, int limit)
+        public virtual async Task<List<Pokemon>> GetRange(int offset, int limit)
         {
             int maxCount = 50;
             if (limit > maxCount) { throw new Exception(string.Format("too many requested. max range {0}", maxCount)); }
 
-            return from pk in _dbContext.Pokemons
+            IQueryable<Pokemon> query = from pk in _dbContext.Pokemons
                 where pk.Number > offset
                       && pk.Number <= offset + limit
                 select pk;
+
+            return await query.ToListAsync();
         }
         
         public virtual Pokemon[] ListLocal()
