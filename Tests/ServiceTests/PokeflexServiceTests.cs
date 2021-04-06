@@ -33,7 +33,7 @@ namespace Tests.ServiceTests
             };
 
             var dbContextMock = new DbContextMock<PokeflexContext>(DummyOptions);
-            var usersDbSetMock = dbContextMock.CreateDbSetMock(x => x.Pokemons, pokemons.ToArray());
+            dbContextMock.CreateDbSetMock(x => x.Pokemons, pokemons.ToArray());
             var pokeflexService = new PokeflexService(dbContextMock.Object);
             
             Pokemon resultmon = pokeflexService.GetByNumber(42);

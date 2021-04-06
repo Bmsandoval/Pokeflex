@@ -13,8 +13,6 @@ Options:
 - help: show this menu
 - start: launch pokeflex's docker container(s). Optionally specify specific one
 - stop: stop pokeflex's docker container(s) [[WARNING: RESETS DATABASE]]
-- restart: stop pokeflex-api and start of pokeflex's docker container(s) that aren't running [[WARNING: RESETS DATABASE]]
-- restart-all: stop and start all of pokeflex's docker container(s) [[WARNING: RESETS DATABASE]]
 - purge: stop containers and purge all remnants [[WARNING: EVEN WORSE THAN RESET]]
 - reset: purges and rebuilds pokeflex's docker container(s) [[WARNING: RESETS DATABASE]]
 - test: runs xunit tests"
@@ -31,17 +29,9 @@ Options:
     'stop')
       echo "STOPPING pokeflex services"
       case "${2}" in
-        'api') docker-compose -f "${POKEFLEX_APP_DIR}/docker-compose.yml" down api ;;
-        'db') docker-compose -f "${POKEFLEX_APP_DIR}/docker-compose.yml" down db ;;
+        'api') docker-compose -f "${POKEFLEX_APP_DIR}/docker-compose.yml" down pokeflex-api ;;
+        'db') docker-compose -f "${POKEFLEX_APP_DIR}/docker-compose.yml" down pokeflex-db ;;
         'all') docker-compose -f "${POKEFLEX_APP_DIR}/docker-compose.yml" down ;;
-        ''|*) echo "'api', 'db', or 'all'"
-      esac
-    ;;
-    'restart')
-      case "${2}" in
-        'api') ${FUNCNAME[0]} stop api && ${FUNCNAME[0]} start api ;;
-        'db') ${FUNCNAME[0]} stop db && ${FUNCNAME[0]} start db ;;
-        'all') ${FUNCNAME[0]} stop all && ${FUNCNAME[0]} start all ;;
         ''|*) echo "'api', 'db', or 'all'"
       esac
     ;;

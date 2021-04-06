@@ -45,10 +45,5 @@ namespace App.Services.ExtPokeApis.PokeApiCo
             
             return obj;
         }
-        
-        public virtual WebResponse SendRequest(WebRequest _request)
-        {
-            return _request.GetResponse();
-        }
     }
 }

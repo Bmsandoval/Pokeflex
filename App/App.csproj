@@ -1,7 +1,16 @@
 <Project name="system" default="build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" Sdk="Microsoft.NET.Sdk.Web">
 	<Target Name="build">
-		<MSBuild BuildInParallel="true" Projects="./AppA/AppA.csproj;./AppB/AppB.csproj" Targets="Build"/>
+		<MSBuild BuildInParallel="true" Projects="./App.csproj;" Targets="Build" />
 	</Target>
+		
+  <Target Name="BuildRunLocal">
+	  <Exec Command="dotnet msbuild . /target:build /restore:false /maxcpucount:2 /p:OutDir=./bin/Debug/net5.0" />
+	  <Exec Command="dotnet run --no-build --launch-profile 'Local' bin/Debug/net5.0" />
+  </Target>
+  <Target Name="BuildRunDocker">
+	  <Exec Command="dotnet msbuild . /target:build /restore:false /maxcpucount:2 /p:OutDir=./bin/Docker/Debug/net5.0" />
+	  <Exec Command="dotnet run --no-build --launch-profile 'Docker' bin/Docker/Debug/net5.0" />
+  </Target>
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>

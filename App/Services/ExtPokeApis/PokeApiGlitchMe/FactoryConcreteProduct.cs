@@ -54,10 +54,5 @@ namespace App.Services.ExtPokeApis.PokeApiGlitchMe
             
             return obj;
         }
-        
-        public WebResponse SendRequest(WebRequest _request)
-        {
-            return _request.GetResponse();
-        }
     }
 }
