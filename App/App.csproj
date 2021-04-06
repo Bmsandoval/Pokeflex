@@ -8,8 +8,7 @@
 	  <Exec Command="dotnet run --no-build --launch-profile 'Local' bin/Debug/net5.0" />
   </Target>
   <Target Name="BuildRunDocker">
-	  <Exec Command="dotnet msbuild . /target:build /restore:false /maxcpucount:2 /p:OutDir=./bin/Docker/Debug/net5.0" />
-	  <Exec Command="dotnet run --no-build --launch-profile 'Docker' bin/Docker/Debug/net5.0" />
+	  <Exec Command="dotnet run --launch-profile 'Docker'" />
   </Target>
 
   <PropertyGroup>

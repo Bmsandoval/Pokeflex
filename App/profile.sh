@@ -41,16 +41,17 @@ Options:
     ;;
     'purge')
       case "${2}" in
-        'api') ${FUNCNAME[0]} stop api && docker system prune --all --force --filter=label=base=true --filter=label=db=true --filter=label=pokeflex=false;;
-        'project') ${FUNCNAME[0]} stop api && docker system prune --all --force --filter=label=base=true --filter=label=pokeflex=false;;
-        'global') docker stop $(docker ps -q) && docker system prune --all --force --filter=label=base=true;;
-        ''|*) echo "'api', 'project', or 'global'"
+        'api') ${FUNCNAME[0]} stop api; docker system prune --all --force --filter=label=base=true --filter=label=notdb=true --filter=label=pokeflex=true ;;
+        'project') ${FUNCNAME[0]} stop api; docker system prune --all --force --filter=label=base=true --filter=label=notdb=true --filter=label=pokeflex=true ;;
+        'everywhere') docker stop $(docker ps -q); docker system prune --all --force --filter=label=base=true --filter=label=notdb=true ;;
+        'everything') docker stop $(docker ps -q); docker system prune --all --force --filter=label=base=true ;;
+        ''|*) echo "'api', 'project', 'everywhere', or 'everything'"
       esac
     ;;
     'reset')
       case "${2}" in
-        'api') ${FUNCNAME[0]} purge api && ${FUNCNAME[0]} rebuild ;;
-        'all') ${FUNCNAME[0]} purge project && ${FUNCNAME[0]} rebuild ;;
+        'api') ${FUNCNAME[0]} purge api; ${FUNCNAME[0]} rebuild ;;
+        'all') ${FUNCNAME[0]} purge project; ${FUNCNAME[0]} rebuild ;;
         ''|*) echo "'api' or 'all'"
       esac
     ;;

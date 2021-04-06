@@ -12,7 +12,7 @@ echo "Database Updated"
 #dotnet msbuild . /target:build /restore:false /maxcpucount:2
 #run_cmd="dotnet run --no-build"
 #run_cmd="dotnet watch msbuild /t:BuildRun"
-run_cmd="dotnet watch msbuild /t:BuildRunDocker"
+run_cmd="dotnet watch run --launch-profile Docker"
 
 echo "SQL Server is up - executing command"
 exec $run_cmd

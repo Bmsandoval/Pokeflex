@@ -13,6 +13,7 @@ namespace App.Controllers
         [Route("health")]
         public IActionResult Index()
         {
+            Console.WriteLine("testy test");
             return Ok();
         }
     }
