@@ -1,4 +1,5 @@
 # globs
+*.sln.DotSettings
 Makefile.in
 *.userprefs
 *.usertasks
