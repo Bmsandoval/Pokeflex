@@ -36,6 +36,17 @@ namespace App.Services.Pokeflex
             return pokemon;
         }
         
+        public virtual IQueryable<Pokemon> GetRange(int offset, int limit)
+        {
+            int maxCount = 50;
+            if (limit > maxCount) { throw new Exception(string.Format("too many requested. max range {0}", maxCount)); }
+
+            return from pk in _dbContext.Pokemons
+                where pk.Number > offset
+                      && pk.Number <= offset + limit
+                select pk;
+        }
+        
         public virtual Pokemon[] ListLocal()
         {
             List<Pokemon> pokemons = _dbContext.Pokemons.ToList();

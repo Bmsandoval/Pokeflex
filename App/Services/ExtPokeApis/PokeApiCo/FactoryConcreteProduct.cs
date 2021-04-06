@@ -12,7 +12,7 @@ namespace App.Services.ExtPokeApis.PokeApiCo
     {
         public readonly string apiSource = "pokeapi.co";
         
-        public override Pokemon GetByNumber(int id)
+        public override IPokemon GetByNumber(int id)
         {
             System.Console.WriteLine("requesting from " + apiSource);
             string url = "https://pokeapi.co/api/v2/pokemon/" + id;
@@ -28,7 +28,7 @@ namespace App.Services.ExtPokeApis.PokeApiCo
             {
                 if (dataStream is null)
                 {
-                    return null;
+                    return default;
                 }
                 // Open the stream using a StreamReader for easy access.
                 StreamReader reader = new StreamReader(dataStream);

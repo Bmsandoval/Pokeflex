@@ -60,8 +60,6 @@ namespace Tests.ControllerTests
             Assert.Equal(pokemon, resultmon);
         }
         
-        
-        
         [Fact]
         public async Task List_ReturnsListOfLocalPokemons()
         {

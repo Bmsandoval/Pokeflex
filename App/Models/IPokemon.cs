@@ -14,10 +14,26 @@ namespace App.Models
 {
     public interface IPokemon
     {
-        public int GetHashCode();
+        public virtual string ApiSource { get => ApiSource; set => ApiSource = value; }
+        public virtual int Number { get => Number; set => Number = value; }
+        public virtual string Name { get => Name; set => Name = value; }
+
+        public virtual int GetHashCode()
+        {
+            return Number.GetHashCode() * 17 +
+                   ApiSource.GetHashCode() * 17 +
+                   Name.GetHashCode() * 17;
+        }
 
         #nullable enable
-        public bool Equals(object? obj);
+        public virtual bool Equals(object? obj)
+        {
+            if (!(obj is Pokemon testmon)) { return false; }
+
+            return Number == testmon.Number &&
+                   ApiSource == testmon.ApiSource &&
+                   Name == testmon.Name;
+        }
         #nullable disable
     }
 }

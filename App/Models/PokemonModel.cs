@@ -15,13 +15,21 @@ namespace App.Models
     {
         [DataMember] public int Id { get; set; }
         [DataMember] public string Source { get; set; }
-        [DataMember] public virtual string ApiSource { get; set; }
-        [DataMember] public virtual int Number { get; set; }
-        [DataMember] public virtual string Name { get; set; }
+        [DataMember] public string ApiSource { get; set; }
+        [DataMember] public int Number { get; set; }
+        [DataMember] public string Name { get; set; }
 
         public Pokemon()
         {
             Source = "PokemonTable";
+        }
+        
+        public Pokemon(IPokemon ipokemon)
+        {
+            Source = "PokemonTable";
+            ApiSource = ipokemon.ApiSource;
+            Number = ipokemon.Number;
+            Name = ipokemon.Name;
         }
 
         public override int GetHashCode()

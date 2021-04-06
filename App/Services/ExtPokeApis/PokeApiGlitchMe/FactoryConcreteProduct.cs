@@ -11,7 +11,7 @@ namespace App.Services.ExtPokeApis.PokeApiGlitchMe
     {
         public readonly string apiSource = "pokeapi.glitch.me";
         
-        public override Pokemon GetByNumber(int id)
+        public override IPokemon GetByNumber(int id)
         {
             System.Console.WriteLine("requesting from " + apiSource);
             string url = "https://pokeapi.glitch.me/v1/pokemon/" + id;

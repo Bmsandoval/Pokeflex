@@ -10,7 +10,7 @@ namespace App.Services.ExtPokeApis.ApiFactoryBase
 {
     public abstract class ExtPokeApiServiceFactoryProduct
     {
-        public abstract Pokemon GetByNumber(int id);
+        public abstract IPokemon GetByNumber(int id);
 
         public virtual WebResponse SendRequest(WebRequest _request)
         {
