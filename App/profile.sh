@@ -35,13 +35,23 @@ Options:
         ''|*) echo "'api', 'db', or 'all'"
       esac
     ;;
+    'rebuild')
+      docker-compose -f "${POKEFLEX_APP_DIR}/docker-compose.yml" build
+    ;;
     'purge')
-      docker stop $(docker ps -q)
-      docker system prune --all --force --filter=label=base=true
+      case "${2}" in
+        'api') ${FUNCNAME[0]} stop api && docker system prune --all --force --filter=label=base=true --filter=label=db=true --filter=label=pokeflex=false;;
+        'project') ${FUNCNAME[0]} stop api && docker system prune --all --force --filter=label=base=true --filter=label=pokeflex=false;;
+        'global') docker stop $(docker ps -q) && docker system prune --all --force --filter=label=base=true;;
+        ''|*) echo "'api', 'project', or 'global'"
+      esac
     ;;
     'reset')
-      ${FUNCNAME[0]} purge
-      docker-compose -f "${POKEFLEX_APP_DIR}/docker-compose.yml" build
+      case "${2}" in
+        'api') ${FUNCNAME[0]} purge api && ${FUNCNAME[0]} rebuild ;;
+        'all') ${FUNCNAME[0]} purge project && ${FUNCNAME[0]} rebuild ;;
+        ''|*) echo "'api' or 'all'"
+      esac
     ;;
     'test')
       local start=$(date +%s)
