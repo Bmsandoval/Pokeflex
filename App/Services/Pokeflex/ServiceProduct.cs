@@ -1,15 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.IO.Compression;
-using System.Net;
-using Newtonsoft.Json.Linq;
 using System.Linq;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading.Tasks;
 using App.Data;
 using App.Models;
-using App.Services.ExtPokeApis.ApiFactoryBase;
 using Microsoft.EntityFrameworkCore;
 
 namespace App.Services.Pokeflex
@@ -22,55 +16,58 @@ namespace App.Services.Pokeflex
         {
             _dbContext = dbContext;
         }
-        
-        public virtual Pokemon GetByNumber(int number)
+
+        public virtual async Task<Pokemon> Select(int pkNumber, int pkGroup=0)
         {
-            var query = from pk in _dbContext.Pokemons
-                where pk.Number.Equals(number)
-                select pk;
-            return query.FirstOrDefault();
+            if (pkNumber < 1) {return default;}
+            
+            IQueryable<Pokemon> flexPokemon = from f in _dbContext.Pokemons where f.Group == pkGroup && f.Number == pkNumber select f;
+            IQueryable<Pokemon> basePokemon = from b in _dbContext.Pokemons where b.Group == 0 && b.Number == pkNumber select b;
+            return await flexPokemon
+                .Concat(
+                    from p in basePokemon where !(
+                        from f in _dbContext.Pokemons where f.Group == 1 && f.Number == p.Number select 1)
+                        .Any() select p).FirstOrDefaultAsync();
         }
         
-        public virtual Pokemon InsertPokemon(Pokemon pokemon)
+        public virtual async Task<int> Insert(Pokemon pokemon)
         {
             _dbContext.Pokemons.Add(pokemon);
-            _dbContext.SaveChanges();
-            return pokemon;
+            return await _dbContext.SaveChangesAsync();
         }
         
-        public virtual async Task<List<Pokemon>> GetRange(int offset, int limit)
+        public virtual async Task<int> Update(int pkGroup, int pkNumber, Pokemon pokemon)
         {
-            int maxCount = 50;
-            if (limit > maxCount) { throw new Exception(string.Format("too many requested. max range {0}", maxCount)); }
+//             return await _dbContext.Database.ExecuteSqlRawAsync(@"
+// Update pokemons AS pk
+// SET pk.[Group]=@p0,
+//     pk.ApiSource='@p1',
+//     pk.Name='@p2'
+// WHERE pk.Number=@p3",
+//                 pokemon.Group, pokemon.ApiSource, pokemon.Name, pokemon.Number);
 
-            IQueryable<Pokemon> query = from pk in _dbContext.Pokemons
-                where pk.Number > offset
-                      && pk.Number <= offset + limit
-                select pk;
+            var pk = await _dbContext
+                .Pokemons
+                .Where(p=> p.Group == pkGroup && p.Number == pkNumber)
+                .FirstOrDefaultAsync();
+            if (pk.Equals(default)) { return default; }
 
-            return await query.ToListAsync();
+            pk.Group = pokemon.Group;
+            pk.Number = pokemon.Number;
+            pk.Name = pokemon.Name;
+
+            return await _dbContext.SaveChangesAsync();
         }
         
-        public virtual Pokemon[] ListLocal()
+        public virtual async Task<List<Pokemon>> GetRange(int offset, int limit, int pkGroup=0)
         {
-            List<Pokemon> pokemons = _dbContext.Pokemons.ToList();
-        
-            return pokemons.ToArray();
+            IQueryable<Pokemon> flexPokemon = from f in _dbContext.Pokemons where f.Group == pkGroup && offset < f.Number && f.Number <= offset+limit select f;
+            IQueryable<Pokemon> basePokemon = from b in _dbContext.Pokemons where b.Group == 0 && offset < b.Number && b.Number <= offset+limit select b;
+            return await flexPokemon
+                .Concat(
+                    from p in basePokemon where !(
+                        from f in _dbContext.Pokemons where f.Group == 1 && f.Number == p.Number select 1)
+                        .Any() select p).ToListAsync();
         }
-        
-        // public Flexmon InsertFlexmon(TargetModel.Pokemon pokemon)
-        // {
-        //     // int id = FlexmonTable.Count == 0 ? 0 : FlexmonTable.Keys.Max() + 1;
-        //
-        //     Flexmon flexmon = new Flexmon(pokemon);
-        //
-        //     if (FlexmonTable.ContainsKey(flexmon.number))
-        //     {
-        //         return null;
-        //     }
-        //     
-        //     FlexmonTable.Add(flexmon.number, flexmon);
-        //     return flexmon;
-        // }
     }
 }

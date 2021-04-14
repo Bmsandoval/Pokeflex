@@ -11,12 +11,12 @@ namespace App.Data
         }
 
         public virtual DbSet<Pokemon> Pokemons { get; set; }
-        public virtual DbSet<Flexmon> Flexmons { get; set; }
+        // public virtual DbSet<Flexmon> Flexmons { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Pokemon>().ToTable("Pokemons");
-            modelBuilder.Entity<Flexmon>().ToTable("Flexmons");
+            // modelBuilder.Entity<Flexmon>().ToTable("Flexmons");
         }
     }
 }

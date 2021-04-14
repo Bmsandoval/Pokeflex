@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 using App.Models;
 using Newtonsoft.Json;
 using App.Services.ExtPokeApis.ApiFactoryBase;
@@ -357,16 +358,17 @@ namespace App.Services.ExtPokeApis.PokeApiCo
         public Type type { get; set; }
     }
 
+    [DataContract]
     public class Pocomon : IPokemon
     {
-        public string ApiSource { get; set; }
-        [JsonProperty("id")] public int Number { get; set; }
-        public string Name { get; set; }
+        [DataMember]public string ApiSource { get; set; }
+        [DataMember][JsonProperty("id")] public int Number { get; set; }
+        [DataMember]public string Name { get; set; }
         public List<Ability> abilities { get; set; }
         public int base_experience { get; set; }
         public List<Form> forms { get; set; }
         public List<GameIndice> game_indices { get; set; }
-        public int height { get; set; }
+        [DataMember]public int height { get; set; }
         public List<object> held_items { get; set; }
         public bool is_default { get; set; }
         public string location_area_encounters { get; set; }
@@ -378,5 +380,17 @@ namespace App.Services.ExtPokeApis.PokeApiCo
         public List<Stat> stats { get; set; }
         public List<Type> types { get; set; }
         public int weight { get; set; }
+        
+        #nullable enable
+        public override bool Equals(object? obj)
+        {
+            if (!(obj is Pocomon testmon)) { return false; }
+
+            return height == testmon.height &&
+                   Number == testmon.Number &&
+                   ApiSource == testmon.ApiSource &&
+                   Name == testmon.Name;
+        }
+        #nullable disable
     }
 }

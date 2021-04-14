@@ -16,7 +16,8 @@ Options:
 - rebuild: force rebuild. probably don't need to do this, it's built into the start and reset commands
 - reset: purges and rebuilds pokeflex's docker container(s) [[WARNING: RESETS DATABASE]]
 - purge: stop containers and purge all remnants [[WARNING: EVEN WORSE THAN RESET]]
-- test: runs xunit tests"
+- test: runs unit|bench tests
+- reprofile: reloads this file"
     ;;
     'start')
       case "${2}" in
@@ -42,9 +43,10 @@ Options:
     'purge')
       case "${2}" in
         'api') ${FUNCNAME[0]} stop api; docker system prune --all --force --filter=label=base=true --filter=label=notdb=true --filter=label=pokeflex=true ;;
-        'project') ${FUNCNAME[0]} stop api; docker system prune --all --force --filter=label=base=true --filter=label=notdb=true --filter=label=pokeflex=true ;;
+        'project') docker stop $(docker ps -q); docker system prune --all --force --filter=label=base=true --filter=label=pokeflex=true ;;
         'everywhere') docker stop $(docker ps -q); docker system prune --all --force --filter=label=base=true --filter=label=notdb=true ;;
         'everything') docker stop $(docker ps -q); docker system prune --all --force --filter=label=base=true ;;
+        'notthisone') docker stop $(docker ps -q); docker system prune --all --force ;;
         ''|*) echo "'api', 'project', 'everywhere', or 'everything'"
       esac
     ;;
@@ -57,10 +59,17 @@ Options:
     ;;
     'test')
       local start=$(date +%s)
-      dotnet test ${POKEFLEX_APP_DIR}/../Tests/Tests.csproj
+      case "${2}" in
+        'unit') dotnet test ${POKEFLEX_APP_DIR}/../Tests/Units/Units.csproj ;;
+        'bench') dotnet run -p ${POKEFLEX_APP_DIR}/../Tests/Benchmarks/Benchmarks.csproj ;;
+        ''|*) echo "'unit' or 'bench'"
+      esac
       local end=$(date +%s)
       echo ""
       echo "Testing completed after $((end-start)) seconds"
+    ;; 
+    'reprofile')
+      . ${POKEFLEX_APP_DIR}/profile.sh
     ;;
 #    'test')
 #      local start=$(date +%s)

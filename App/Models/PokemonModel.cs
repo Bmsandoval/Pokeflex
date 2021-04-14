@@ -14,19 +14,18 @@ namespace App.Models
     public class Pokemon : IPokemon
     {
         [DataMember] public int Id { get; set; }
-        [DataMember] public string Source { get; set; }
+        [DataMember] public int Group { get; set; }
         [DataMember] public string ApiSource { get; set; }
         [DataMember] public int Number { get; set; }
         [DataMember] public string Name { get; set; }
-
-        public Pokemon()
-        {
-            Source = "PokemonTable";
-        }
         
-        public Pokemon(IPokemon ipokemon)
+        public Pokemon() { Group = 0; }
+
+        public Pokemon(int group=0) { Group = group; }
+        
+        public Pokemon(IPokemon ipokemon, int group=0)
         {
-            Source = "PokemonTable";
+            Group = group;
             ApiSource = ipokemon.ApiSource;
             Number = ipokemon.Number;
             Name = ipokemon.Name;
@@ -34,7 +33,8 @@ namespace App.Models
 
         public override int GetHashCode()
         {
-            return Number.GetHashCode() * 17 +
+            return Group.GetHashCode() * 17 +
+                   Number.GetHashCode() * 17 +
                    ApiSource.GetHashCode() * 17 +
                    Id.GetHashCode() * 17 +
                    Name.GetHashCode() * 17;
@@ -46,7 +46,7 @@ namespace App.Models
             if (!(obj is Pokemon testmon)) { return false; }
 
             return Id == testmon.Id &&
-                   Source == testmon.Source &&
+                   Group == testmon.Group &&
                    Number == testmon.Number &&
                    ApiSource == testmon.ApiSource &&
                    Name == testmon.Name;
