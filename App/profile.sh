@@ -60,8 +60,18 @@ Options:
     'test')
       local start=$(date +%s)
       case "${2}" in
-        'unit') dotnet test ${POKEFLEX_APP_DIR}/../Tests/Units/Units.csproj ;;
-        'bench') dotnet run -p ${POKEFLEX_APP_DIR}/../Tests/Benchmarks/Benchmarks.csproj ;;
+        'unit') dotnet test "${POKEFLEX_APP_DIR}/../Tests/Units/Units.csproj" ;;
+#        'bench') 
+        'bench')
+          case "${3}" in 
+          '-d'|'-debug') sudo dotnet run -p "${POKEFLEX_APP_DIR}/../Tests/Benchmarks/Benchmarks.csproj" ;;
+          '-r'|'-release') export PokeflexBenchmarkDbType="sqlite"; sudo dotnet run -c Release -p "${POKEFLEX_APP_DIR}/../Tests/Benchmarks/Benchmarks.csproj" sqlite;;
+#          '-r'|'-release') export PokeflexBenchmarkDbType="sqlite"; sudo dotnet run -c Release -p "${POKEFLEX_APP_DIR}/../Tests/Benchmarks/Benchmarks.csproj" ;;
+#          '-r'|'-release') sudo dotnet run -c Release -p "${POKEFLEX_APP_DIR}/../Tests/Benchmarks/Benchmarks.csproj" ;;
+#          '-r'|'-release') sudo dotnet run -c Release -p "${POKEFLEX_APP_DIR}/../Tests/Benchmarks/Benchmarks.csproj" ;;
+          ''|*) echo "'-d|-debug' '-release|-r'"
+          esac
+        ;;
         ''|*) echo "'unit' or 'bench'"
       esac
       local end=$(date +%s)

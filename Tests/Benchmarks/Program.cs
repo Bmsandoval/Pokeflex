@@ -10,6 +10,8 @@ using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Running;
 using EntityFrameworkCoreMock;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using TestSupport.Helpers;
 
 namespace Benchmarks
 {
@@ -17,13 +19,23 @@ namespace Benchmarks
     {
         public static void Main(string[] args)
         {
-            var benchmarkConfig = ManualConfig
+            if (args.Length == 0)
+            {
+                Environment.SetEnvironmentVariable("PokeflexBenchmarkDbType", "");
+            }
+            else
+            {
+                Environment.SetEnvironmentVariable("PokeflexBenchmarkDbType", args[0]);
+            }
+            
+            var benchmarkConfig =
+                ManualConfig
                 .Create(DefaultConfig.Instance)
-                .WithOption(ConfigOptions.JoinSummary, true)
-                .WithOption(ConfigOptions.DisableOptimizationsValidator, true)
                 .WithOption(ConfigOptions.DisableLogFile, true);
-            // BenchmarkRunner.Run<SampleBenchmarks>(benchmarkConfig);
-            BenchmarkRunner.Run<PokeflexServiceBenchmarks>(benchmarkConfig);
+            
+            
+            BenchmarkRunner.Run<PokeflexServiceBenchmarks.PokeflexServiceSelectBenchmarks>(benchmarkConfig);
+            // BenchmarkRunner.Run<PokeflexServiceBenchmarks.PokeflexServiceAnotherSelectBenchmarks>(benchmarkConfig);
         }
     }
 }
