@@ -31,6 +31,8 @@ namespace Benchmarks
             var benchmarkConfig =
                 ManualConfig
                 .Create(DefaultConfig.Instance)
+                .WithOption(ConfigOptions.JoinSummary, true)
+                .WithOption(ConfigOptions.DisableOptimizationsValidator, true)
                 .WithOption(ConfigOptions.DisableLogFile, true);
             
             

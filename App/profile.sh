@@ -61,15 +61,17 @@ Options:
       local start=$(date +%s)
       case "${2}" in
         'unit') dotnet test "${POKEFLEX_APP_DIR}/../Tests/Units/Units.csproj" ;;
-#        'bench') 
         'bench')
           case "${3}" in 
-          '-d'|'-debug') sudo dotnet run -p "${POKEFLEX_APP_DIR}/../Tests/Benchmarks/Benchmarks.csproj" ;;
-          '-r'|'-release') export PokeflexBenchmarkDbType="sqlite"; sudo dotnet run -c Release -p "${POKEFLEX_APP_DIR}/../Tests/Benchmarks/Benchmarks.csproj" sqlite;;
-#          '-r'|'-release') export PokeflexBenchmarkDbType="sqlite"; sudo dotnet run -c Release -p "${POKEFLEX_APP_DIR}/../Tests/Benchmarks/Benchmarks.csproj" ;;
-#          '-r'|'-release') sudo dotnet run -c Release -p "${POKEFLEX_APP_DIR}/../Tests/Benchmarks/Benchmarks.csproj" ;;
-#          '-r'|'-release') sudo dotnet run -c Release -p "${POKEFLEX_APP_DIR}/../Tests/Benchmarks/Benchmarks.csproj" ;;
-          ''|*) echo "'-d|-debug' '-release|-r'"
+          '-d'|'-debug') 
+            dotnet run -p "${POKEFLEX_APP_DIR}/../Tests/Benchmarks/Benchmarks.csproj" mock \
+            | perl -wlne 'print if /^[|]|\/\/ Benchmark: |\/\/ [*]{5} /'
+          ;;
+          '-r'|'-release') 
+            sudo dotnet run -c Release -p "${POKEFLEX_APP_DIR}/../Tests/Benchmarks/Benchmarks.csproj" native \
+            | perl -wlne 'print if /^[|]|\/\/ Benchmark: |\/\/ [*]{5} /'
+          ;;
+          ''|*) echo "'-d|-debug' or '-r|-release'"
           esac
         ;;
         ''|*) echo "'unit' or 'bench'"
