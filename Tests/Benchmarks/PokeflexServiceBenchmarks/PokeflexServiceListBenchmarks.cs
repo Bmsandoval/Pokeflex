@@ -17,10 +17,9 @@ namespace Benchmarks.PokeflexServiceBenchmarks
     [CategoriesColumn]
     public class PokeflexServiceListBenchmarks
     {
-        [Params(10)] public int Groups;
-        [Params(100)] public int Numbers;
-        [Params(10)] public int Offset;
-        [Params(10)] public int Limit;
+        [Params(1, 10, 25)] public int Groups;
+        [Params(100, 1000, 10000)] public int Numbers;
+        [Params(0.1, 0.20, 0.30)] public double LimitAsPctNumbers;
         // [Params(10, 20)] public int Groups;
         // [Params(100, 1_000)] public int Numbers;
 
@@ -52,23 +51,28 @@ namespace Benchmarks.PokeflexServiceBenchmarks
 
         [Benchmark(Baseline = true)]
         [BenchmarkCategory("Linq")]
-        public async Task<List<Pokemon>> SelectOneLinq()
+        public async Task<List<Pokemon>> ListManyLinqBaseline()
         {
+            Random r = new Random();
+            int limit = (int)(Numbers * LimitAsPctNumbers);
+            int offset = r.Next(0, Numbers - limit);
             return await 
                 (from pk in DbContextFactory.DbContext.PokeflexContext.Pokemons select pk)
-                .Skip(Offset)
-                .Take(Offset + Limit)
+                .Skip(offset)
+                .Take(offset + limit)
                 .ToListAsync();
         }
-
+        
         
         [Benchmark]
         [BenchmarkCategory("Linq")]
-        public async Task<List<Pokemon>> UnionWhereNotExistsLinq()
+        public async Task<List<Pokemon>> ListUnionWhereNotExistsLinq()
         {
             Random r = new Random();
             var service = new PokeflexService(DbContextFactory.DbContext.PokeflexContext);
-            var pokemon = await service.GetRange(Offset, Limit, r.Next(1, Groups));
+            int limit = (int)(Numbers * LimitAsPctNumbers);
+            int offset = r.Next(0, Numbers - limit);
+            var pokemon = await service.GetRange(offset, limit, r.Next(1, Groups));
             return pokemon;
         }
         
@@ -96,18 +100,50 @@ namespace Benchmarks.PokeflexServiceBenchmarks
 //             return pokemon;
 //         }
 
+
+        [Benchmark]
+        [BenchmarkCategory("Raw")]
+        public Pokemon ListUnionWhereNotExistsCteRaw()
+        {
+            Random r = new Random();
+            int limit = (int)(Numbers * LimitAsPctNumbers);
+            int offset = r.Next(0, Numbers - limit);
+            var pokeflexContext=DbContextFactory.DbContext.PokeflexContext;
+            string sql = @"
+WITH fnums ([Number]) AS ( 
+    SELECT [Number]
+    FROM pokemons
+    WHERE [Group] = @p0 AND [Number] > @p1 AND [Number] <= @p2
+)
+SELECT [Id], [ApiSource], [Group], [Name], [Number]
+FROM pokemons
+WHERE [Group] = @p0 AND [Number] > @p1 AND [Number] <= @p2
+    UNION ALL
+SELECT [Id], [ApiSource], [Group], [Name], [Number]
+FROM pokemons
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM fnums
+    WHERE fnums.Number = pokemons.Number
+)";
+            var pokemon = pokeflexContext.Pokemons.FromSqlRaw(sql, r.Next(0,Groups), offset, limit).AsEnumerable();
+            return pokemon.FirstOrDefault();
+        }
+
         [Benchmark]
         [BenchmarkCategory("Linq")]
-        public async Task<List<Pokemon>> CoalesceLinq()
+        public async Task<List<Pokemon>> ListCoalesceLinq()
         {
             Random r = new Random();
             var pokeflexContext = DbContextFactory.DbContext.PokeflexContext;
+            int limit = (int)(Numbers * LimitAsPctNumbers);
+            int offset = r.Next(0, Numbers - limit);
             var grp = r.Next(0, Groups);
             var pokemon =
                 from bse in pokeflexContext.Pokemons
                 join flx in pokeflexContext.Pokemons on bse.Number equals flx.Number into flx
                 from f in flx.DefaultIfEmpty()
-                where bse.Group==grp && bse.Number>Offset && bse.Number <= Offset+Limit
+                where bse.Group==grp && bse.Number>offset && bse.Number <= offset+limit
                 select new Pokemon(){
                     Id= f != null? f.Id: bse.Id,
                     Number= f != null? f.Number: bse.Number,

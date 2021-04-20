@@ -15,12 +15,10 @@ namespace Benchmarks.PokeflexServiceBenchmarks
 {
     // [RPlotExporter]
     [CategoriesColumn]
-    public class PokeflexServiceSelectBenchmarks
+    public class PokeflexServiceGetBenchmarks
     {
-        [Params(10)] public int Groups;
-        [Params(100)] public int Numbers;
-        // [Params(10, 20)] public int Groups;
-        // [Params(100, 1_000)] public int Numbers;
+        [Params(1, 10, 25)] public int Groups;
+        [Params(100, 1000, 10000)] public int Numbers;
 
         [GlobalSetup]
         public void Setup()
@@ -49,7 +47,7 @@ namespace Benchmarks.PokeflexServiceBenchmarks
         }
 
         [Benchmark(Baseline = true)]
-        public async Task<Pokemon> SelectOne()
+        public async Task<Pokemon> GetOneLinqBaseline()
         {
             var pokeflexContext=DbContextFactory.DbContext.PokeflexContext;
             string sql = @"
@@ -62,7 +60,7 @@ FROM [Pokemons] AS [p]";
         
         [Benchmark]
         [BenchmarkCategory("Linq")]
-        public async Task<Pokemon> UnionWhereNotExistsLinq()
+        public async Task<Pokemon> GetUnionWhereNotExistsLinq()
         {
             Random r = new Random();
             var service = new PokeflexService(DbContextFactory.DbContext.PokeflexContext);
@@ -70,33 +68,61 @@ FROM [Pokemons] AS [p]";
             return pokemon;
         }
         
-//         [Benchmark]
-//         [BenchmarkCategory("Raw")]
-//         public async Task<Pokemon> UnionWhereNotExistsRaw()
-//         {
-//             Random r = new Random();
-//             var pokeflexContext=DbContextFactory.DbContext.PokeflexContext;
-//             string sql = @"
-// SELECT [t].[Id], [t].[ApiSource], [t].[Group], [t].[Name], [t].[Number]
-// FROM (
-//     SELECT [p].[Id], [p].[ApiSource], [p].[Group], [p].[Name], [p].[Number]
-//     FROM [Pokemons] AS [p]
-//     WHERE ([p].[Group] = @p0) AND ([p].[Number] = @p1)
-//     UNION ALL
-//     SELECT [p0].[Id], [p0].[ApiSource], [p0].[Group], [p0].[Name], [p0].[Number]
-//     FROM [Pokemons] AS [p0]
-//     WHERE (([p0].[Group] = 0) AND ([p0].[Number] = @p1)) AND NOT (EXISTS (
-//         SELECT 1
-//         FROM [Pokemons] AS [p1]
-//         WHERE ([p1].[Group] = 1) AND ([p1].[Number] = [p0].[Number])))
-// ) AS [t]";
-//             var pokemon = await pokeflexContext.Pokemons.FromSqlRaw(sql, r.Next(0,Groups), r.Next(1, Numbers)).FirstOrDefaultAsync();
-//             return pokemon;
-//         }
+        [Benchmark]
+        [BenchmarkCategory("Raw")]
+        public Pokemon GetUnionWhereNotExistsCteRaw()
+        {
+            Random r = new Random();
+            var pokeflexContext=DbContextFactory.DbContext.PokeflexContext;
+            string sql = @"
+WITH fnums ([Number]) AS ( 
+    SELECT [Number]
+    FROM pokemons
+    WHERE [Group] = @p0 AND [Number] = @p1
+)
+SELECT [Id], [ApiSource], [Group], [Name], [Number]
+FROM pokemons
+WHERE [Group] = @p0 AND [Number] = @p1
+    UNION ALL
+SELECT [Id], [ApiSource], [Group], [Name], [Number]
+FROM pokemons
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM fnums
+    WHERE fnums.Number = pokemons.Number
+)";
+            var pokemon = pokeflexContext.Pokemons.FromSqlRaw(sql, r.Next(0,Groups), r.Next(1, Numbers)).AsEnumerable();
+            return pokemon.FirstOrDefault();
+        }
+        
+        
+        [Benchmark]
+        [BenchmarkCategory("Raw")]
+        public async Task<Pokemon> GetUnionWhereNotExistsRaw()
+        {
+            Random r = new Random();
+            var pokeflexContext=DbContextFactory.DbContext.PokeflexContext;
+            string sql = @"
+SELECT [t].[Id], [t].[ApiSource], [t].[Group], [t].[Name], [t].[Number]
+FROM (
+    SELECT [p].[Id], [p].[ApiSource], [p].[Group], [p].[Name], [p].[Number]
+    FROM [Pokemons] AS [p]
+    WHERE ([p].[Group] = @p0) AND ([p].[Number] = @p1)
+    UNION ALL
+    SELECT [p0].[Id], [p0].[ApiSource], [p0].[Group], [p0].[Name], [p0].[Number]
+    FROM [Pokemons] AS [p0]
+    WHERE (([p0].[Group] = 0) AND ([p0].[Number] = @p1)) AND NOT (EXISTS (
+        SELECT 1
+        FROM [Pokemons] AS [p1]
+        WHERE ([p1].[Group] = 1) AND ([p1].[Number] = [p0].[Number])))
+) AS [t]";
+            var pokemon = await pokeflexContext.Pokemons.FromSqlRaw(sql, r.Next(0,Groups), r.Next(1, Numbers)).FirstOrDefaultAsync();
+            return pokemon;
+        }
 
         [Benchmark]
         [BenchmarkCategory("Linq")]
-        public async Task<Pokemon> CoalesceLinq()
+        public async Task<Pokemon> GetCoalesceLinq()
         {
             Random r = new Random();
             var pokeflexContext = DbContextFactory.DbContext.PokeflexContext;
@@ -117,29 +143,29 @@ FROM [Pokemons] AS [p]";
             return await pokemon.FirstOrDefaultAsync();
         }
 
-//         [Benchmark]
-//         [BenchmarkCategory("Raw")]
-//         public async Task<Pokemon> CoalesceRaw()
-//         {
-//             Random r = new Random();
-//             var pokeflexContext=DbContextFactory.DbContext.PokeflexContext;
-//             string sql = @"
-// SELECT 
-//     COALESCE( pk_flex.Id, pk_base.Id ) AS 'Id',
-//     COALESCE( pk_flex.Name, pk_base.Name ) AS 'Name',
-//     COALESCE( pk_flex.Number, pk_base.Number ) AS 'Number',
-//     COALESCE( pk_flex.[Group], pk_base.[Group] ) AS 'Group',
-//     COALESCE( pk_flex.ApiSource, pk_base.ApiSource ) AS 'ApiSource'
-// FROM pokemons AS pk_base
-// JOIN pokemons AS pk_flex ON pk_flex.Number=pk_base.Number
-// WHERE pk_base.Number=@p0 AND pk_flex.[Group]=@p1 AND pk_base.[Group]=0";
-//             var pokemon = await pokeflexContext.Pokemons.FromSqlRaw(sql, r.Next(0,Groups), r.Next(1, Numbers)).FirstOrDefaultAsync();
-//             return pokemon;
-//         }
+        [Benchmark]
+        [BenchmarkCategory("Raw")]
+        public async Task<Pokemon> GetCoalesceRaw()
+        {
+            Random r = new Random();
+            var pokeflexContext=DbContextFactory.DbContext.PokeflexContext;
+            string sql = @"
+SELECT 
+    COALESCE( pk_flex.Id, pk_base.Id ) AS 'Id',
+    COALESCE( pk_flex.Name, pk_base.Name ) AS 'Name',
+    COALESCE( pk_flex.Number, pk_base.Number ) AS 'Number',
+    COALESCE( pk_flex.[Group], pk_base.[Group] ) AS 'Group',
+    COALESCE( pk_flex.ApiSource, pk_base.ApiSource ) AS 'ApiSource'
+FROM pokemons AS pk_base
+JOIN pokemons AS pk_flex ON pk_flex.Number=pk_base.Number
+WHERE pk_base.Number=@p0 AND pk_flex.[Group]=@p1 AND pk_base.[Group]=0";
+            var pokemon = await pokeflexContext.Pokemons.FromSqlRaw(sql, r.Next(0,Groups), r.Next(1, Numbers)).FirstOrDefaultAsync();
+            return pokemon;
+        }
 
         [Benchmark]
         [BenchmarkCategory("Linq")]
-        public async Task<Pokemon> SequentialLinqWhereNotIn()
+        public async Task<Pokemon> GetSequentialLinqWhereNotIn()
         {
             Random r = new Random();
             var pokeflexContext = DbContextFactory.DbContext.PokeflexContext;
@@ -163,7 +189,7 @@ FROM [Pokemons] AS [p]";
         
         [Benchmark]
         [BenchmarkCategory("Linq")]
-        public async Task<Pokemon> SequentialLinq()
+        public async Task<Pokemon> GetSequentialLinq()
         {
             Random r = new Random();
             var pokeflexContext = DbContextFactory.DbContext.PokeflexContext;
@@ -184,23 +210,24 @@ FROM [Pokemons] AS [p]";
             return pokemon;
         }
         
-//         [Benchmark]
-//         public async Task<Pokemon> SequentialRaw()
-//         {
-//             Random r = new Random();
-//             var pokeflexContext=DbContextFactory.DbContext.PokeflexContext;
-//             string sql = @"
-// SELECT 
-//     COALESCE( pk_flex.Id, pk_base.Id ) AS 'Id',
-//     COALESCE( pk_flex.Name, pk_base.Name ) AS 'Name',
-//     COALESCE( pk_flex.Number, pk_base.Number ) AS 'Number',
-//     COALESCE( pk_flex.[Group], pk_base.[Group] ) AS 'Group',
-//     COALESCE( pk_flex.ApiSource, pk_base.ApiSource ) AS 'ApiSource'
-// FROM pokemons AS pk_base
-// JOIN pokemons AS pk_flex ON pk_flex.Number=pk_base.Number
-// WHERE pk_base.Number=@p0 AND pk_flex.[Group]=@p1 AND pk_base.[Group]=0";
-//             var pokemon = await pokeflexContext.Pokemons.FromSqlRaw(sql, r.Next(0,Groups), r.Next(1, Numbers)).FirstOrDefaultAsync();
-//             return pokemon;
-//         }
+        [Benchmark]
+        [BenchmarkCategory("Raw")]
+        public async Task<Pokemon> GetSequentialRaw()
+        {
+            Random r = new Random();
+            var pokeflexContext=DbContextFactory.DbContext.PokeflexContext;
+            string sql = @"
+SELECT 
+    COALESCE( pk_flex.Id, pk_base.Id ) AS 'Id',
+    COALESCE( pk_flex.Name, pk_base.Name ) AS 'Name',
+    COALESCE( pk_flex.Number, pk_base.Number ) AS 'Number',
+    COALESCE( pk_flex.[Group], pk_base.[Group] ) AS 'Group',
+    COALESCE( pk_flex.ApiSource, pk_base.ApiSource ) AS 'ApiSource'
+FROM pokemons AS pk_base
+JOIN pokemons AS pk_flex ON pk_flex.Number=pk_base.Number
+WHERE pk_base.Number=@p0 AND pk_flex.[Group]=@p1 AND pk_base.[Group]=0";
+            var pokemon = await pokeflexContext.Pokemons.FromSqlRaw(sql, r.Next(0,Groups), r.Next(1, Numbers)).FirstOrDefaultAsync();
+            return pokemon;
+        }
     }
 }

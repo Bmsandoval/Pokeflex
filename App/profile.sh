@@ -74,7 +74,7 @@ Options:
             '-n'|'-native') db="native" ;;
             '-m'|'-mock') db="mock" ;;
             '-p'|'-priority') usesudo="sudo" ;;
-            '-c'|'-concise') verbosity="| perl -wlne 'print if /^[|]|\/\/ Benchmark: |\/\/ [*]{5} |\s+[-]{3}\s+|\s+at\s+/'" ;;
+            '-c'|'-concise') verbosity="| perl -wlne 'print if /^[|]|\/\/ Benchmark: |\/\/ [*]{5} |\s+[-]{3}|\s+at\s+/'" ;;
             '-v'|'-verbose') verbosity="" ;;
             '-dry') dryrun=true ;;
             '-h'|'-help') help=true && echo "

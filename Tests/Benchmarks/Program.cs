@@ -36,9 +36,8 @@ namespace Benchmarks
                 .WithOption(ConfigOptions.DisableLogFile, true);
             
             
+            BenchmarkRunner.Run<PokeflexServiceBenchmarks.PokeflexServiceGetBenchmarks>(benchmarkConfig);
             BenchmarkRunner.Run<PokeflexServiceBenchmarks.PokeflexServiceListBenchmarks>(benchmarkConfig);
-            BenchmarkRunner.Run<PokeflexServiceBenchmarks.PokeflexServiceSelectBenchmarks>(benchmarkConfig);
-            // BenchmarkRunner.Run<PokeflexServiceBenchmarks.PokeflexServiceAnotherSelectBenchmarks>(benchmarkConfig);
         }
     }
 }
