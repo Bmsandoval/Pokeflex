@@ -5,12 +5,13 @@ using System.Runtime.Serialization.Formatters.Binary;
 using App.Services.ExtPokeApis.ApiFactoryBase;
 using App.Services.ExtPokeApis.PokeApiCo;
 using App.Shared;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace App.Models
 {
-    [DataContract][Serializable]
+    [DataContract][Serializable][Index(nameof(Group), nameof(Number))]
     public class Pokemon : IPokemon
     {
         [DataMember] public int Id { get; set; }

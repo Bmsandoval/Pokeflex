@@ -62,17 +62,42 @@ Options:
       case "${2}" in
         'unit') dotnet test "${POKEFLEX_APP_DIR}/../Tests/Units/Units.csproj" ;;
         'bench')
-          case "${3}" in 
-          '-d'|'-debug') 
-            dotnet run -p "${POKEFLEX_APP_DIR}/../Tests/Benchmarks/Benchmarks.csproj" mock \
-            | perl -wlne 'print if /^[|]|\/\/ Benchmark: |\/\/ [*]{5} /'
-          ;;
-          '-r'|'-release') 
-            sudo dotnet run -c Release -p "${POKEFLEX_APP_DIR}/../Tests/Benchmarks/Benchmarks.csproj" native \
-            | perl -wlne 'print if /^[|]|\/\/ Benchmark: |\/\/ [*]{5} /'
-          ;;
-          ''|*) echo "'-d|-debug' or '-r|-release'"
-          esac
+          local build db usesudo verbosity dryrun help
+          # defaults
+          build="-c Release"
+          db="inmemory"
+          for var in "$@"; do
+            case "${var}" in
+            '-r'|'-release') build="-c Release" ;;
+            '-d'|'-debug') build="" ;;
+            '-i'|'-inmemory') db="inmemory" ;;
+            '-n'|'-native') db="native" ;;
+            '-m'|'-mock') db="mock" ;;
+            '-p'|'-priority') usesudo="sudo" ;;
+            '-c'|'-concise') verbosity="| perl -wlne 'print if /^[|]|\/\/ Benchmark: |\/\/ [*]{5} |\s+[-]{3}\s+|\s+at\s+/'" ;;
+            '-v'|'-verbose') verbosity="" ;;
+            '-dry') dryrun=true ;;
+            '-h'|'-help') help=true && echo "
+-release|-debug : in release mode, optimizations are enabled for truer benchmarks
+-mock|-native|-inmemory : mock uses a hash table, inmemory uses a sqlite database, native uses localhost (I use this against docker)
+    InMemory is as fast as Native, but doesn't have all the same capabilities. Mock really should only be used for unit tests.
+-priority : runs using sudo to enable high priority mode on the process. Allows for more accurate benchmarks
+-concise : parses output using perl regex for more concise output
+-help : displays this menu"
+            esac
+          done
+          local command="${usesudo} dotnet run ${build} -p ${POKEFLEX_APP_DIR}/../Tests/Benchmarks/Benchmarks.csproj ${db} ${verbosity}"
+          if [[ $dryrun ]]; then
+            echo "${command}"
+          elif [[ ! $help ]]; then
+            eval "${command}"
+          fi
+#dotnet run -c Release -f netcoreapp2.1 -- --filter *IntroNativeMemory.Alloc* --profiler NativeMemory
+#top -pid 98921 >> newfile
+#top -b -n 3 | sed -n '8, 12{s/^ *//;s/ *$//;s/  */,/gp;};12q' >> newfile.csv
+#sudo docker inspect –format=”{{.State.Pid}}” pokeflex-db | grep "Pid"
+#docker top pokeflex-db
+#docker stats
         ;;
         ''|*) echo "'unit' or 'bench'"
       esac

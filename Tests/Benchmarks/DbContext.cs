@@ -1,14 +1,11 @@
 using System;
 using System.Linq;
-using System.Threading.Tasks;
 using App.Data;
 using App.Models;
-using App.Services.Pokeflex;
 using EntityFrameworkCoreMock;
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Options;
 using TestSupport.EfHelpers;
 using TestSupport.Helpers;
 
@@ -17,13 +14,10 @@ namespace Benchmarks
     public interface IDbContext
     {
         public PokeflexContext PokeflexContext { get; set; }
-
-        private void BuildContext() {}
     }
 
     public class DbContextFactory
     {
-        public DbContextFactory FactoryInstance { get; } = new();
         public static IDbContext DbContext { get; set; }
         private static string DbType { get; set; }
 
@@ -44,9 +38,9 @@ namespace Benchmarks
             }
             switch (DbType)
             {
-                // case "sqlite":
-                //     DbContext = new InMemoryDbContext();
-                //     break;
+                case "inmemory":
+                    DbContext = new InMemoryDbContext(pokemons);
+                    break;
                 case "native":
                     DbContext = new NativeDbContext(pokemons);
                     break;
@@ -63,68 +57,79 @@ namespace Benchmarks
     public class MockDbContext : IDbContext
     {
         public PokeflexContext PokeflexContext { get; set; }
+        private DbContextOptions<PokeflexContext> ContextOptions { get; set; }
 
-        public void BuildContext(Pokemon[] pokemons)
-        {
-            var dummyOptions = new DbContextOptionsBuilder<PokeflexContext>().Options;
-            var dbContextMock = new DbContextMock<PokeflexContext>(dummyOptions);
-            dbContextMock.CreateDbSetMock(x => x.Pokemons, pokemons);
-            PokeflexContext = dbContextMock.Object;
-        }
+        private void BuildOptions() { ContextOptions = new DbContextOptionsBuilder<PokeflexContext>().Options; }
 
         public MockDbContext(Pokemon[] pokemons)
         {
-            BuildContext(pokemons);
+            BuildOptions();
+            var dbContextMock = new DbContextMock<PokeflexContext>(ContextOptions);
+            dbContextMock.CreateDbSetMock(x => x.Pokemons, pokemons);
+            PokeflexContext = dbContextMock.Object;
         }
     }
 
-    public class DbAccessContext : IDbContext
+    public class InMemoryDbContext : IDbContext 
     {
-        protected IConfigurationRoot Config { get; set; }
         public PokeflexContext PokeflexContext { get; set; }
+        private string ConnectionString { get; set; }
+        private DbContextOptions<PokeflexContext> ContextOptions { get; set; }
+
+        private void SetConnectionString()
+        {
+            var connectionStringBuilder = new SqliteConnectionStringBuilder { DataSource = ":memory:" };
+            ConnectionString = connectionStringBuilder.ToString();
+        }
+
+        private void BuildOptions()
+        {
+            var connection = new SqliteConnection(ConnectionString);
+            connection.Open();
+            var builder = new DbContextOptionsBuilder<PokeflexContext>();
+            builder.UseSqlite(connection);
+            ContextOptions = builder.Options;
+        }
+        public InMemoryDbContext(Pokemon[] pokemons)
+        {
+            SetConnectionString();
+            BuildOptions();
+            PokeflexContext = new PokeflexContext(ContextOptions);
+            PokeflexContext.CreateEmptyViaDelete();
+            PokeflexContext.Pokemons.BulkInsert(pokemons);
+        }
+    }
+    
+    public class NativeDbContext : IDbContext 
+    {
+        public PokeflexContext PokeflexContext { get; set; }
+        private string ConnectionString { get; set; }
+        private DbContextOptions<PokeflexContext> ContextOptions { get; set; }
+        private IConfigurationRoot Config { get; set; }
         
-        protected void SetConfiguration()
+        private void SetConnectionString()
         {
             var callingProjectPath = TestData.GetCallingAssemblyTopLevelDir();
             Config = new ConfigurationBuilder()
                 .SetBasePath(callingProjectPath)
                 .AddJsonFile("appsettings.Local.json").Build();
+            ConnectionString = Config.GetConnectionString("DefaultConnection");
         }
-    }
 
-    // public class InMemoryDbContext : DbAccessContext 
-    // {
-    //     public InMemoryDbContext()
-    //     {
-    //         var connectionString = Config.GetConnectionString("DefaultConnection");
-    //         var builder = new DbContextOptionsBuilder<PokeflexContext>();
-    //         builder.UseSqlServer(connectionString);
-    //         using (var context = new PokeflexContext(builder.Options))
-    //         {
-    //             context.Database.EnsureCreated();
-    //             // Run this for each new test
-    //             context.Database.EnsureClean();
-    //         }
-    //     }
-    // }
-    
-    public class NativeDbContext : DbAccessContext
-    {
-        private void BuildContext()
+        private void BuildOptions()
         {
-            var connectionString = Config.GetConnectionString("DefaultConnection");
             var builder = new DbContextOptionsBuilder<PokeflexContext>();
-            builder.UseSqlServer(connectionString);
-            PokeflexContext = new PokeflexContext(builder.Options);
-            PokeflexContext.Database.EnsureCreated();
-            // Run this for each new test
-            PokeflexContext.Database.EnsureClean();
+            builder.UseSqlServer(ConnectionString);
+            ContextOptions = builder.Options;
+
         }
         
         public NativeDbContext(Pokemon[] pokemons)
         {
-            SetConfiguration();
-            BuildContext();
+            SetConnectionString();
+            BuildOptions();
+            PokeflexContext = new PokeflexContext(ContextOptions);
+            PokeflexContext.CreateEmptyViaDelete();
             PokeflexContext.Pokemons.BulkInsert(pokemons);
         }
     }
