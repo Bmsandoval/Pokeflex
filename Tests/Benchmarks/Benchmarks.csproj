@@ -19,6 +19,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="ShuffleList" Version="1.0.0" />
     <PackageReference Include="Z.EntityFramework.Extensions.EFCore" Version="5.1.30" />
   </ItemGroup>
 

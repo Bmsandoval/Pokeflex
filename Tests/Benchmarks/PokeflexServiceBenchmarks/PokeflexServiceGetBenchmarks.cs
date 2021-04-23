@@ -13,12 +13,11 @@ using Xunit.Sdk;
 
 namespace Benchmarks.PokeflexServiceBenchmarks
 {
-    // [RPlotExporter]
     [CategoriesColumn]
     public class PokeflexServiceGetBenchmarks
     {
-        [Params(1, 10, 25)] public int Groups;
-        [Params(100, 1000, 10000)] public int Numbers;
+        [Params(1, 10)] public int Groups;
+        [Params(100, 1000)] public int Numbers;
 
         [GlobalSetup]
         public void Setup()
@@ -210,24 +209,24 @@ WHERE pk_base.Number=@p0 AND pk_flex.[Group]=@p1 AND pk_base.[Group]=0";
             return pokemon;
         }
         
-        [Benchmark]
-        [BenchmarkCategory("Raw")]
-        public async Task<Pokemon> GetSequentialRaw()
-        {
-            Random r = new Random();
-            var pokeflexContext=DbContextFactory.DbContext.PokeflexContext;
-            string sql = @"
-SELECT 
-    COALESCE( pk_flex.Id, pk_base.Id ) AS 'Id',
-    COALESCE( pk_flex.Name, pk_base.Name ) AS 'Name',
-    COALESCE( pk_flex.Number, pk_base.Number ) AS 'Number',
-    COALESCE( pk_flex.[Group], pk_base.[Group] ) AS 'Group',
-    COALESCE( pk_flex.ApiSource, pk_base.ApiSource ) AS 'ApiSource'
-FROM pokemons AS pk_base
-JOIN pokemons AS pk_flex ON pk_flex.Number=pk_base.Number
-WHERE pk_base.Number=@p0 AND pk_flex.[Group]=@p1 AND pk_base.[Group]=0";
-            var pokemon = await pokeflexContext.Pokemons.FromSqlRaw(sql, r.Next(0,Groups), r.Next(1, Numbers)).FirstOrDefaultAsync();
-            return pokemon;
-        }
+//         [Benchmark]
+//         [BenchmarkCategory("Raw")]
+//         public async Task<Pokemon> GetSequentialRaw()
+//         {
+//             Random r = new Random();
+//             var pokeflexContext=DbContextFactory.DbContext.PokeflexContext;
+//             string sql = @"
+// SELECT 
+//     COALESCE( pk_flex.Id, pk_base.Id ) AS 'Id',
+//     COALESCE( pk_flex.Name, pk_base.Name ) AS 'Name',
+//     COALESCE( pk_flex.Number, pk_base.Number ) AS 'Number',
+//     COALESCE( pk_flex.[Group], pk_base.[Group] ) AS 'Group',
+//     COALESCE( pk_flex.ApiSource, pk_base.ApiSource ) AS 'ApiSource'
+// FROM pokemons AS pk_base
+// JOIN pokemons AS pk_flex ON pk_flex.Number=pk_base.Number
+// WHERE pk_base.Number=@p0 AND pk_flex.[Group]=@p1 AND pk_base.[Group]=0";
+//             var pokemon = await pokeflexContext.Pokemons.FromSqlRaw(sql, r.Next(0,Groups), r.Next(1, Numbers)).FirstOrDefaultAsync();
+//             return pokemon;
+//         }
     }
 }
