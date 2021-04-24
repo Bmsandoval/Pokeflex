@@ -75,7 +75,7 @@ namespace App.Models
         private static IQueryable<Pokemon> InRange(this IQueryable<Pokemon> queryable, int skip, int take=default)
         { 
             return queryable.Where(take == default
-                ? p => p.Number == skip - 1
+                ? p => p.Number == skip
                 : p => p.Number > skip && p.Number <= skip + take);
         }
         public static IQueryable<Pokemon> Flexmons(this IQueryable<Pokemon> q, int pkGroup, int skip, int take=default)
@@ -100,7 +100,7 @@ namespace App.Models
         }
 
         public static IQueryable<Pokemon> IncludeBasemons(this IQueryable<Pokemon> q, DbSet<Pokemon> db, int flexGroup,
-            int skip, int take = 1)
+            int skip, int take = default)
         {
             return q
                 .Concat(db

@@ -22,9 +22,8 @@ namespace App.Services.Pokeflex
         {
             var pokeCtx = _dbContext.Pokemons;
             return await pokeCtx
-                .Flexmons(0,pkNumber)
+                .Flexmons(flexGroup,pkNumber)
                 .IncludeBasemons(pokeCtx,flexGroup,pkNumber)
-                .OrderByNum()
                 .FirstOrDefaultAsync();
         }
         
@@ -36,18 +35,12 @@ namespace App.Services.Pokeflex
         
         public virtual async Task<int> Update(int pkGroup, int pkNumber, Pokemon pokemon)
         {
-//             return await _dbContext.Database.ExecuteSqlRawAsync(@"
-// Update pokemons AS pk
-// SET pk.[Group]=@p0,
-//     pk.ApiSource='@p1',
-//     pk.Name='@p2'
-// WHERE pk.Number=@p3",
-//                 pokemon.Group, pokemon.ApiSource, pokemon.Name, pokemon.Number);
-
-            var pk = await _dbContext
-                .Pokemons
-                .Where(p=> p.Group == pkGroup && p.Number == pkNumber)
+            var pokeCtx = _dbContext.Pokemons;
+            var pk = await pokeCtx
+                .Flexmons(pkGroup,pkNumber)
+                .IncludeBasemons(pokeCtx,pkGroup,pkNumber)
                 .FirstOrDefaultAsync();
+            // var pk = await Select(pkNumber, pkGroup);
             if (pk.Equals(default)) { return default; }
 
             pk.Group = pokemon.Group;
@@ -61,7 +54,7 @@ namespace App.Services.Pokeflex
         {
             var pokeCtx = _dbContext.Pokemons;
             return await pokeCtx
-                .Flexmons(0,offset, limit)
+                .Flexmons(flexGroup,offset, limit)
                 .IncludeBasemons(pokeCtx,flexGroup,offset, limit)
                 .OrderByNum()
                 .ToListAsync();
