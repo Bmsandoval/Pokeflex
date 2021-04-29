@@ -9,6 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using App.Data;
+using App.Models;
 using App.Services;
 using App.Services.ExtPokeApis.ApiFactoryBase;
 using App.Services.Pokeflex;
@@ -37,6 +38,8 @@ namespace App
             
             services.AddTransient<ExtPokeApiServiceFactoryProduct>(s => ExtPokeApiServiceFactory.PokemonService());
             services.AddTransient<PokeflexService>();
+            services.AddTransient<UserService>();
+            services.AddTransient<GroupService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

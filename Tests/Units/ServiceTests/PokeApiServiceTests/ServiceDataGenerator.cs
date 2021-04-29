@@ -5,7 +5,7 @@ using App.Services.ExtPokeApis.PokeApiCo;
 using App.Shared;
 using Moq;
 
-namespace Units.ServiceTests.PokeApiServiceTests
+namespace Tests.Units.ServiceTests.PokeApiServiceTests
 {
     public class MockPokeApiWebRequestSender: PokeapiCoService
     {

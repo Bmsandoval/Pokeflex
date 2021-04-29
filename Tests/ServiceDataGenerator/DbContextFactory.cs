@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using App.Data;
 using App.Models;
@@ -9,7 +10,7 @@ using Microsoft.Extensions.Configuration;
 using TestSupport.EfHelpers;
 using TestSupport.Helpers;
 
-namespace Benchmarks
+namespace Tests.ServiceDataGenerator
 {
     public interface IDbContext
     {
@@ -18,55 +19,32 @@ namespace Benchmarks
 
     public class DbContextFactory
     {
-        public static IDbContext DbContext { get; set; }
-        private static string DbType { get; set; }
-
         private DbContextFactory() { }
 
-        public static void InitDbContext(string dbType = "", Pokemon[] pokemons = null)
+        public static IDbContext NewDbContext(
+            Pokemon[] pokemons = default,
+            User[] users=default,
+            Group[] groups=default,
+            UserGroup[] userGroups=default
+            )
         {
-            if (string.IsNullOrEmpty(dbType))
-            {
-                if (string.IsNullOrEmpty(DbType))
-                {
-                    DbType = "mock";
-                } // else DbType stays what it is currently
-            }
-            else
-            {
-                DbType = dbType;
-            }
-            switch (DbType)
+            var contextType =
+                Environment.GetEnvironmentVariable("DotnetTestDbType", EnvironmentVariableTarget.Process)
+                ?? "";
+
+            pokemons ??= Array.Empty<Pokemon>();
+            users ??= Array.Empty<User>();
+            groups ??= Array.Empty<Group>();
+            userGroups ??= Array.Empty<UserGroup>();
+            switch (contextType)
             {
                 case "inmemory":
-                    DbContext = new InMemoryDbContext(pokemons);
-                    break;
+                    return new InMemoryDbContext(pokemons, users, groups, userGroups);
                 case "native":
-                    DbContext = new NativeDbContext(pokemons);
-                    break;
-                case "mock":
-                    DbContext = new MockDbContext(pokemons);
-                    break;
+                    return new NativeDbContext(pokemons, users, groups, userGroups);
                 default:
-                    throw new ArgumentException();
+                    throw new ArgumentException("invalid option for env var PokeflexTestDbType %s", contextType);
             }
-        }
-    }
-
-
-    public class MockDbContext : IDbContext
-    {
-        public PokeflexContext PokeflexContext { get; set; }
-        private DbContextOptions<PokeflexContext> ContextOptions { get; set; }
-
-        private void BuildOptions() { ContextOptions = new DbContextOptionsBuilder<PokeflexContext>().Options; }
-
-        public MockDbContext(Pokemon[] pokemons)
-        {
-            BuildOptions();
-            var dbContextMock = new DbContextMock<PokeflexContext>(ContextOptions);
-            dbContextMock.CreateDbSetMock(x => x.Pokemons, pokemons);
-            PokeflexContext = dbContextMock.Object;
         }
     }
 
@@ -90,13 +68,39 @@ namespace Benchmarks
             builder.UseSqlite(connection);
             ContextOptions = builder.Options;
         }
-        public InMemoryDbContext(Pokemon[] pokemons)
+        public InMemoryDbContext(Pokemon[] pokemons, User[] users, Group[] groups, UserGroup[] userGroups)
         {
             SetConnectionString();
             BuildOptions();
             PokeflexContext = new PokeflexContext(ContextOptions);
-            PokeflexContext.CreateEmptyViaDelete();
-            PokeflexContext.Pokemons.BulkInsert(pokemons);
+            PokeflexContext.Database.EnsureDeleted();
+            PokeflexContext.ChangeTracker.Clear();
+            PokeflexContext.Database.EnsureCreated();
+
+            HashSet<int> groupIds = new();
+            foreach (var p in pokemons)
+            {
+                if (p.GroupId is null) PokeflexContext.Pokemons.Add(p);
+                else if (groups is null) groupIds.Add((int)p.GroupId);
+            }
+
+            foreach (var @group in
+                groups ?? (
+                    from gId in groupIds
+                    select new Group {Id = gId})
+                .ToArray())
+            {
+                @group.Pokemons = new List<Pokemon>();
+                foreach (var pokemon in pokemons)
+                {
+                    if (pokemon.GroupId != @group.Id) continue;
+                    pokemon.Group = @group;
+                    PokeflexContext.Pokemons.Add(pokemon);
+                    @group.Pokemons.Add(pokemon);
+                }
+                PokeflexContext.Groups.Add(group);
+            }
+            PokeflexContext.BulkSaveChanges();
         }
     }
     
@@ -124,7 +128,7 @@ namespace Benchmarks
 
         }
         
-        public NativeDbContext(Pokemon[] pokemons)
+        public NativeDbContext(Pokemon[] pokemons, User[] users, Group[] groups, UserGroup[] userGroups)
         {
             SetConnectionString();
             BuildOptions();

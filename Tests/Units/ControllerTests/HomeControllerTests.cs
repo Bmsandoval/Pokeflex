@@ -2,7 +2,7 @@ using App.Controllers;
 using Microsoft.AspNetCore.Mvc;
 using Xunit;
 
-namespace Units.ControllerTests
+namespace Tests.Units.ControllerTests
 {
     public class HomeControllerTests 
     {

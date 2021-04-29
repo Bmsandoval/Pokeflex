@@ -8,12 +8,9 @@ using Microsoft.Extensions.Logging;
 
 namespace App.Controllers
 {
+    [Route("health")]
     public class HomeController : Controller
     {
-        [Route("health")]
-        public IActionResult Index()
-        {
-            return Ok();
-        }
+        public IActionResult Index() => Ok();
     }
 }
