@@ -17,10 +17,8 @@ namespace Tests.ServiceDataGenerator
         public PokeflexContext PokeflexContext { get; set; }
     }
 
-    public class DbContextFactory
+    public static class DbContextFactory
     {
-        private DbContextFactory() { }
-
         public static IDbContext NewDbContext(
             Pokemon[] pokemons = default,
             User[] users=default,
