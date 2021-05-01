@@ -4,7 +4,6 @@ using App.Data;
 using App.Models;
 using App.Services.Pokeflex;
 using Tests.ServiceDataGenerator;
-using Tests.ServiceDataGenerator.Seeders;
 using Xunit;
 
 namespace Tests.Units.ServiceTests.PokeflexServiceTests.PokemonTests
@@ -13,9 +12,11 @@ namespace Tests.Units.ServiceTests.PokeflexServiceTests.PokemonTests
     {
         // TEST A FEW OPERATIONS IN A ROW FROM SAME DB
         [Theory]
-        [MemberData(nameof(PokemonSeeder.BaseOnlyDatabase), MemberType = typeof(PokemonSeeder))]
-        public async void TestUpdate(PokeflexContext context, Pokemon poke)
+        [MemberData(nameof(Seeder.BasePokeOnlyDb), MemberType = typeof(Seeder))]
+        public async void TestUpdate(Mocker mocks)
         {
+            var context = DbContextFactory.NewUniqueContext(GetType().Name, mocks).PokeflexContext;
+            var poke = context.Pokemons.First();
             var service = new PokeflexService(context);
             poke.Name = Faker.Lorem.GetFirstWord();
             await service.Update(poke.GroupId, poke.Number, poke);

@@ -3,7 +3,6 @@ using App.Data;
 using App.Models;
 using App.Services.Pokeflex;
 using Tests.ServiceDataGenerator;
-using Tests.ServiceDataGenerator.Seeders;
 using Xunit;
 
 namespace Tests.Units.ServiceTests.PokeflexServiceTests.PokemonTests
@@ -12,16 +11,17 @@ namespace Tests.Units.ServiceTests.PokeflexServiceTests.PokemonTests
     {
         // TEST A FEW OPERATIONS IN A ROW FROM SAME DB
         [Theory]
-        [MemberData(nameof(PokemonSeeder.EmptyDatabase), MemberType = typeof(PokemonSeeder))]
-        public async void TestAllServiceFunctions(PokeflexContext context)
+        [MemberData(nameof(Seeder.EmptyDb), MemberType = typeof(Seeder))]
+        public async void TestAllServiceFunctions(Mocker mocks)
         {
+            var context = DbContextFactory.NewUniqueContext(GetType().Name, mocks).PokeflexContext;
             var pokeflexService = new PokeflexService(context);
             var groupsService = new GroupService(context);
             
             // TEST EMPTY SELECT
             Pokemon testmon = await pokeflexService.Select(42, 1);
             Assert.Null(testmon);
-
+        
             var group = new Group() {Id = 1, Pokemons = new List<Pokemon>()};
             // INSERT NEW
             var inserted = new Pokemon { GroupId = 1, Number = 1, Name = Faker.Lorem.GetFirstWord(), Group = group};
@@ -52,9 +52,10 @@ namespace Tests.Units.ServiceTests.PokeflexServiceTests.PokemonTests
         
         // TEST MANY TO MANY
         [Theory]
-        [MemberData(nameof(PokemonSeeder.EmptyDatabase), MemberType = typeof(PokemonSeeder))]
-        public async void TestManyToMany(PokeflexContext context)
+        [MemberData(nameof(Seeder.EmptyDb), MemberType = typeof(Seeder))]
+        public async void TestManyToMany(Mocker mocks)
         {
+            var context = DbContextFactory.NewUniqueContext(GetType().Name, mocks).PokeflexContext;
             var service = new PokeflexService(context);
             var result = await service.Testy();
             Assert.NotEmpty(result);

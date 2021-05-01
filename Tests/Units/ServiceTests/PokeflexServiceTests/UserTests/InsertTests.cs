@@ -3,7 +3,6 @@ using App.Data;
 using App.Models;
 using App.Services.Pokeflex;
 using Tests.ServiceDataGenerator;
-using Tests.ServiceDataGenerator.Seeders;
 using Xunit;
 
 namespace Tests.Units.ServiceTests.PokeflexServiceTests.UserTests
@@ -12,12 +11,13 @@ namespace Tests.Units.ServiceTests.PokeflexServiceTests.UserTests
     {
         // TEST INSERT USER
         [Theory]
-        [MemberData(nameof(UserSeeder.EmptyDatabase), MemberType = typeof(UserSeeder))]
-        public async void TestInsertUser(PokeflexContext context)
+        [MemberData(nameof(Seeder.EmptyDb), MemberType = typeof(Seeder))]
+        public async void TestInsertUser(Mocker mocks)
         {
+            var context = DbContextFactory.NewUniqueContext(GetType().Name, mocks).PokeflexContext;
             Assert.False(context.Users.Any());
             var service = new UserService(context);
-            Assert.Equal(1, await service.Insert(User.NewMock()));
+            Assert.Equal(1, await service.Insert(Mocker.MockUser()));
             Assert.True(context.Users.Any());
         }
     }

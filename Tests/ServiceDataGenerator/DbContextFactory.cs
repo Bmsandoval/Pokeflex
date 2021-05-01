@@ -19,27 +19,21 @@ namespace Tests.ServiceDataGenerator
 
     public static class DbContextFactory
     {
-        public static IDbContext NewDbContext(
-            Pokemon[] pokemons = default,
-            User[] users=default,
-            Group[] groups=default,
-            UserGroup[] userGroups=default
+        public static IDbContext NewUniqueContext(
+            string callingClassName,
+            Mocker mocker
             )
         {
             var contextType =
                 Environment.GetEnvironmentVariable("DotnetTestDbType", EnvironmentVariableTarget.Process)
                 ?? "";
 
-            pokemons ??= Array.Empty<Pokemon>();
-            users ??= Array.Empty<User>();
-            groups ??= Array.Empty<Group>();
-            userGroups ??= Array.Empty<UserGroup>();
             switch (contextType)
             {
                 case "inmemory":
-                    return new InMemoryDbContext(pokemons, users, groups, userGroups);
+                    return new InMemoryDbContext(callingClassName, mocker);
                 case "native":
-                    return new NativeDbContext(pokemons, users, groups, userGroups);
+                    return new NativeDbContext(callingClassName,  mocker);
                 default:
                     throw new ArgumentException("invalid option for env var PokeflexTestDbType %s", contextType);
             }
@@ -52,9 +46,13 @@ namespace Tests.ServiceDataGenerator
         private string ConnectionString { get; set; }
         private DbContextOptions<PokeflexContext> ContextOptions { get; set; }
 
-        private void SetConnectionString()
+        private void SetConnectionString(string dbUniquifier)
         {
-            var connectionStringBuilder = new SqliteConnectionStringBuilder { DataSource = ":memory:" };
+            var connectionStringBuilder = new SqliteConnectionStringBuilder
+            {
+                DataSource = dbUniquifier,
+                Mode = SqliteOpenMode.Memory,
+            };
             ConnectionString = connectionStringBuilder.ToString();
         }
 
@@ -66,39 +64,28 @@ namespace Tests.ServiceDataGenerator
             builder.UseSqlite(connection);
             ContextOptions = builder.Options;
         }
-        public InMemoryDbContext(Pokemon[] pokemons, User[] users, Group[] groups, UserGroup[] userGroups)
+        public InMemoryDbContext(string dbUniquifier, Mocker mocker)
         {
-            SetConnectionString();
+            SetConnectionString(dbUniquifier);
             BuildOptions();
             PokeflexContext = new PokeflexContext(ContextOptions);
-            PokeflexContext.Database.EnsureDeleted();
-            PokeflexContext.ChangeTracker.Clear();
-            PokeflexContext.Database.EnsureCreated();
-
-            HashSet<int> groupIds = new();
-            foreach (var p in pokemons)
+            PokeflexContext.CreateEmptyViaDelete();
+            // PokeflexContext.Database.EnsureDeleted();
+            // PokeflexContext.ChangeTracker.Clear();
+            // PokeflexContext.Database.EnsureCreated();
+            
+            foreach (var group in mocker)
             {
-                if (p.GroupId is null) PokeflexContext.Pokemons.Add(p);
-                else if (groups is null) groupIds.Add((int)p.GroupId);
-            }
-
-            foreach (var @group in
-                groups ?? (
-                    from gId in groupIds
-                    select new Group {Id = gId})
-                .ToArray())
-            {
-                @group.Pokemons = new List<Pokemon>();
-                foreach (var pokemon in pokemons)
+                foreach (var poke in group.Pokemons)
                 {
-                    if (pokemon.GroupId != @group.Id) continue;
-                    pokemon.Group = @group;
-                    PokeflexContext.Pokemons.Add(pokemon);
-                    @group.Pokemons.Add(pokemon);
+                    PokeflexContext.Pokemons.Add(poke);
                 }
+
+                if (group.Id == 0) continue;
+                group.Id = default;
                 PokeflexContext.Groups.Add(group);
             }
-            PokeflexContext.BulkSaveChanges();
+            PokeflexContext.SaveChanges();
         }
     }
     
@@ -118,7 +105,7 @@ namespace Tests.ServiceDataGenerator
             ConnectionString = Config.GetConnectionString("DefaultConnection");
         }
 
-        private void BuildOptions()
+        private void BuildOptions(string dbUniquifier)
         {
             var builder = new DbContextOptionsBuilder<PokeflexContext>();
             builder.UseSqlServer(ConnectionString);
@@ -126,13 +113,13 @@ namespace Tests.ServiceDataGenerator
 
         }
         
-        public NativeDbContext(Pokemon[] pokemons, User[] users, Group[] groups, UserGroup[] userGroups)
+        public NativeDbContext(string dbNameUniquifier, Mocker mocker)
         {
-            SetConnectionString();
-            BuildOptions();
-            PokeflexContext = new PokeflexContext(ContextOptions);
-            PokeflexContext.CreateEmptyViaDelete();
-            PokeflexContext.Pokemons.BulkInsert(pokemons);
+            // SetConnectionString();
+            // BuildOptions(dbNameUniquifier);
+            // PokeflexContext = new PokeflexContext(ContextOptions);
+            // PokeflexContext.CreateEmptyViaDelete();
+            // PokeflexContext.Pokemons.BulkInsert(pokemons);
         }
     }
 }

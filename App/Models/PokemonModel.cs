@@ -17,7 +17,7 @@ using Newtonsoft.Json.Linq;
 namespace App.Models
 {
     [DataContract][Serializable][Index(nameof(GroupId), nameof(Number))]
-    public class Pokemon : IPokemon, IMockable
+    public class Pokemon : IPokemon
     {
         [DataMember] public int Id { get; set; }
         [DataMember] public int? GroupId { get; set; }
@@ -36,32 +36,6 @@ namespace App.Models
             ApiSource = pokemon.ApiSource;
             Number = pokemon.Number;
             Name = pokemon.Name;
-        }
-
-        public static Pokemon NewMock(int? groupId, int number, string apiSource=default, string name=default)
-        {
-            return new Pokemon{
-                GroupId = groupId,
-                Number = number,
-                ApiSource = apiSource ?? Faker.Lorem.GetFirstWord(),
-                Name = name ?? Faker.Lorem.GetFirstWord()
-            };
-        }
-
-        public static Pokemon[] NewMocks(int maxGroups, int maxNumbers)
-        {
-            List<Pokemon> pokemons = new ();
-            for (int g = 0; g <= maxGroups; g++)
-            {
-                for (int n=1; n <= maxNumbers; n++)
-                {
-                    pokemons.Add(NewMock(
-                        groupId: g==0?null:g,
-                        number: n));
-                }
-            }
-
-            return pokemons.ToArray();
         }
 
         public override int GetHashCode()

@@ -15,15 +15,10 @@ using Newtonsoft.Json.Linq;
 
 namespace App.Models
 {
-    public class User : IMockable
+    public class User
     {
         public int Id { get; set; }
 
         public IList<UserGroup> UserGroups { get; set; }
-        
-        public static User NewMock()
-        {
-            return new () { };
-        }
     }
 }

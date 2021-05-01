@@ -1,9 +1,10 @@
+using System;
 using System.Linq;
 using App.Data;
 using App.Models;
 using App.Services.Pokeflex;
+using Microsoft.EntityFrameworkCore;
 using Tests.ServiceDataGenerator;
-using Tests.ServiceDataGenerator.Seeders;
 using Xunit;
 
 namespace Tests.Units.ServiceTests.PokeflexServiceTests.PokemonTests
@@ -12,50 +13,57 @@ namespace Tests.Units.ServiceTests.PokeflexServiceTests.PokemonTests
     {
         // SELECT NULL FROM EMPTY
         [Theory]
-        [MemberData(nameof(PokemonSeeder.EmptyDatabase), MemberType = typeof(PokemonSeeder))]
-        public async void TestCanSelectFromEmptyDb(PokeflexContext context)
+        [MemberData(nameof(Seeder.EmptyDb), MemberType = typeof(Seeder))]
+        public async void TestCanSelectFromEmptyDb(Mocker mocks)
         {
+            var context = DbContextFactory.NewUniqueContext(GetType().Name, mocks).PokeflexContext;
             var service = new PokeflexService(context);
             Pokemon pokemon = await service.Select(-1);
             Assert.Null(pokemon);
         }
-
+    
         
         // SELECT BASE FROM MIXED
         [Theory]
-        [MemberData(nameof(PokemonSeeder.MixedDatabase), MemberType = typeof(PokemonSeeder))]
-        public async void TestCanSelectBaseFromMixedDb(PokeflexContext context, Pokemon basePk, Pokemon _)
+        [MemberData(nameof(Seeder.MixedPokeDb), MemberType = typeof(Seeder))]
+        public async void TestCanSelectBaseFromMixedDb(Mocker mocks, int number)
         {
+            var context = DbContextFactory.NewUniqueContext(GetType().Name, mocks).PokeflexContext;
             var service = new PokeflexService(context);
-            Pokemon resultmon = await service.Select(basePk.Number);
+            Pokemon resultmon = await service.Select(number);
             Assert.NotNull(resultmon);
-            Assert.Equal(basePk, resultmon);
+            Assert.Null(resultmon.GroupId);
+            Assert.Equal(number, resultmon.Number);
         }
         
         
         // SELECT OVERRIDE FROM MIXED
         [Theory]
-        [MemberData(nameof(PokemonSeeder.MixedDatabase), MemberType = typeof(PokemonSeeder))]
-        public async void TestCanSelectOverrideFromMixedDb(PokeflexContext context, Pokemon _, Pokemon flexPk)
+        [MemberData(nameof(Seeder.MixedPokeDb), MemberType = typeof(Seeder))]
+        public async void TestCanSelectOverrideFromMixedDb(Mocker mocks, int number)
         {
+            var context = DbContextFactory.NewUniqueContext(GetType().Name, mocks).PokeflexContext;
             var service = new PokeflexService(context);
-            Pokemon resultmon = await service.Select(flexPk.Number, flexPk.GroupId);
-            Assert.True(context.Pokemons.Any());
+            Pokemon resultmon = await service.Select(number, 1);
             Assert.NotNull(resultmon);
-            Assert.True(flexPk.Equals(resultmon));
+            Assert.NotNull(resultmon.GroupId);
+            Assert.Equal(number, resultmon.Number);
         }
         
         
         // SELECT FROM SINGLE-TYPED
         [Theory]
-        [MemberData(nameof(PokemonSeeder.BaseOnlyDatabase), MemberType = typeof(PokemonSeeder))]
-        [MemberData(nameof(PokemonSeeder.FlexOnlyDatabase), MemberType = typeof(PokemonSeeder))]
-        public async void TestCanSelectFromDbWithSingleTypes(PokeflexContext context, Pokemon exists)
+        [MemberData(nameof(Seeder.BasePokeOnlyDb), MemberType = typeof(Seeder))]
+        [MemberData(nameof(Seeder.FlexPokeOnlyDb), MemberType = typeof(Seeder))]
+        public async void TestCanSelectFromDbWithSingleTypes(Mocker mocks)
         {
+            var context = DbContextFactory.NewUniqueContext(GetType().Name, mocks).PokeflexContext;
+            var poke = context.Pokemons.First();
             var service = new PokeflexService(context);
-            Pokemon resultmon = await service.Select(exists.Number, exists.GroupId);
+            Pokemon resultmon = await service.Select(poke.Number, poke.GroupId);
+            Assert.True(context.Pokemons.Any());
             Assert.NotNull(resultmon);
-            Assert.Equal(exists, resultmon);
+            Assert.Equal(poke, resultmon);
         }
     }
 }

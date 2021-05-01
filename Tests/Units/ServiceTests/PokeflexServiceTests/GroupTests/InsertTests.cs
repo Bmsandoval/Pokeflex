@@ -5,7 +5,6 @@ using App.Models;
 using App.Services.Pokeflex;
 using Microsoft.EntityFrameworkCore;
 using Tests.ServiceDataGenerator;
-using Tests.ServiceDataGenerator.Seeders;
 using Xunit;
 
 namespace Tests.Units.ServiceTests.PokeflexServiceTests.GroupTests
@@ -14,15 +13,16 @@ namespace Tests.Units.ServiceTests.PokeflexServiceTests.GroupTests
     {
         // TEST INSERT USER
         [Theory]
-        [MemberData(nameof(GroupSeeder.EmptyDatabase), MemberType = typeof(GroupSeeder))]
-        public async void TestInsertGroup(PokeflexContext context)
+        [MemberData(nameof(Seeder.EmptyDb), MemberType = typeof(Seeder))]
+        public async void TestInsertGroup(Mocker mocks)
         {
+            var context = DbContextFactory.NewUniqueContext(GetType().Name, mocks).PokeflexContext;
             Assert.False(context.Groups.Any());
             var service = new GroupService(context);
-            await service.Insert(Group.NewMock());
+            await service.Insert(Mocker.MockGroup());
             Assert.True(context.Groups.Any());
             Assert.Equal(1, (await context.Groups.SingleOrDefaultAsync()).Id);
-            await service.Insert(Group.NewMock());
+            await service.Insert(Mocker.MockGroup());
             Assert.Equal(2, (await context.Groups.OrderByDescending(g=>g.Id).FirstOrDefaultAsync()).Id);
         }
     }

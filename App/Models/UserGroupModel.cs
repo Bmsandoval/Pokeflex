@@ -15,7 +15,7 @@ using Newtonsoft.Json.Linq;
 namespace App.Models
 {
     [Index(nameof(UserId),nameof(GroupId))]
-    public class UserGroup : IMockable
+    public class UserGroup
     {
         public int Id { get; set; }
         public int UserId { get; set; }
@@ -23,10 +23,5 @@ namespace App.Models
         
         public int GroupId { get; set; }
         public Group Group { get; set; }
-        
-        public static UserGroup NewMock()
-        {
-            return new () { };
-        }
     }
 }

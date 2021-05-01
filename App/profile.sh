@@ -32,7 +32,10 @@ _pokeflex_test_bench_options=\
 \t-nativedb\t:\truns tests against a native db on local host (I use this against a docker db)
 \t-verbose\t:\t[default] no holes barred
 \t-concise\t:\tparses output using perl regex for more concise output
-\t-filter\t:\toptionally filter to specific tests
+\t-filter-any\t:\tRuns tests that are in ANY of the provided categories
+\t-filter-all\t:\tRuns tests that are in ALL of the provided categories
+\t-quick\t:\tRuns benchmarks in-process, on short-job setting. not bad, but not the best.
+\t-debug\t:\tRuns benchmarks in fastest possible setting. bad benchmarks, but good for testing/debugging broken benchmarks
 \t-dry\t:\tprint the resulting command instead of running it
 \t-help\t:\tdisplays this menu"
 
@@ -129,12 +132,13 @@ ${_pokeflex_base_options}"
           esac
           ;;
         'bench')
-          local build db verbosity dryrun help filter filtering
+          local build db verbosity dryrun help filter filtering quick debug
           # defaults
           build="-c Release"
           db="inmemory"
           while shift; do
             if [[ "${1}" == "--" ]]; then 
+              shift
               break
             fi
             case "${1}" in 
@@ -142,13 +146,16 @@ ${_pokeflex_base_options}"
             '-n'|'-nativedb') db="native" && filtering=false ;;
             '-c'|'-concise') verbosity="| perl -wlne 'print if /^[|]|\/\/ Benchmark: |\/\/ [*]{5} |\s+[-]{3}|\s+at\s+/'" && filtering=false ;;
             '-v'|'-verbose') verbosity="" && filtering=false ;;
-            '-f'|'-filter') filter="--allCategories " && filtering=true ;;
+            '-fl'|'-filter-all') filter="--allCategories " && filtering=true ;;
+            '-fy'|'-filter-any') filter="--anyCategories " && filtering=true ;;
+            '-q'|'-quick') quick="-j short -i" ;; # short run job, with in-process benchmarks
+            '-d'|'-debug') debug="--warmupCount 1 --iterationCount 1 --invocationCount 1 --unrollFactor 1 --runOncePerIteration true" ;;
             '-dry') dryrun=true && filtering=false ;;
             '-h'|'-help') help=true && echo -e "${_pokeflex_test_bench_options}" && filtering=false ;;
             *) [[ $filtering ]] && filter+=" ${1}" ;;
             esac
           done
-          local command="export DotnetTestDbType=${db} && sudo -E dotnet run -c Release -p ${POKEFLEX_APP_DIR}/../Tests/Tests.csproj ${filter} ${@} ${verbosity}" 
+          local command="export DotnetTestDbType=${db} && sudo -E dotnet run -c Release -p ${POKEFLEX_APP_DIR}/../Tests/Tests.csproj -- ${filter} ${debug} ${quick} ${@} ${verbosity}" 
           if [[ $dryrun ]]; then
             echo "${command}"
           elif [[ $help ]]; then
@@ -200,7 +207,7 @@ ${_pokeflex_base_options}"
 } 2>/dev/null
 
 
-__pokeflext_list_benchmark_tests () {
+__pokeflext_list_bench_tests () {
   local _testFiles=($(cd ${POKEFLEX_APP_DIR}/../Tests && find . -type f -not -path "*/Units/*" -not -path "*/obj/*" -not -path "*/bin/*" -not -path "*.Artifacts/*" -not -path "*/ServiceDataGenerator/*" -not -name "Tests.csproj" -not -name "Program.cs" -not -name "appsettings.*.json" -not -path "*/.idea/*"))
   rm pipe0; mkfifo pipe0
   _pids=()
@@ -286,6 +293,12 @@ _fzf_complete_pokeflex () {
     "test") COMPREPLY=($(compgen -W "unit bench" "${COMP_WORDS[COMP_CWORD]}")) ;;
     "bench") COMPREPLY=("" $(compgen -W "$(echo -e "${_pokeflex_test_bench_options}" | perl -ne 'print "$1 " if /\t([^\t]+)\t/')" "${COMP_WORDS[COMP_CWORD]}")) ;;
     "unit") COMPREPLY=("" $(compgen -W "$(echo -e "${_pokeflex_test_unit_options}" | perl -ne 'print "$1 " if /\t([^\t]+)\t/')" "${COMP_WORDS[COMP_CWORD]}")) ;;
+    "-f"|"-filter")
+      [[ " ${COMP_WORDS[@]} " =~ " unit " ]] && COMPREPLY=("" $(compgen -W "$(__pokeflext_list_unit_tests)" "${COMP_WORDS[COMP_CWORD]}"))
+    ;;
+    "-fy"|"-filter-any"|"-fl"|"-filter-all")
+      [[ " ${COMP_WORDS[@]} " =~ " bench " ]] && COMPREPLY=("" $(compgen -W "$(__pokeflext_list_bench_tests)" "${COMP_WORDS[COMP_CWORD]}"))
+    ;;
     esac  
   else
   #####################
@@ -303,18 +316,19 @@ _fzf_complete_pokeflex () {
         which fzf >/dev/null && _fzf_complete --with-nth=2 --delimiter='\t' --preview='echo -e {4}' --preview-window=up:sharp:wrap:40% --prompt="pokeflex> " -- "$@" < <(
           echo -e "${_pokeflex_test_bench_options}")
       ;;
-      "-f")
-        case "${COMP_WORDS[COMP_CWORD-2]}" in
-        "unit")
+      "-f"|"-filter")
+        if [[ " ${COMP_WORDS[@]} " =~ " unit " ]]; then
           which fzf >/dev/null && _fzf_complete --multi --preview-window=up:sharp:wrap:40% --prompt="pokeflex> " -- "$@" < <(
             echo -e "$(__pokeflext_list_unit_tests)")
-        ;;
-        "bench")
-          which fzf >/dev/null && _fzf_complete --multi --preview-window=up:sharp:wrap:40% --prompt="pokeflex> " -- "$@" < <(
-            echo -e "$(__pokeflext_list_benchmark_tests)")
-        ;;
-        esac
+        fi
       ;;
+      "-fy"|"-filter-any"|"-fl"|"-filter-all")
+        if [[ " ${COMP_WORDS[@]} " =~ " bench " ]]; then
+          which fzf >/dev/null && _fzf_complete --multi --preview-window=up:sharp:wrap:40% --prompt="pokeflex> " -- "$@" < <(
+            echo -e "$(__pokeflext_list_bench_tests)")
+        fi
+      ;;
+      
       esac
   fi
 }
@@ -323,11 +337,12 @@ _fzf_complete_pokeflex () {
 _fzf_complete_pokeflex_post () {
   local result
   read -ra result
-  if [[ "${COMP_WORDS[COMP_CWORD-1]}" == "-f" ]]; then
+  case "${COMP_WORDS[COMP_CWORD-1]}" in
+  "-f"|"-filter"|"-fy"|"-filter-any"|"-fl"|"-filter-all")
     while read -ra line; do
       result+=" ${line}"
     done
-  fi
+  esac
   echo "${result}"
 }
 

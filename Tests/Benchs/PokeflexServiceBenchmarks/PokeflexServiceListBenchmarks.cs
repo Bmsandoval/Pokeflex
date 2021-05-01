@@ -13,15 +13,19 @@ namespace Tests.Benchs.PokeflexServiceBenchmarks
 {
     public class PokeflexServiceListBase
     {
-        [Params( 1, 10, 15)] public int Groups;
-        [Params(10, 1_000, 100_000)] public int Numbers;
+        [Params( 5, 10, 15)] public int Groups;
+        [Params(10, 1_000, 10_000)] public int Numbers;
         [Params(0.1, 0.20, 0.30)] public double LimitAsPctNumbers;
         protected int Group;
         protected int Limit;
         protected int Offset;
         protected IDbContext DbContext;
         private readonly Random _rand = new ();
-        [GlobalSetup] public void Setup() => DbContext = DbContextFactory.NewDbContext(Pokemon.NewMocks(Groups, Numbers));
+        [GlobalSetup] public void Setup() => DbContext = DbContextFactory
+            .NewUniqueContext( GetType().Name, Mocker
+                .HasGroups(Groups)
+                .WithPokemons(Numbers));
+
         [IterationSetup] public void IterationSetup()
         {
             Limit = (int)(Numbers * LimitAsPctNumbers);

@@ -13,8 +13,8 @@ namespace Tests.Benchs.PokeflexServiceBenchmarks
 {
     public class PokeflexServiceGetBase
     {
-        [Params(1, 10, 15)] public int Groups;
-        [Params(10, 1000, 100000)] public int Numbers;
+        [Params(5, 10, 15)] public int Groups;
+        [Params(10, 1_000, 10_000)] public int Numbers;
         protected int Group;
         protected int Number;
         protected IDbContext DbContext;
@@ -23,16 +23,19 @@ namespace Tests.Benchs.PokeflexServiceBenchmarks
         [GlobalSetup]
         public void Setup()
         {
-            var mockPokemons = Pokemon.NewMocks(Groups, Numbers);
-            DbContext = DbContextFactory.NewDbContext(mockPokemons);
+            DbContext = DbContextFactory
+                .NewUniqueContext(
+                    GetType().Name,
+                    Mocker
+                        .HasGroups(Groups)
+                        .WithPokemons(Numbers));
         }
 
         [IterationSetup] public void IterationSetup()
         {
-            Number = _rand.Next(0, Numbers);
-            Group = _rand.Next(1, Groups);
+            Number = _rand.Next(1, Numbers);
+            Group = _rand.Next(0, Groups);
         }
-
     }
     
     
@@ -40,7 +43,7 @@ namespace Tests.Benchs.PokeflexServiceBenchmarks
     public class PokeflexServiceLinqGetBenchmarks : PokeflexServiceGetBase
     {
         [BenchmarkCategory("LinqQuery")]
-        [Benchmark(Baseline = true)] public async Task<Pokemon> LinqQueryBaseline()
+        [Benchmark(Baseline = true, Description = "Linq Query Syntax")] public async Task<Pokemon> LinqQueryBaseline()
         {
             var service = new PokeflexService(DbContext.PokeflexContext);
             var pokeflexContext=DbContext.PokeflexContext;
@@ -50,7 +53,7 @@ namespace Tests.Benchs.PokeflexServiceBenchmarks
                 .FirstOrDefaultAsync();
         }
         [BenchmarkCategory("LinqMethod")]
-        [Benchmark] public void LinqMethodBaseline()
+        [Benchmark(Description = "Linq Method Syntax")] public void LinqMethodBaseline()
         {
             var service = new PokeflexService(DbContext.PokeflexContext);
             var pokeflexContext=DbContext.PokeflexContext;

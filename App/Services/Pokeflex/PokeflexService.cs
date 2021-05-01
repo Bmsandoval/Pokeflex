@@ -21,10 +21,12 @@ namespace App.Services.Pokeflex
         public virtual async Task<Pokemon> Select(int pkNumber, int? flexGroup=null)
         {
             var pokeCtx = _dbContext.Pokemons;
-            return await pokeCtx
-                .Flexmons(flexGroup,pkNumber)
-                .IncludeBasemons(pokeCtx,flexGroup,pkNumber)
-                .FirstOrDefaultAsync();
+            var flexmons = pokeCtx.Flexmons(flexGroup, pkNumber);
+            return flexGroup != null
+                ? await flexmons.FirstOrDefaultAsync()
+                : await flexmons
+                    .IncludeBasemons(pokeCtx, flexGroup, pkNumber)
+                    .FirstOrDefaultAsync();
         }
         
         public virtual async Task<int> Insert(Pokemon pokemon)

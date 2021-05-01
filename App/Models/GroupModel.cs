@@ -15,17 +15,12 @@ using Newtonsoft.Json.Linq;
 
 namespace App.Models
 {
-    public class Group : IMockable
+    public class Group
     {
         public int Id { get; set; }
 
         public IList<UserGroup> UserGroups { get; set; }
         
         public IList<Pokemon> Pokemons { get; set; }
-        
-        public static Group NewMock()
-        {
-            return new () { };
-        }
     }
 }
