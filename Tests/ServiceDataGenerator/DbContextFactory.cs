@@ -71,7 +71,7 @@ namespace Tests.ServiceDataGenerator
             PokeflexContext = new PokeflexContext(ContextOptions);
             PokeflexContext.CreateEmptyViaDelete();
             // PokeflexContext.Database.EnsureDeleted();
-            // PokeflexContext.ChangeTracker.Clear();
+            PokeflexContext.ChangeTracker.Clear();
             // PokeflexContext.Database.EnsureCreated();
             
             foreach (var group in mocker)
@@ -82,7 +82,6 @@ namespace Tests.ServiceDataGenerator
                 }
 
                 if (group.Id == 0) continue;
-                group.Id = default;
                 PokeflexContext.Groups.Add(group);
             }
             PokeflexContext.SaveChanges();

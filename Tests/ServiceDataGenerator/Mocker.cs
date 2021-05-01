@@ -22,9 +22,7 @@ namespace Tests.ServiceDataGenerator
             ApiSource = Faker.Lorem.GetFirstWord(),
             Name = Faker.Lorem.GetFirstWord()};
         public static Group MockGroup(int? id = null) =>
-            id == null
-                ? new Group {Pokemons = new List<Pokemon>()}
-                : new Group {Id = (int) id, Pokemons = new List<Pokemon>()};
+                new Group {Pokemons = new List<Pokemon>()};
         
         public static Mocker Empty()
         {
