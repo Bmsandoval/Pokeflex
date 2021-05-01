@@ -155,7 +155,7 @@ ${_pokeflex_base_options}"
             *) [[ $filtering ]] && filter+=" ${1}" ;;
             esac
           done
-          local command="export DotnetTestDbType=${db} && sudo -E dotnet run -c Release -p ${POKEFLEX_APP_DIR}/../Tests/Tests.csproj -- ${filter} ${debug} ${quick} ${@} ${verbosity}" 
+          local command="export DotnetTestDbType=${db} && sudo -E dotnet run -c Release -p ${POKEFLEX_APP_DIR}/../Tests/Tests.csproj -- --join ${filter} ${debug} ${quick} ${@} ${verbosity}" 
           if [[ $dryrun ]]; then
             echo "${command}"
           elif [[ $help ]]; then
