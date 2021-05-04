@@ -13,9 +13,12 @@ namespace Tests.Benchs.PokeflexServiceBenchmarks
 {
     public class PokeflexServiceListBase
     {
-        [Params( 5, 10, 15)] public int Groups;
-        [Params(10, 1_000, 10_000)] public int Numbers;
-        [Params(0.1, 0.20, 0.30)] public double LimitAsPctNumbers;
+        // [Params( 5, 15)] public int Groups;
+        // [Params(100, 1_000, 5_000)] public int Numbers;
+        // [Params(0.10, 0.30)] public double LimitAsPctNumbers;
+        [Params( 15)] public int Groups;
+        [Params(5_000)] public int Numbers;
+        [Params(0.30)] public double LimitAsPctNumbers;
         protected int Group;
         protected int Limit;
         protected int Offset;
@@ -35,7 +38,7 @@ namespace Tests.Benchs.PokeflexServiceBenchmarks
     }
     
     
-    [BenchmarkCategory("Service", "Pokeflex", "Linq", "List")]
+    [BenchmarkCategory("All", "Service", "Pokeflex", "Linq", "List")]
     [CategoriesColumn] public class PokeflexServiceLinqListBenchmarks : PokeflexServiceListBase
     {
         [Benchmark(Baseline = true)] public async Task<List<Pokemon>> Baseline()

@@ -5,48 +5,49 @@ POKEFLEX_APP_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 
 
 _pokeflex_base_options=\
-"\tstart\t:\tlaunch pokeflex's docker container(s). Optionally specify specific one
-\tstop\t:\tstop pokeflex's docker container(s)
-\tremake\t:\tforce rebuild. probably don't need to do this, it's built into the start and reset commands
-\treset\t:\tpurges and rebuilds pokeflex's docker container(s) [[WARNING: RESETS DATABASE]]
-\tpurge\t:\tstop containers and purge all remnants [[WARNING: EVEN WORSE THAN RESET]]
-\ttest\t:\truns unit|bench tests
-\tsync\t:\tsyncs this project with a non-local host
-\trepro\t:\treloads this file
-\thelp\t:\tshow this menu"
+"\t\t\tOne of the following is required
+start\t:\tlaunch pokeflex's docker container(s). Optionally specify specific one
+stop\t:\tstop pokeflex's docker container(s)
+remake\t:\tforce rebuild. probably don't need to do this, it's built into the start and reset commands
+reset\t:\tpurges and rebuilds pokeflex's docker container(s) [[WARNING: RESETS DATABASE]]
+purge\t:\tstop containers and purge all remnants [[WARNING: EVEN WORSE THAN RESET]]
+test\t:\truns unit|bench tests
+sync\t:\tsyncs this project with a non-local host
+repro\t:\treloads this file
+help\t:\tshow this menu"
 
 
 _pokeflex_purge_options=\
 "\t\t\tOne of the following is required
-\tapi\t:\tThis project's backend's docker container (db unaffected)
-\tproject\t:\tAll docker containers for this project
-\teverywhere\t:\tAll non-database docker containers, regardless of project
-\teverything\t:\tAll docker containers, regardless of project
-\tkillme\t:\tPurges base docker image. You probably don't want to do this
-\thelp\t:\tdisplays this menu"
+api\t:\tThis project's backend's docker container (db unaffected)
+project\t:\tAll docker containers for this project
+everywhere\t:\tAll non-database docker containers, regardless of project
+everything\t:\tAll docker containers, regardless of project
+killme\t:\tPurges base docker image. You probably don't want to do this
+help\t:\tdisplays this menu"
 
 
 _pokeflex_test_bench_options=\
 "\t\t\tAll following arguments are optional
-\t-inmemorydb\t:\t[default] runs tests against an inmemory sqlite database.
-\t-nativedb\t:\truns tests against a native db on local host (I use this against a docker db)
-\t-verbose\t:\t[default] no holes barred
-\t-concise\t:\tparses output using perl regex for more concise output
-\t-filter-any\t:\tRuns tests that are in ANY of the provided categories
-\t-filter-all\t:\tRuns tests that are in ALL of the provided categories
-\t-quick\t:\tRuns benchmarks in-process, on short-job setting. not bad, but not the best.
-\t-debug\t:\tRuns benchmarks in fastest possible setting. bad benchmarks, but good for testing/debugging broken benchmarks
-\t-dry\t:\tprint the resulting command instead of running it
-\t-help\t:\tdisplays this menu"
+-inmemorydb\t:\t[default] runs tests against an inmemory sqlite database.
+-nativedb\t:\truns tests against a native db on local host (I use this against a docker db)
+-verbose\t:\t[default] no holes barred
+-quiet\t:\tparses output using perl regex for more concise output
+-filter-any\t:\tRuns tests that are in ANY of the provided categories
+-filter-all\t:\tRuns tests that are in ALL of the provided categories
+-rapid\t:\tRuns benchmarks in-process, on short-job setting. not bad, but not the best.
+-debug\t:\tRuns benchmarks in fastest possible setting. bad benchmarks, but good for testing/debugging broken benchmarks
+-dry\t:\tprint the resulting command instead of running it
+-help\t:\tdisplays this menu"
 
 
 _pokeflex_test_unit_options=\
 "\t\t\tAll following arguments are optional
-\t-inmemorydb\t:\t[default] runs tests against an inmemory sqlite database.
-\t-nativedb\t:\truns tests against a native db on local host (I use this against a docker db)
-\t-filter\t:\toptionally filter to specific tests
-\t-dry\t:\tprint the resulting command instead of running it
-\t-help\t:\tdisplays this menu"
+-inmemorydb\t:\t[default] runs tests against an inmemory sqlite database.
+-nativedb\t:\truns tests against a native db on local host (I use this against a docker db)
+-filter\t:\toptionally filter to specific tests
+-dry\t:\tprint the resulting command instead of running it
+-help\t:\tdisplays this menu"
 
 
 alias pf="pokeflex"
@@ -85,7 +86,7 @@ ${_pokeflex_base_options}"
     'purge')
       case "${_subOption}" in
         'api') ${FUNCNAME[0]} stop api; docker system prune --all --force --filter=label=base=true --filter=label=notdb=true --filter=label=pokeflex=true ;;
-        'project') docker stop $(docker ps -q); docker system prune --all --force --filter=label=base=true --filter=label=pokeflex=true ;;
+        'project') docker stop $(docker ps -q); docker system prune --all --force --filter=label=base=true --filter=label=pokeflex=true; ${FUNCNAME[0]} sync -cease ;;
         'everywhere') docker stop $(docker ps -q); docker system prune --all --force --filter=label=base=true --filter=label=notdb=true ;;
         'everything') docker stop $(docker ps -q); docker system prune --all --force --filter=label=base=true ;;
         'killme') docker stop $(docker ps -q); docker system prune --all --force ;;
@@ -103,7 +104,7 @@ ${_pokeflex_base_options}"
       local start=$(date +%s)
       case "${_subOption}" in
         'unit') 
-          local db help dryrun filtering filter
+          local db help dryrun filtering filter continuous
           db="inmemory"
           while shift; do
             if [[ "${1}" == "--" ]]; then 
@@ -117,6 +118,7 @@ ${_pokeflex_base_options}"
             case "${1}" in
             '-i'|'-inmemory') db="inmemory"; filtering=0 ;;
             '-n'|'-native') db="native"; filtering=0 ;;
+            '-c'|'-continuous') continuous=1; filtering=0 ;;
             '-dry') dryrun=1; filtering=0 ;;
             '-f'|'-filter') filter="--filter '"; filtering=1 ;;
             '-h'|'-help') help=1; echo -e "${_pokeflex_test_unit_options}"; filtering=0 ;;
@@ -128,13 +130,13 @@ ${_pokeflex_base_options}"
           case "1" in
           "${dryrun}") echo "${command}" ;;
           "${help}") eval "dotnet test ${POKEFLEX_APP_DIR}/../Tests/Tests.csproj --help" ;;
+          "${continuous}") fswatch . | while read -r line; do eval "${command}"; done ;;
           *) eval "${command}" ;;
           esac
           ;;
         'bench')
-          local build db verbosity dryrun help filter filtering quick debug
+          local db verbosity dryrun help filter filtering rapid debug
           # defaults
-          build="-c Release"
           db="inmemory"
           while shift; do
             if [[ "${1}" == "--" ]]; then 
@@ -144,18 +146,18 @@ ${_pokeflex_base_options}"
             case "${1}" in 
             '-i'|'-inmemorydb') db="inmemory" && filtering=false ;;
             '-n'|'-nativedb') db="native" && filtering=false ;;
-            '-c'|'-concise') verbosity="| perl -wlne 'print if /^[|]|\/\/ Benchmark: |\/\/ [*]{5} |\s+[-]{3}|\s+at\s+/'" && filtering=false ;;
+            '-q'|'-quiet') verbosity="| perl -wlne 'print if /^[|]|\/\/ Benchmark: |\/\/ [*]{5} |\s+[-]{3}|\s+at\s+/'" && filtering=false ;;
             '-v'|'-verbose') verbosity="" && filtering=false ;;
             '-fl'|'-filter-all') filter="--allCategories " && filtering=true ;;
             '-fy'|'-filter-any') filter="--anyCategories " && filtering=true ;;
-            '-q'|'-quick') quick="-j short -i" ;; # short run job, with in-process benchmarks
+            '-r'|'-rapid') rapid="-j short -i" ;; # short run job, with in-process benchmarks
             '-d'|'-debug') debug="--warmupCount 1 --iterationCount 1 --invocationCount 1 --unrollFactor 1 --runOncePerIteration true" ;;
             '-dry') dryrun=true && filtering=false ;;
             '-h'|'-help') help=true && echo -e "${_pokeflex_test_bench_options}" && filtering=false ;;
             *) [[ $filtering ]] && filter+=" ${1}" ;;
             esac
           done
-          local command="export DotnetTestDbType=${db} && sudo -E dotnet run -c Release -p ${POKEFLEX_APP_DIR}/../Tests/Tests.csproj -- --join ${filter} ${debug} ${quick} ${@} ${verbosity}" 
+          local command="export DotnetTestDbType=${db} && sudo -E dotnet run -c Release -p ${POKEFLEX_APP_DIR}/../Tests/Tests.csproj -- --join ${filter} ${debug} ${rapid} ${@} ${verbosity}" 
           if [[ $dryrun ]]; then
             echo "${command}"
           elif [[ $help ]]; then
@@ -174,7 +176,7 @@ ${_pokeflex_base_options}"
       . ${POKEFLEX_APP_DIR}/profile.sh
     ;;
 	'sync')
-		case "${2}" in
+		case "${1}" in
 		'-b'|'-begin')
 			local _watchDir="${POKEFLEX_APP_DIR}/.."
 			if [[ -n "${FSWATCH_PID}" ]]; then
@@ -278,21 +280,21 @@ _fzf_complete_pokeflex () {
   ## HANDLE BASE OPTIONS
   if [[ "${COMP_CWORD}" == "1" ]]; then
     if [[ "${COMP_WORDS[COMP_CWORD]}" == "**" ]]; then
-      which fzf >/dev/null && _fzf_complete --with-nth=2 --delimiter='\t' --preview='echo -e {4}' --preview-window=up:sharp:wrap:40% --prompt="pokeflex> " -- "$@" < <(
+      which fzf >/dev/null && _fzf_complete --with-nth=1 --delimiter='\t' --preview='echo -e {3}' --preview-window=up:sharp:wrap:40% --prompt="pokeflex> " -- "$@" < <(
         echo -e "${_pokeflex_base_options}")
     else 
-      COMPREPLY=($(compgen -W "$(echo -e "${_pokeflex_base_options}" | perl -ne 'print "$1 " if /\t([^\t]+)\t/')" "${COMP_WORDS[COMP_CWORD]}"))
+      COMPREPLY=($(compgen -W "$(echo -e "${_pokeflex_base_options}" | perl -ne 'print "$1 " if /([^\t]+)\t/')" "${COMP_WORDS[COMP_CWORD]}"))
     fi
   elif [[ "${COMP_WORDS[COMP_CWORD]}" != "**" ]]; then
     #####################
     ## HANDLE NORMAL OPTIONS
     case "${COMP_WORDS[COMP_CWORD-1]}" in
     "start"|"stop") COMPREPLY=($(compgen -W "api db all" "${COMP_WORDS[COMP_CWORD]}")) ;;
-    "purge") COMPREPLY=("" $(compgen -W "$(echo -e "${_pokeflex_purge_options}" | perl -ne 'print "$1 " if /\t([^\t]+)\t/')" "${COMP_WORDS[COMP_CWORD]}")) ;;
+    "purge") COMPREPLY=("" $(compgen -W "$(echo -e "${_pokeflex_purge_options}" | perl -ne 'print "$1 " if /([^\t]+)\t/')" "${COMP_WORDS[COMP_CWORD]}")) ;;
     "reset") COMPREPLY=($(compgen -W "api all" "${COMP_WORDS[COMP_CWORD]}")) ;;
     "test") COMPREPLY=($(compgen -W "unit bench" "${COMP_WORDS[COMP_CWORD]}")) ;;
-    "bench") COMPREPLY=("" $(compgen -W "$(echo -e "${_pokeflex_test_bench_options}" | perl -ne 'print "$1 " if /\t([^\t]+)\t/')" "${COMP_WORDS[COMP_CWORD]}")) ;;
-    "unit") COMPREPLY=("" $(compgen -W "$(echo -e "${_pokeflex_test_unit_options}" | perl -ne 'print "$1 " if /\t([^\t]+)\t/')" "${COMP_WORDS[COMP_CWORD]}")) ;;
+    "bench") COMPREPLY=("" $(compgen -W "$(echo -e "${_pokeflex_test_bench_options}" | perl -ne 'print "$1 " if /([^\t]+)\t/')" "${COMP_WORDS[COMP_CWORD]}")) ;;
+    "unit") COMPREPLY=("" $(compgen -W "$(echo -e "${_pokeflex_test_unit_options}" | perl -ne 'print "$1 " if /([^\t]+)\t/')" "${COMP_WORDS[COMP_CWORD]}")) ;;
     "-f"|"-filter")
       [[ " ${COMP_WORDS[@]} " =~ " unit " ]] && COMPREPLY=("" $(compgen -W "$(__pokeflext_list_unit_tests)" "${COMP_WORDS[COMP_CWORD]}"))
     ;;
@@ -305,15 +307,15 @@ _fzf_complete_pokeflex () {
   ## HANDLE FZF OPTIONS
       case "${COMP_WORDS[COMP_CWORD-1]}" in
       "purge")
-        which fzf >/dev/null && _fzf_complete --with-nth=2 --delimiter='\t' --preview='echo -e {4}' --preview-window=up:sharp:wrap:40% --prompt="pokeflex> " -- "$@" < <(
+        which fzf >/dev/null && _fzf_complete --with-nth=1 --delimiter='\t' --preview='echo -e {3}' --preview-window=up:sharp:wrap:40% --prompt="pokeflex> " -- "$@" < <(
           echo -e "${_pokeflex_purge_options}")
       ;;
       "unit")
-        which fzf >/dev/null && _fzf_complete --with-nth=2 --delimiter='\t' --preview='echo -e {4}' --preview-window=up:sharp:wrap:40% --prompt="pokeflex> " -- "$@" < <(
+        which fzf >/dev/null && _fzf_complete --with-nth=1 --delimiter='\t' --preview='echo -e {3}' --preview-window=up:sharp:wrap:40% --prompt="pokeflex> " -- "$@" < <(
           echo -e "${_pokeflex_test_unit_options}")
       ;;
       "bench")
-        which fzf >/dev/null && _fzf_complete --with-nth=2 --delimiter='\t' --preview='echo -e {4}' --preview-window=up:sharp:wrap:40% --prompt="pokeflex> " -- "$@" < <(
+        which fzf >/dev/null && _fzf_complete --with-nth=1 --delimiter='\t' --preview='echo -e {3}' --preview-window=up:sharp:wrap:40% --prompt="pokeflex> " -- "$@" < <(
           echo -e "${_pokeflex_test_bench_options}")
       ;;
       "-f"|"-filter")

@@ -16,6 +16,8 @@
     <PackageReference Include="FlexLabs.EntityFrameworkCore.Upsert" Version="4.0.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.7.1" />
     <PackageReference Include="Moq" Version="4.16.1" />
+    <PackageReference Include="NeinLinq" Version="5.1.0" />
+    <PackageReference Include="NeinLinq.EntityFrameworkCore" Version="5.0.1" />
     <PackageReference Include="ShuffleList" Version="1.0.0" />
     <PackageReference Include="xunit" Version="2.4.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.3">
@@ -34,7 +36,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Benchs" />
     <Folder Include="Units" />
   </ItemGroup>
 

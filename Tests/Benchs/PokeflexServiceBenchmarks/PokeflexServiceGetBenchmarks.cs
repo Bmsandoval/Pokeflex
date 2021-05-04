@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using App.Models;
 using App.Services.Pokeflex;
 using BenchmarkDotNet.Attributes;
 using Microsoft.EntityFrameworkCore;
+using NeinLinq;
 using Tests.ServiceDataGenerator;
 using TestSupport.EfHelpers;
 
@@ -13,8 +15,10 @@ namespace Tests.Benchs.PokeflexServiceBenchmarks
 {
     public class PokeflexServiceGetBase
     {
-        [Params(5, 10, 15)] public int Groups;
-        [Params(10, 1_000, 10_000)] public int Numbers;
+        // [Params(5, 10, 15)] public int Groups;
+        // [Params(10, 1_000, 10_000)] public int Numbers;
+        [Params(15)] public int Groups;
+        [Params(10_000)] public int Numbers;
         protected int Group;
         protected int Number;
         protected IDbContext DbContext;
@@ -39,7 +43,7 @@ namespace Tests.Benchs.PokeflexServiceBenchmarks
     }
     
     
-    [BenchmarkCategory("Service", "Pokeflex", "Linq", "Get")][CategoriesColumn]
+    [BenchmarkCategory("All", "Service", "Pokeflex", "Linq", "Get")][CategoriesColumn]
     public class PokeflexServiceLinqGetBenchmarks : PokeflexServiceGetBase
     {
         [BenchmarkCategory("LinqQuery")]
