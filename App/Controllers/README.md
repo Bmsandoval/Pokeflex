@@ -7,5 +7,5 @@ App/Controllers/README.md:3
 
 
 [a relative link](other_file.md)
-[testy](OtherReadme.md)
-[testify](App/Controllers/README.md:3)
+[testy](OtherReadme.md:2)
+[testify](README.md:3)
