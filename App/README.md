@@ -8,6 +8,7 @@ $ dotnet add ./Tests/PokeflexTests.csproj reference ./App/Pokeflex.csproj
 
 
 
+
 # Create ram disk 512mb ramdisk (512*2048=1048576)
 $ diskutil erasevolume HFS+ 'RAM Disk' `hdiutil attach -nomount ram://1048576`
 ```

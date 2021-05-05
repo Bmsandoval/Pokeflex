@@ -1,5 +1,6 @@
 ﻿using System;
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Exporters.Csv;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
 using Tests.Benchs.PokeflexServiceBenchmarks;
@@ -13,6 +14,7 @@ namespace Tests
             BenchmarkSwitcher.FromAssembly(typeof(Program).Assembly)
                 .Run(args, ManualConfig
                     .Create(DefaultConfig.Instance)
+                    .AddExporter(CsvExporter.Default)
                     .WithOption(ConfigOptions.DisableOptimizationsValidator, true));
             // var benchmarkConfig =
             //     ManualConfig

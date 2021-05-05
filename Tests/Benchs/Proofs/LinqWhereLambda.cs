@@ -55,49 +55,49 @@ namespace Tests.Benchs.Proofs
                     select p)
                 .FirstOrDefault();
         }
-        
-        [BenchmarkCategory("CompiledNeinExpression")]
-        [Benchmark] public Pokemon CompiledNeinExpressions()
-        {
-            var pokeflexContext=DbContext.PokeflexContext;
-            return  (
-                from p in pokeflexContext.Pokemons.ToInjectable()
-                where p.CompiledNeinInGroup(Group)
-                    select p)
-                .FirstOrDefault();
-        }
-        
-        [BenchmarkCategory("LinqQueryBaseline")]
-        [Benchmark] public Pokemon LinqQuerySyntax()
-        {
-            var pokeflexContext=DbContext.PokeflexContext;
-            return  (
-                from p in pokeflexContext.Pokemons
-                where p.GroupId == Group
-                    select p)
-                .FirstOrDefault();
-        }
-        
-        [BenchmarkCategory("LinqMethodBaseline")]
-        [Benchmark] public Pokemon LinqMethodSyntax()
-        {
-            var pokeflexContext=DbContext.PokeflexContext;
-            return pokeflexContext.Pokemons.Where(p => p.GroupId == Group).FirstOrDefault();
-        }
-        
-        [BenchmarkCategory("BuiltPredicateExpression")]
-        [Benchmark] public async Task<Pokemon> BuiltPredicate()
-        {
-            var pokeflexContext=DbContext.PokeflexContext;
-            var pred = PredicateBuilder.True<Pokemon>().And(p=>p.GroupId==Group);
-            return await pokeflexContext.Pokemons.Where(pred).FirstOrDefaultAsync();
-        }
-        [BenchmarkCategory("IQueryableExtension")]
-        [Benchmark] public Pokemon IQueryableExtension()
-        {
-            var pokeflexContext=DbContext.PokeflexContext;
-            return pokeflexContext.Pokemons.IQueryableInGroup(Group).FirstOrDefault();
-        }
+        //
+        // [BenchmarkCategory("CompiledNeinExpression")]
+        // [Benchmark] public Pokemon CompiledNeinExpressions()
+        // {
+        //     var pokeflexContext=DbContext.PokeflexContext;
+        //     return  (
+        //         from p in pokeflexContext.Pokemons.ToInjectable()
+        //         where p.CompiledNeinInGroup(Group)
+        //             select p)
+        //         .FirstOrDefault();
+        // }
+        //
+        // [BenchmarkCategory("LinqQueryBaseline")]
+        // [Benchmark] public Pokemon LinqQuerySyntax()
+        // {
+        //     var pokeflexContext=DbContext.PokeflexContext;
+        //     return  (
+        //         from p in pokeflexContext.Pokemons
+        //         where p.GroupId == Group
+        //             select p)
+        //         .FirstOrDefault();
+        // }
+        //
+        // [BenchmarkCategory("LinqMethodBaseline")]
+        // [Benchmark] public Pokemon LinqMethodSyntax()
+        // {
+        //     var pokeflexContext=DbContext.PokeflexContext;
+        //     return pokeflexContext.Pokemons.Where(p => p.GroupId == Group).FirstOrDefault();
+        // }
+        //
+        // [BenchmarkCategory("BuiltPredicateExpression")]
+        // [Benchmark] public async Task<Pokemon> BuiltPredicate()
+        // {
+        //     var pokeflexContext=DbContext.PokeflexContext;
+        //     var pred = PredicateBuilder.True<Pokemon>().And(p=>p.GroupId==Group);
+        //     return await pokeflexContext.Pokemons.Where(pred).FirstOrDefaultAsync();
+        // }
+        // [BenchmarkCategory("IQueryableExtension")]
+        // [Benchmark] public Pokemon IQueryableExtension()
+        // {
+        //     var pokeflexContext=DbContext.PokeflexContext;
+        //     return pokeflexContext.Pokemons.IQueryableInGroup(Group).FirstOrDefault();
+        // }
 
         [BenchmarkCategory("LinqMethodExtendedExpression")]
         [Benchmark] public Pokemon ExtendedLambdaMethodSyntax()

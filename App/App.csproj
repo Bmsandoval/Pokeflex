@@ -41,4 +41,7 @@
     <Folder Include="Migrations" />
     <Folder Include="Services\ExtPokeApis" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="Controllers\OtherReadme.md" />
+  </ItemGroup>
 </Project>
