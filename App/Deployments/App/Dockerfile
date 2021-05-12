@@ -3,17 +3,17 @@ LABEL base=true
 LABEL pokeflex=true
 
 
-FROM base AS builder
+FROM base AS apirunner
 LABEL notdb=true
 LABEL pokeflex=true
 ENV PATH $PATH:/root/.dotnet/tools
 
 RUN ["dotnet","tool","install","-g","dotnet-ef"]
 
-WORKDIR "/src/app/"
+WORKDIR "/src/App/"
 
 COPY *.csproj .
 RUN ["dotnet", "restore"]
 EXPOSE 5001
 
-ENTRYPOINT ["/bin/bash", "./entrypoint.sh"]
+ENTRYPOINT ["/bin/bash", "./Deployments/App/entrypoint.sh"]

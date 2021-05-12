@@ -1,0 +1,23 @@
+version: '3'
+
+services:
+  pokeflex-unit-tester:
+    container_name: "pokeflex-unit-tester"
+    volumes:
+      - ./:/src
+      - bin:/src/App/bin
+      - obj:/src/App/obj
+      - dependencies:/src/App/Dependencies
+      - tbin:/src/Tests/bin
+      - tobj:/src/Tests/obj
+      - tdependencies:/src/Tests/Dependencies
+    build:
+      context: .
+      dockerfile: "Tests/Deployments/Units/Dockerfile"
+volumes: 
+  bin:
+  obj:
+  dependencies:
+  tbin:
+  tobj:
+  tdependencies:

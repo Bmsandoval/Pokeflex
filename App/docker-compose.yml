@@ -6,9 +6,10 @@ services:
     ports:
       - '5001:5001'
     volumes:
-      - ./:/src/app
-      - bin:/src/app/bin
-      - dependencies:/src/app/Dependencies
+      - ./:/src/App
+      - bin:/src/App/bin
+      - obj:/src/App/obj
+      - dependencies:/src/App/Dependencies
     build:
       context: .
       dockerfile: "Deployments/App/Dockerfile"
@@ -28,4 +29,5 @@ services:
       ACCEPT_EULA: "Y"
 volumes: 
   bin:
+  obj:
   dependencies:

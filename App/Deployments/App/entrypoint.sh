@@ -15,6 +15,6 @@ echo "Database Updated"
 run_cmd="dotnet watch run --launch-profile Docker"
 
 echo "SQL Server is up - executing command"
-exec $run_cmd
+eval $run_cmd
 
 

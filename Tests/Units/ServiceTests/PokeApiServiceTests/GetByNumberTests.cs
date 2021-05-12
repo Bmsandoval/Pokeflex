@@ -8,7 +8,7 @@ namespace Tests.Units.ServiceTests.PokeApiServiceTests
     public class ServiceTests
     {
         [Theory]
-        [MemberData(nameof(global::Tests.Units.ServiceTests.PokeApiServiceTests.ServiceDataGenerator.SingleInput), MemberType = typeof(global::Tests.Units.ServiceTests.PokeApiServiceTests.ServiceDataGenerator))]
+        [MemberData(nameof(ServiceDataGenerator.SingleInput), MemberType = typeof(ServiceDataGenerator))]
         public void TestCanPullPocomonFromWeb(PokeapiCoService service, Pocomon pocomon)
         {
             Pocomon resultmon = (Pocomon)service.GetByNumber(42);
