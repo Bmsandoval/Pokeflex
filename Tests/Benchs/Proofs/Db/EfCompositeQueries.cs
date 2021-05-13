@@ -7,37 +7,16 @@ using BenchmarkDotNet.Attributes;
 using Microsoft.EntityFrameworkCore;
 using NeinLinq;
 using Tests.ServiceDataGenerator;
+using Xunit;
 
 namespace Tests.Benchs.Proofs.Db
 {
-    public class EfCompositeQueriesBase 
+    public class EfCompositeQueriesBase : SingleQueriesBase
     {
         // [Params(5, 10, 15)] public int Groups;
         // [Params(10, 1_000, 10_000)] public int Numbers;
-        [Params(15)] public int Groups;
-        [Params(10, 100)] public int Numbers;
-        // [Params(10_000)] public int Numbers;
-        protected int Group;
-        protected int Number;
-        protected IDbContext DbContext;
-        private Random _rand = new();
-
-        [GlobalSetup]
-        public void Setup()
-        {
-            DbContext = DbContextFactory
-                .NewUniqueContext(
-                    GetType().Name,
-                    Mocker
-                        .HasGroups(Groups)
-                        .WithPokemons(Numbers));
-        }
-
-        [IterationSetup] public void IterationSetup()
-        {
-            Number = _rand.Next(1, Numbers);
-            Group = _rand.Next(0, Groups);
-        }
+        [Params(15)] public override int Groups { get; set; }
+        [Params(10, 100)] public override int Numbers { get; set; }
     }
     
     
@@ -84,11 +63,18 @@ namespace Tests.Benchs.Proofs.Db
         [Benchmark] public async Task<Pokemon> RawQuery()
         {
             var pokeflexContext=DbContext.PokeflexContext;
-            string sql = @"
+            string sql = Group is null
+            ? @"
+SELECT [p].[Id], [p].[ApiSource], [p].[GroupId], [p].[Name], [p].[Number]
+FROM [Pokemons] AS [p]
+WHERE ([p].[GroupId] is NULL) AND ([p].[Number] = @p1)"
+            : @"
 SELECT [p].[Id], [p].[ApiSource], [p].[GroupId], [p].[Name], [p].[Number]
 FROM [Pokemons] AS [p]
 WHERE ([p].[GroupId] = @p0) AND ([p].[Number] = @p1)";
-             return await pokeflexContext.Pokemons.FromSqlRaw(sql, Group, Number).FirstOrDefaultAsync();
+            var pokemon = await pokeflexContext.Pokemons.FromSqlRaw(sql, Group, Number).FirstOrDefaultAsync();
+            Assert.NotNull(pokemon);
+            return pokemon;
         }
         
         // [BenchmarkCategory("LinqQueryBaseline")]

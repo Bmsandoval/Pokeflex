@@ -3,8 +3,6 @@ using Xunit;
 
 namespace Tests.Units.ServiceTests.PokeApiServiceTests
 {
-    
-    
     public class ServiceTests
     {
         [Theory]

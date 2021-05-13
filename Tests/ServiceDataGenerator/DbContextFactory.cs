@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using App.Data;
 using App.Models;
 using EntityFrameworkCoreMock;
+using Microsoft.Data.SqlClient;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -70,9 +72,6 @@ namespace Tests.ServiceDataGenerator
             BuildOptions();
             PokeflexContext = new PokeflexContext(ContextOptions);
             PokeflexContext.CreateEmptyViaDelete();
-            // PokeflexContext.Database.EnsureDeleted();
-            PokeflexContext.ChangeTracker.Clear();
-            // PokeflexContext.Database.EnsureCreated();
             
             foreach (var group in mocker)
             {
@@ -95,30 +94,45 @@ namespace Tests.ServiceDataGenerator
         private DbContextOptions<PokeflexContext> ContextOptions { get; set; }
         private IConfigurationRoot Config { get; set; }
         
-        private void SetConnectionString()
+        private void SetConnectionString(string dbUniquifier)
         {
             var callingProjectPath = TestData.GetCallingAssemblyTopLevelDir();
             Config = new ConfigurationBuilder()
                 .SetBasePath(callingProjectPath)
-                .AddJsonFile("appsettings.Local.json").Build();
-            ConnectionString = Config.GetConnectionString("DefaultConnection");
+                .AddJsonFile("appsettings.Test.json").Build();
+            string connectionString = Config.GetConnectionString("UnitTestConnection");
+            SqlConnectionStringBuilder connectionStringBuilder = !string.IsNullOrEmpty(connectionString) ? new SqlConnectionStringBuilder(connectionString) : throw new InvalidOperationException("You are missing a connection string of name 'UnitTestConnection' in the appsettings.json file.");
+            if (!connectionStringBuilder.InitialCatalog.EndsWith("Test"))
+                throw new InvalidOperationException("The database name in your connection string must end with 'Test', but is '" + connectionStringBuilder.InitialCatalog + "'. This is a safety measure to help stop DeleteAllUnitTestDatabases from deleting production databases.");
+            connectionStringBuilder.InitialCatalog += $"{'_'}{dbUniquifier}";
+            ConnectionString = connectionStringBuilder.ToString();
         }
 
-        private void BuildOptions(string dbUniquifier)
+        private void BuildOptions()
         {
             var builder = new DbContextOptionsBuilder<PokeflexContext>();
             builder.UseSqlServer(ConnectionString);
             ContextOptions = builder.Options;
-
         }
         
         public NativeDbContext(string dbNameUniquifier, Mocker mocker)
         {
-            // SetConnectionString();
-            // BuildOptions(dbNameUniquifier);
-            // PokeflexContext = new PokeflexContext(ContextOptions);
-            // PokeflexContext.CreateEmptyViaDelete();
-            // PokeflexContext.Pokemons.BulkInsert(pokemons);
+            SetConnectionString(dbNameUniquifier);
+            BuildOptions();
+            PokeflexContext = new PokeflexContext(ContextOptions);
+            PokeflexContext.CreateEmptyViaDelete();
+            
+            foreach (var group in mocker)
+            {
+                foreach (var poke in group.Pokemons)
+                {
+                    PokeflexContext.Pokemons.Add(poke);
+                }
+
+                if (group.Id == 0) continue;
+                PokeflexContext.Groups.Add(group);
+            }
+            PokeflexContext.SaveChanges();
         }
     }
 }

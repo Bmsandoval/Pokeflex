@@ -8,7 +8,7 @@ Intel Core i7-9750H CPU 2.60GHz, 1 CPU, 12 logical and 6 physical cores
 Toolchain=InProcessEmitToolchain  InvocationCount=1  UnrollFactor=1  
 
 ```
-|          Method | Groups | Numbers |     Mean |   Error |   StdDev |   Median |
-|---------------- |------- |-------- |---------:|--------:|---------:|---------:|
-| **ManualPredicate** |     **15** |      **10** | **153.3 μs** | **8.19 μs** | **23.77 μs** | **142.1 μs** |
-| **ManualPredicate** |     **15** |     **100** | **142.7 μs** | **5.59 μs** | **15.58 μs** | **138.6 μs** |
+|          Method | Groups | Numbers |     Mean |     Error |    StdDev |   Median |
+|---------------- |------- |-------- |---------:|----------:|----------:|---------:|
+| **ManualPredicate** |     **15** |      **10** | **3.531 ms** | **0.2687 ms** | **0.7882 ms** | **3.260 ms** |
+| **ManualPredicate** |     **15** |     **100** | **3.797 ms** | **0.2207 ms** | **0.6474 ms** | **3.660 ms** |

@@ -20,6 +20,7 @@ namespace App.Services.Pokeflex
          */
         public virtual async Task<int> Insert(Group group)
         {
+            group.Id = 0;
             _dbContext.Groups.Add(group);
             return await _dbContext.SaveChangesAsync();
         }

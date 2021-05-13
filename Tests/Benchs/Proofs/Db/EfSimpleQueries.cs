@@ -7,37 +7,16 @@ using BenchmarkDotNet.Attributes;
 using Microsoft.EntityFrameworkCore;
 using NeinLinq;
 using Tests.ServiceDataGenerator;
+using Xunit;
 
 namespace Tests.Benchs.Proofs.Db
 {
-    public class EfSimpleQueriesBase 
+    public class EfSimpleQueriesBase : SingleQueriesBase
     {
         // [Params(5, 10, 15)] public int Groups;
         // [Params(10, 1_000, 10_000)] public int Numbers;
-        [Params(15)] public int Groups;
-        [Params(10, 100)] public int Numbers;
-        // [Params(10_000)] public int Numbers;
-        protected int Group;
-        protected int Number;
-        protected IDbContext DbContext;
-        private Random _rand = new();
-
-        [GlobalSetup]
-        public void Setup()
-        {
-            DbContext = DbContextFactory
-                .NewUniqueContext(
-                    GetType().Name,
-                    Mocker
-                        .HasGroups(Groups)
-                        .WithPokemons(Numbers));
-        }
-
-        [IterationSetup] public void IterationSetup()
-        {
-            Number = _rand.Next(1, Numbers);
-            Group = _rand.Next(0, Groups);
-        }
+        [Params(15)] public override int Groups { get; set; }
+        [Params(10, 100)] public override int Numbers { get; set; }
     }
     
     
@@ -70,7 +49,10 @@ namespace Tests.Benchs.Proofs.Db
         [Benchmark] public Pokemon ManualPredicate()
         {
             var pokeflexContext=DbContext.PokeflexContext;
-            return pokeflexContext.Pokemons.Where(SimpleExtensionLinqHelpers.PredicateExpression(Group, Number)).FirstOrDefault();
+            var pokemon = pokeflexContext.Pokemons.Where(SimpleExtensionLinqHelpers.PredicateExpression(Group, Number))
+                .FirstOrDefault();
+            Assert.NotNull(pokemon);
+            return pokemon;
         }
         
 //         [BenchmarkCategory("LambdaQuery")]

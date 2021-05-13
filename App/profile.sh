@@ -37,7 +37,7 @@ _pokeflex_test_bench_options=\
 -filter-any\t:\tRuns tests that are in ANY of the provided categories
 -filter-all\t:\tRuns tests that are in ALL of the provided categories
 -rapid\t:\tRuns benchmarks in fastest possible setting. bad benchmarks, but good for testing/debugging broken benchmarks
--docker\t:\tRuns the tests in a docker container
+-virtualized\t:\tRuns the tests in a docker container
 -dry\t:\tprint the resulting command instead of running it
 -help\t:\tdisplays this menu"
 
@@ -107,7 +107,6 @@ ${_pokeflex_base_options}"
       case "${_subOption}" in
         'unit') 
           local db help dryrun filtering filter continuous virtualized save
-          virtualized=0
           db="inmemory"
           while shift; do
             if [[ "${1}" == "--" ]]; then 
@@ -126,14 +125,14 @@ ${_pokeflex_base_options}"
             '-f'|'-filter') filter="--filter '"; filtering=1 ;;
             '-v'|'-virtualized') virtualized=1 ;;
             '-h'|'-help') help=1; echo -e "${_pokeflex_test_unit_options}"; filtering=0 ;;
-            *) [[ $filtering ]] && filter+="${1}|" ;;
+            *) [[ $filtering == 1 ]] && filter+="${1}|" ;;
             esac
           done
           [ -n "${filter}" ] && filter=${filter%?} && filter+="'"
           local appDir
-          [ ${virtualized} ] && appDir="/src" || appDir="${POKEFLEX_APP_DIR}"
+          [ $virtualized ] && appDir="/src" || appDir="${POKEFLEX_APP_DIR}"
           local command="export DotnetTestDbType=${db} && dotnet ${continuous} test ${appDir}/Tests/Tests.csproj ${filter} ${@}" 
-          case "1" in
+          case 1 in
           "${dryrun}") echo "${command}" ;;
           "${help}") eval "dotnet test ${POKEFLEX_APP_DIR}/Tests/Tests.csproj --help" ;;
           "${virtualized}") 
