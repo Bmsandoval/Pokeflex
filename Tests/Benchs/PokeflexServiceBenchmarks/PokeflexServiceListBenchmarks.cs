@@ -6,19 +6,23 @@ using App.Models;
 using App.Services.Pokeflex;
 using BenchmarkDotNet.Attributes;
 using ListRandomizer;
+using Microsoft.Azure.Cosmos.Linq;
 using Microsoft.EntityFrameworkCore;
+using Tests.Benchs.Proofs.Db;
 using Tests.ServiceDataGenerator;
+using Xunit;
+using Xunit.Sdk;
 
 namespace Tests.Benchs.PokeflexServiceBenchmarks
 {
     public class PokeflexServiceListBase
     {
-        // [Params( 5, 15)] public int Groups;
-        // [Params(100, 1_000, 5_000)] public int Numbers;
-        // [Params(0.10, 0.30)] public double LimitAsPctNumbers;
-        [Params( 15)] public int Groups;
-        [Params(5_000)] public int Numbers;
-        [Params(0.30)] public double LimitAsPctNumbers;
+        [Params( 5, 15)] public int Groups;
+        [Params(100, 1_000, 5_000)] public int Numbers;
+        [Params(0.10, 0.30)] public double LimitAsPctNumbers;
+        // [Params( 15)] public int Groups;
+        // [Params(100)] public int Numbers;
+        // [Params(0.30)] public double LimitAsPctNumbers;
         protected int Group;
         protected int Limit;
         protected int Offset;
@@ -32,7 +36,7 @@ namespace Tests.Benchs.PokeflexServiceBenchmarks
         [IterationSetup] public void IterationSetup()
         {
             Limit = (int)(Numbers * LimitAsPctNumbers);
-            Offset = _rand.Next(0, Numbers - Limit);
+            Offset = _rand.Next(1, Numbers - Limit);
             Group = _rand.Next(1, Groups);
         }
     }
@@ -41,42 +45,72 @@ namespace Tests.Benchs.PokeflexServiceBenchmarks
     [BenchmarkCategory("All", "Service", "Pokeflex", "Linq", "List")]
     [CategoriesColumn] public class PokeflexServiceLinqListBenchmarks : PokeflexServiceListBase
     {
-        [Benchmark(Baseline = true)] public async Task<List<Pokemon>> Baseline()
+        [Benchmark(Baseline = true)] public async Task<List<Pokemon>> SelectListOfBases()
         {
             var pokeflexContext=DbContext.PokeflexContext;
             var service = new PokeflexService(pokeflexContext);
-            return await 
-                (from pk in DbContext.PokeflexContext.Pokemons where pk.GroupId==Group select pk)
-                .Skip(Offset)
+            return await (
+                    from pk in DbContext.PokeflexContext.Pokemons 
+                    where pk.GroupId==Group
+                          && pk.Number>Offset 
+                          && pk.Number <=Offset+Limit 
+                    select pk)
+                .OrderByNum()
                 .Take(Limit)
                 .ToListAsync();
         }
-        
         
         [BenchmarkCategory("ActiveState")]
         [Benchmark] public async Task<List<Pokemon>> UnionWhereNotExists()
         {
             var pokeflexContext=DbContext.PokeflexContext;
             var service = new PokeflexService(pokeflexContext);
+            return await (
+                from flx in pokeflexContext.Pokemons
+                    where flx.GroupId == Group && flx.Number > Offset && flx.Number <= Offset + Limit
+                    select flx).
+                Concat(
+                from bse in pokeflexContext.Pokemons
+                    where bse.GroupId == Group && bse.Number > Offset && bse.Number <= Offset + Limit
+                          && !(from f in pokeflexContext.Pokemons
+                                  where f.GroupId == Group select f.Number)
+                              .Contains(bse.Number)
+                select bse)
+                .OrderByNum()
+                .ToListAsync();
+        }
+        
+        [Benchmark] public async Task<List<Pokemon>> LiveServiceCode()
+        {
+            var pokeflexContext=DbContext.PokeflexContext;
+            var service = new PokeflexService(pokeflexContext);
             return await service.GetRange(Offset, Limit, Group);
         }
-
+        
         [Benchmark] public async Task<List<Pokemon>> Coalesce()
         {
             var pokeflexContext = DbContext.PokeflexContext;
-            var pokemon =
-                from bse in pokeflexContext.Pokemons
-                join flx in pokeflexContext.Pokemons on bse.Number equals flx.Number into flx
-                from f in flx.DefaultIfEmpty()
-                where bse.GroupId==Group && bse.Number>Offset && bse.Number <= Offset+Limit
-                select new Pokemon(){
-                    Id= f != null? f.Id: bse.Id,
-                    Number= f != null? f.Number: bse.Number,
-                    Group= f != null? f.Group: bse.Group,
-                    ApiSource= f != null? f.ApiSource: bse.ApiSource,
-                    Name= f != null? f.Name: bse.Name,
-                };
-            return await pokemon.ToListAsync();
+            var service = new PokeflexService(pokeflexContext);
+            return await (from bse in (
+                    from bs in pokeflexContext.Pokemons
+                    where bs.GroupId == Group && bs.Number > Offset && bs.Number <= Offset + Limit select bs).OrderByNum()
+                    join flx in 
+                        from fl in pokeflexContext.Pokemons
+                        where fl.GroupId == Group && fl.Number > Offset && fl.Number <= Offset + Limit
+                        select fl
+                        on bse.Number equals flx.Number into flx
+                    from f in flx.DefaultIfEmpty()
+                    select new Pokemon
+                    {
+                        Id = f != null ? f.Id : bse.Id,
+                        Number = f != null ? f.Number : bse.Number,
+                        Group = f != null ? f.Group : bse.Group,
+                        ApiSource = f != null ? f.ApiSource : bse.ApiSource,
+                        Name = f != null ? f.Name : bse.Name
+                    })
+                .Take(Limit)
+                .OrderByNum()
+                .ToListAsync();
         }
     }
     

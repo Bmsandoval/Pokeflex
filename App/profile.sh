@@ -168,7 +168,7 @@ ${_pokeflex_base_options}"
             esac
           done
           [ ${virtualized} ] && appDir="/src" || appDir="${POKEFLEX_APP_DIR}"
-          local command="export DotnetTestDbType="${db}" && sudo -E dotnet run -c Release -p ${appDir}/Tests/Tests.csproj -- -i -a ${appDir}/Tests/Benchs/ ${save} ${filter} ${rapid} ${@} ${verbosity}" 
+          local command="export DotnetTestDbType="${db}" && sudo -E dotnet run -c Release -p ${appDir}/Tests/Tests.csproj -- -i -m -a ${appDir}/Tests/Benchs/ ${save} ${filter} ${rapid} ${@} ${verbosity}" 
           case "1" in
           "${dryrun}") echo "${command}" ;;
           "${help}") eval "dotnet run -p ${POKEFLEX_APP_DIR}/Tests/Tests.csproj -- --help" ;;

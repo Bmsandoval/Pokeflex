@@ -1,19 +1,10 @@
 using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Runtime.Serialization;
-using System.Runtime.Serialization.Formatters.Binary;
-using App.Data;
-using App.Services.ExtPokeApis.ApiFactoryBase;
-using App.Services.ExtPokeApis.PokeApiCo;
 using App.Shared;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using NeinLinq;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 namespace App.Models
 {
@@ -64,31 +55,31 @@ namespace App.Models
 
     public static class PokemonLinqHelpers
     {
-        /*
-         * Purpose: Find Pokemon(s) with @pkNumber in group 0
-         */
         public static IQueryable<Pokemon> Basemons(this IQueryable<Pokemon> q, int skip, int take=default) =>
             q.Flexmons(null, skip, take);
-        private static IQueryable<Pokemon> InGroup(this IQueryable<Pokemon> queryable, int? group) =>
-            queryable.Where(p => p.GroupId == group);
-        private static IQueryable<Pokemon> InRange(this IQueryable<Pokemon> queryable, int skip, int take=default) => 
-            queryable.Where(take == default
-                ? p => p.Number == skip
-                : p => p.Number > skip && p.Number <= skip + take);
-        public static IQueryable<Pokemon> Flexmons(this IQueryable<Pokemon> q, int? group, int skip, int take=default) => q
-            .InGroup(group)
-            .InRange(skip, take);
+        public static IQueryable<Pokemon> IncludeBasemons(this IQueryable<Pokemon> q, DbSet<Pokemon> db, int? flexGroup,
+            int skip, int take = default) => q
+            .Concat(db
+            .Basemons(skip, take)
+            .ExceptExists(db, flexGroup));
         public static IOrderedQueryable<Pokemon> OrderByNum(this IQueryable<Pokemon> q, bool ascending=false) =>
             ascending ? q.OrderBy(pokemon => pokemon.Number) : q.OrderByDescending(pokemon => pokemon.Number);
         public static IQueryable<Pokemon> ExceptExists(this IQueryable<Pokemon> q, IQueryable<Pokemon> pokemons, int? grp=null) =>
             from p in q
                 where ! pokemons.Any(f => f.GroupId == grp && f.Number == p.Number)
                 select p;
-        public static IQueryable<Pokemon> IncludeBasemons(this IQueryable<Pokemon> q, DbSet<Pokemon> db, int? flexGroup,
-            int skip, int take = default) => q
-            .Concat(db
-            .Basemons(skip, take)
-            .ExceptExists(db, flexGroup));
+        
+        public static IQueryable<Pokemon> Flexmons(this IQueryable<Pokemon> q, int? group, int skip, int take = default) => q
+            .Where(PredicateBuilder.True<Pokemon>()
+                .InGroup(group)
+                .InRange(skip, take));
+        
+        private static Expression<Func<Pokemon, bool>> InGroup(this Expression<Func<Pokemon,bool>> expr, int? group)=>
+            PredicateTranslator.And(expr, p => p.GroupId == group);
+        private static Expression<Func<Pokemon, bool>> InRange(this Expression<Func<Pokemon, bool>> expr, int skip, int take = default) =>
+            take == default
+                ? PredicateTranslator.And(expr, p => p.Number == skip)
+                : PredicateTranslator.And(expr, p => p.Number > skip && p.Number <= skip + take);
         // private static IQueryable<T> Limit<T>(IQueryable<T> source, int limit) => source.TagWith("Limit").Take(limit);
 
     }

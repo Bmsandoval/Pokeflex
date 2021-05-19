@@ -8,6 +8,7 @@ using App.Services.Pokeflex;
 using BenchmarkDotNet.Attributes;
 using Microsoft.EntityFrameworkCore;
 using NeinLinq;
+using Tests.Benchs.Proofs.Db;
 using Tests.ServiceDataGenerator;
 using TestSupport.EfHelpers;
 using Xunit;
@@ -48,7 +49,7 @@ namespace Tests.Benchs.PokeflexServiceBenchmarks
     public class PokeflexServiceLinqGetBenchmarks : PokeflexServiceGetBase
     {
         [BenchmarkCategory("LinqQuery")]
-        [Benchmark(Baseline = true, Description = "Linq Query Syntax")] public async Task<Pokemon> LinqQueryBaseline()
+        [Benchmark(Baseline = true)] public async Task<Pokemon> LinqQueryBaseline()
         {
             var service = new PokeflexService(DbContext.PokeflexContext);
             var pokeflexContext=DbContext.PokeflexContext;
@@ -58,7 +59,7 @@ namespace Tests.Benchs.PokeflexServiceBenchmarks
                 .FirstOrDefaultAsync();
         }
         [BenchmarkCategory("LinqMethod")]
-        [Benchmark(Description = "Linq Method Syntax")] public void LinqMethodBaseline()
+        [Benchmark] public void LinqMethodBaseline()
         {
             var service = new PokeflexService(DbContext.PokeflexContext);
             var pokeflexContext=DbContext.PokeflexContext;
@@ -66,6 +67,16 @@ namespace Tests.Benchs.PokeflexServiceBenchmarks
                 .Pokemons
                 .Where(p => p.GroupId == Group && p.Number == Number)
                 .FirstOrDefaultAsync();
+        }
+        
+        [Benchmark] public async Task<List<Pokemon>> Proposal()
+        {
+            var pokeCtx=DbContext.PokeflexContext.Pokemons;
+            return await pokeCtx
+                .AFlexmons(Group,Number)
+                .AIncludeBasemons(pokeCtx,Group,Number)
+                .AOrderByNumber()
+                .ToListAsync();
         }
 
         [Benchmark] public async Task<Pokemon> UnionWhereNotExistsWithoutExtensionMethods()

@@ -14,6 +14,8 @@ services:
     build:
       context: .
       dockerfile: "Tests/Deployments/Units/Dockerfile"
+    environment:
+      
 volumes: 
   bin:
   obj:

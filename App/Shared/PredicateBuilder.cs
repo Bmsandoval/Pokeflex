@@ -1,9 +1,8 @@
-
 using System;
 using System.Linq;
 using System.Linq.Expressions;
 
-namespace Tests.Benchs.Proofs.Db 
+namespace App.Shared
 {
     public static class PredicateBuilder
     {
@@ -27,5 +26,3 @@ namespace Tests.Benchs.Proofs.Db
         }
     }
 }
-    
-    
