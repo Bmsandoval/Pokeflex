@@ -199,7 +199,7 @@ ${_pokeflex_base_options}"
 				if [[ -n "${FSWATCH_PID}" ]]; then
 					echo "already syncing"
 				else
-					fswatch -o "${POKEFLEX_CODE_DIR}/" \
+					fswatch -o "${POKEFLEX_CODE_DIR}/" -e ".*" -i "\\.cs$" \
 					| while read -r _; do
 			  rsync -taz "${POKEFLEX_CODE_DIR}/" ${2}:~/projects/Pokeflex/ \
 				--exclude "bin/" --exclude ".git/" --exclude "obj/" \
