@@ -18,9 +18,9 @@ namespace App.Services.Pokeflex
         /**
          * Purpose: Insert new user
          */
-        public virtual async Task<int> Insert(User user)
+        public virtual async Task<int> Insert(AppUser appUser)
         {
-            _dbContext.Users.Add(user);
+            _dbContext.AppUsers.Add(appUser);
             return await _dbContext.SaveChangesAsync();
         }
         

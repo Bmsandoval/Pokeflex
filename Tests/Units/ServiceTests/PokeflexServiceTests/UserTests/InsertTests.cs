@@ -15,10 +15,10 @@ namespace Tests.Units.ServiceTests.PokeflexServiceTests.UserTests
         public async void TestInsertUser(Mocker mocks)
         {
             var context = DbContextFactory.NewUniqueContext(GetType().Name, mocks).PokeflexContext;
-            Assert.False(context.Users.Any());
+            Assert.False(context.AppUsers.Any());
             var service = new UserService(context);
             Assert.Equal(1, await service.Insert(Mocker.MockUser()));
-            Assert.True(context.Users.Any());
+            Assert.True(context.AppUsers.Any());
         }
     }
 }

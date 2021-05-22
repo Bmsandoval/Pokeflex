@@ -10,9 +10,13 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using App.Data;
 using App.Models;
+using App.Permissions;
 using App.Services;
 using App.Services.ExtPokeApis.ApiFactoryBase;
+using App.Services.Permissions;
 using App.Services.Pokeflex;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace App
@@ -31,15 +35,24 @@ namespace App
         {
             services.AddDbContext<PokeflexContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
-
-            services.AddDatabaseDeveloperPageExceptionFilter();
-
-            services.AddControllersWithViews();
             
             services.AddTransient<ExtPokeApiServiceFactoryProduct>(s => ExtPokeApiServiceFactory.PokemonService());
             services.AddTransient<PokeflexService>();
             services.AddTransient<UserService>();
             services.AddTransient<GroupService>();
+            services.AddTransient<PermissionService>();
+            
+            services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
+            services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();
+            services.AddIdentity<AppUser, IdentityRole>()
+                    .AddEntityFrameworkStores<PokeflexContext>()
+                    .AddUserManager<AppUserManager<AppUser>>()
+                    .AddDefaultTokenProviders();
+            services.AddScoped(s => s.GetService<AppUserManager<AppUser>>());
+            
+            services.AddDatabaseDeveloperPageExceptionFilter();
+            services.AddControllersWithViews();
+            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -60,7 +73,7 @@ namespace App
 
             app.UseRouting();
 
-            //app.UseAuthorization();
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {

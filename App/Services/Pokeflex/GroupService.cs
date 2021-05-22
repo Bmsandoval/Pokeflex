@@ -36,11 +36,11 @@ namespace App.Services.Pokeflex
         /**
          * Purpose: Add user to a group
          */
-        public virtual async Task<int> AddUser(int groupId, User user) => throw new NotImplementedException();
+        public virtual async Task<int> AddUser(int groupId, AppUser appUser) => throw new NotImplementedException();
         
         /**
          * Purpose: List users in a specific group
          */
-        public virtual async Task<List<User>> ListUsers(int groupId) => throw new NotImplementedException();
+        public virtual async Task<List<AppUser>> ListUsers(int groupId) => throw new NotImplementedException();
     }
 }

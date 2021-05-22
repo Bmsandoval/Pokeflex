@@ -61,7 +61,7 @@ namespace App.Services.Pokeflex
                 .ToListAsync();
         }
         
-        public virtual async Task<List<User>> Testy()
+        public virtual async Task<List<AppUser>> Testy()
         {
             // var mathClass = new Class { Name = "Math" };
             // mathClass.Students.Add(new Student { Name = "Alice" });
@@ -92,7 +92,7 @@ namespace App.Services.Pokeflex
             // // .ThenInclude(ug => ug.Group)
             // // .ToListAsync();
             
-            var user = new User();
+            var user = new AppUser();
             var usergroup = new UserGroup();
             var group = new Group();
             var pokemon = new Pokemon();
@@ -102,12 +102,12 @@ namespace App.Services.Pokeflex
             group.Pokemons = new List<Pokemon>{pokemon};
             
             _dbContext.UserGroups.Add(usergroup);
-            _dbContext.Users.Add(user);
+            _dbContext.AppUsers.Add(user);
             _dbContext.Groups.Add(group);
             _dbContext.Pokemons.Add(pokemon);
             
             await _dbContext.SaveChangesAsync();
-            return await _dbContext.Users
+            return await _dbContext.AppUsers
                 .Include(u => u.UserGroups)
                 .ThenInclude(ug => ug.Group)
                 .ToListAsync();

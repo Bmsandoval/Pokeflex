@@ -9,15 +9,16 @@ using App.Data;
 using App.Services.ExtPokeApis.ApiFactoryBase;
 using App.Services.ExtPokeApis.PokeApiCo;
 using App.Shared;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace App.Models
 {
-    public class User
+    public class AppUser : IdentityUser
     {
-        public int Id { get; set; }
+        // public string Id { get; set; }
 
         public IList<UserGroup> UserGroups { get; set; }
     }

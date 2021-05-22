@@ -6,11 +6,13 @@ using Microsoft.AspNetCore.Mvc;
 using App.Models;
 using App.Services.ExtPokeApis.ApiFactoryBase;
 using App.Services.Pokeflex;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 
 namespace App.Controllers
 {
     [Route("pokemon")]
+    [Authorize("Permission:SuperAdmin")]
     public class PokemonsController : Controller
     {
         private readonly ExtPokeApiServiceFactoryProduct _svcExtExtPokeApiApi;

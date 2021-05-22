@@ -14,8 +14,8 @@ namespace Tests.ServiceDataGenerator
 
         private Mocker() { }
         
-        public static User MockUser(int? id=null) =>
-            id == null ? new User() : new User { Id=(int)id }; 
+        public static AppUser MockUser(int? id=null) =>
+            id == null ? new AppUser() : new AppUser { Id=(int)id }; 
         public static Pokemon MockPokemon(int? groupId, int number) => new (){
             GroupId = groupId,
             Number = number,
