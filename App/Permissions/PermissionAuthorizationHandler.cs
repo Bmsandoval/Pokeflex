@@ -31,7 +31,7 @@ namespace App.Permissions
         {
             var permissionsService = (PermissionService?) _appUserManager.Services.GetService(typeof(PermissionService))
                                      ?? throw new NoNullAllowedException("Null found when accessing PermissionService");
-            if (permissionsService.Permitted(requirement.Permission))
+            if (await permissionsService.Permitted(requirement.Permission))
             {
                 context.Succeed(requirement);
             }

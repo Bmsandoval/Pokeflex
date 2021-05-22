@@ -15,15 +15,9 @@ namespace App.Services.Permissions
             _dbContext = dbContext;
         }
 
-        public virtual bool Permitted(string permission)
+        public virtual async Task<bool> Permitted(string permission)
         {
-            // var users = (DbSet<IdentityUser<int>>) _dbContext.AppUsers;
-            // return _dbContext.AppUsers.AnyAsync(x => x.Type == "Permission" &&
-            //              x.Value == requirement.Permission &&
-            //              x.Issuer == "LOCAL AUTHORITY")
-            
-            // return false;
-            return true;
+            return await _dbContext.AppUsers.AnyAsync();
         }
     }
 }
