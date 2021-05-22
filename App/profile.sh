@@ -1,7 +1,7 @@
 #!/bin/bash
 
 
-POKEFLEX_APP_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." >/dev/null && pwd )"
+POKEFLEX_CODE_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." >/dev/null && pwd )"
 
 
 _pokeflex_base_options=\
@@ -14,7 +14,8 @@ purge\t:\tstop containers and purge all remnants [[WARNING: EVEN WORSE THAN RESE
 test\t:\truns unit|bench tests
 sync\t:\tsyncs this project with a non-local host
 repro\t:\treloads this file
-help\t:\tshow this menu"
+help\t:\tshow this menu
+edit\t:\thelper for opening this file in vim"
 
 
 _pokeflex_purge_options=\
@@ -53,7 +54,6 @@ _pokeflex_test_unit_options=\
 
 
 alias pf="pokeflex"
-# Use: view/edit documentation
 pokeflex () {
   local _option="${1}"
   shift
@@ -66,8 +66,8 @@ ${_pokeflex_base_options}"
     ;;
     'start')
       case "${_subOption}" in
-        'api') docker-compose -f "${POKEFLEX_APP_DIR}/App/docker-compose.yml" up --build pokeflex-api ;;
-        'db') docker-compose -f "${POKEFLEX_APP_DIR}/App/docker-compose.yml" up -d pokeflex-db ;;
+        'api') docker-compose -f "${POKEFLEX_CODE_DIR}/App/docker-compose.yml" up --build pokeflex-api ;;
+        'db') docker-compose -f "${POKEFLEX_CODE_DIR}/App/docker-compose.yml" up -d pokeflex-db ;;
         'all') ${FUNCNAME[0]} start db && ${FUNCNAME[0]} start api ;;
         ''|*) echo "'api', 'db', or 'all'"
       esac
@@ -76,19 +76,19 @@ ${_pokeflex_base_options}"
     'stop')
       echo "STOPPING pokeflex services"
       case "${_subOption}" in
-        'api') docker-compose -f "${POKEFLEX_APP_DIR}/App/docker-compose.yml" down pokeflex-api ;;
-        'db') docker-compose -f "${POKEFLEX_APP_DIR}/App/docker-compose.yml" down pokeflex-db ;;
-        'all') docker-compose -f "${POKEFLEX_APP_DIR}/App/docker-compose.yml" down ;;
+        'api') docker-compose -f "${POKEFLEX_CODE_DIR}/App/docker-compose.yml" down pokeflex-api ;;
+        'db') docker-compose -f "${POKEFLEX_CODE_DIR}/App/docker-compose.yml" down pokeflex-db ;;
+        'all') docker-compose -f "${POKEFLEX_CODE_DIR}/App/docker-compose.yml" down ;;
         ''|*) echo "'api', 'db', or 'all'"
       esac
     ;;
     'rebuild')
-      docker-compose -f "${POKEFLEX_APP_DIR}/App/docker-compose.yml" build
+      docker-compose -f "${POKEFLEX_CODE_DIR}/App/docker-compose.yml" build
     ;;
     'purge')
       case "${_subOption}" in
         'api') ${FUNCNAME[0]} stop api; docker system prune --all --force --filter=label=base=true --filter=label=notdb=true --filter=label=pokeflex=true ;;
-        'project') docker stop $(docker ps -q); docker system prune --all --force --filter=label=base=true --filter=label=pokeflex=true; ${FUNCNAME[0]} sync -cease ;;
+        'project') docker stop $(docker ps -q); docker system prune --all --force --filter=label=base=true --filter=label=pokeflex=true ;;
         'everywhere') docker stop $(docker ps -q); docker system prune --all --force --filter=label=base=true --filter=label=notdb=true ;;
         'everything') docker stop $(docker ps -q); docker system prune --all --force --filter=label=base=true ;;
         'killme') docker stop $(docker ps -q); docker system prune --all --force ;;
@@ -130,15 +130,15 @@ ${_pokeflex_base_options}"
           done
           [ -n "${filter}" ] && filter=${filter%?} && filter+="'"
           local appDir
-          [ $virtualized ] && appDir="/src" || appDir="${POKEFLEX_APP_DIR}"
-          local command="export DotnetTestDbType=${db} && dotnet ${continuous} test ${appDir}/Tests/Tests.csproj ${filter} ${@}" 
+          [ $virtualized ] && appDir="/src" || appDir="${POKEFLEX_CODE_DIR}"
+          local command="export DotnetTestDbType=${db} && \$(which dotnet) ${continuous} test ${appDir}/Tests/Tests.csproj ${filter} ${@}" 
           case 1 in
           "${dryrun}") echo "${command}" ;;
-          "${help}") eval "dotnet test ${POKEFLEX_APP_DIR}/Tests/Tests.csproj --help" ;;
+          "${help}") eval "\$(which dotnet) test ${POKEFLEX_CODE_DIR}/Tests/Tests.csproj --help" ;;
           "${virtualized}") 
             local virtualCommand="$(echo $command | perl -pe 's/\//\\\//g')"
-            perl -pi -e 's/(?<=^run_cmd=")(.*)(?=")/'"${virtualCommand}"'/g' "${POKEFLEX_APP_DIR}/Tests/Deployments/Units/entrypoint.sh"
-            docker-compose -f "${POKEFLEX_APP_DIR}/docker-compose.yml" up --build
+            perl -pi -e 's/(?<=^run_cmd=")(.*)(?=")/'"${virtualCommand}"'/g' "${POKEFLEX_CODE_DIR}/Tests/Deployments/Units/entrypoint.sh"
+            docker-compose -f "${POKEFLEX_CODE_DIR}/docker-compose.yml" up --build
           ;;
           *) eval "${command}" ;;
           esac
@@ -162,20 +162,20 @@ ${_pokeflex_base_options}"
             '-fy'|'-filter-any') filter="--anyCategories " && filtering=1 ;;
             '-r'|'-rapid') rapid="-j short --warmupCount 1 --iterationCount 1 --invocationCount 1 --unrollFactor 1 --runOncePerIteration true" ;; # short run job, with in-process benchmarks
             '-v'|'-virtualized') virtualized=1 ;;
-            '-d'|'-dry') dryrun=true && filtering=0 ;;
-            '-h'|'-help') help=true && echo -e "${_pokeflex_test_bench_options}" && filtering=false ;;
+            '-d'|'-dry') dryrun=1 && filtering=0 ;;
+            '-h'|'-help') help=1 && echo -e "${_pokeflex_test_bench_options}" && filtering=false ;;
             *) [[ $filtering ]] && filter+=" ${1}" ;;
             esac
           done
-          [ ${virtualized} ] && appDir="/src" || appDir="${POKEFLEX_APP_DIR}"
-          local command="export DotnetTestDbType="${db}" && sudo -E dotnet run -c Release -p ${appDir}/Tests/Tests.csproj -- -i -m -a ${appDir}/Tests/Benchs/ ${save} ${filter} ${rapid} ${@} ${verbosity}" 
+          [ ${virtualized} ] && appDir="/src" || appDir="${POKEFLEX_CODE_DIR}"
+          local command="export DotnetTestDbType=${db} && sudo -E \$(which dotnet) run -c Release -p ${appDir}/Tests/Tests.csproj -- -i -m -a ${appDir}/Tests/Benchs/ ${save} ${filter} ${rapid} ${@} ${verbosity}" 
           case "1" in
           "${dryrun}") echo "${command}" ;;
-          "${help}") eval "dotnet run -p ${POKEFLEX_APP_DIR}/Tests/Tests.csproj -- --help" ;;
+          "${help}") eval "\$(which dotnet) run -p ${POKEFLEX_CODE_DIR}/Tests/Tests.csproj -- --help" ;;
           "${virtualized}") 
             local virtualCommand="$(echo $command | perl -pe 's/\//\\\//g' | perl -pe 's/ sudo -E / /')"
-            perl -pi -e 's/(?<=^run_cmd=")(.*)(?=")/'"${virtualCommand}"'/g' "${POKEFLEX_APP_DIR}/Tests/Deployments/Units/entrypoint.sh"
-            docker-compose -f "${POKEFLEX_APP_DIR}/docker-compose-unit-bench.yml" up --build
+            perl -pi -e 's/(?<=^run_cmd=")(.*)(?=")/'"${virtualCommand}"'/g' "${POKEFLEX_CODE_DIR}/Tests/Deployments/Units/entrypoint.sh"
+            docker-compose -f "${POKEFLEX_CODE_DIR}/docker-compose-unit-bench.yml" up --build
           ;;
           *) eval "${command}"
           esac
@@ -187,23 +187,26 @@ ${_pokeflex_base_options}"
       echo "Testing completed after $((end-start)) seconds"
     ;; 
     'repro')
-      . ${POKEFLEX_APP_DIR}/App/profile.sh
+      . ${POKEFLEX_CODE_DIR}/App/profile.sh
     ;;
 	'sync')
 		case "${1}" in
 		'-b'|'-begin')
-			local _watchDir="${POKEFLEX_APP_DIR}"
-			if [[ -n "${FSWATCH_PID}" ]]; then
-				echo "already syncing"
+			if [[ -z "${2}" ]]; then
+				echo "Unknown destination. Sync command requires a local/remote address with which to sync the code"
 			else
-				fswatch -o "${_watchDir}/" \
-				| while read -r _; do
-          rsync -az "${_watchDir}" hunin:~/projects/Pokeflex \
-            --exclude "bin/" --exclude ".git/" --exclude "obj/" \
-            --exclude ".idea/" --exclude ".vs/" --exclude "BenchmarkDotNet.Artifacts/"
-        done \
-        &
-				export FSWATCH_PID=$!
+				if [[ -n "${FSWATCH_PID}" ]]; then
+					echo "already syncing"
+				else
+					fswatch -o "${POKEFLEX_CODE_DIR}/" \
+					| while read -r _; do
+			  rsync -az "${POKEFLEX_CODE_DIR}/" ${2}:~/projects/Pokeflex/ \
+				--exclude "bin/" --exclude ".git/" --exclude "obj/" \
+				--exclude ".idea/" --exclude ".vs/" --exclude "BenchmarkDotNet.Artifacts/"
+			done \
+			&
+					export FSWATCH_PID=$!
+				fi
 			fi
 		;;
 		'-c'|'-cease')
@@ -218,13 +221,14 @@ ${_pokeflex_base_options}"
 		;;
 		esac
 	;;
+  'edit') vim ${POKEFLEX_CODE_DIR}/App/profile.sh ;;
   *) echo -e "ERROR: invalid option <${_option}>. Try..\n$ ${FUNCNAME[0]} help" ;;
   esac
 } 2>/dev/null
 
 
 __pokeflext_list_bench_tests () {
-  local _testFiles=($(cd ${POKEFLEX_APP_DIR}/Tests && find . -type f -not -path "*/Units/*" -not -path "*/obj/*" -not -path "*/bin/*" -not -path "*.Artifacts/*" -not -path "*/ServiceDataGenerator/*" -not -name "Tests.csproj" -not -name "Program.cs" -not -name "appsettings.*.json" -not -path "*/.idea/*"))
+  local _testFiles=($(cd ${POKEFLEX_CODE_DIR}/Tests && find . -type f -not -path "*/Units/*" -not -path "*/obj/*" -not -path "*/bin/*" -not -path "*.Artifacts/*" -not -path "*/ServiceDataGenerator/*" -not -name "Tests.csproj" -not -name "Program.cs" -not -name "appsettings.*.json" -not -path "*/.idea/*"))
   rm pipe0; mkfifo pipe0
   _pids=()
   for _testFile in "${_testFiles[@]}"; do
@@ -239,7 +243,7 @@ __pokeflext_list_bench_tests () {
         print "$r\n";
       }
     }
-    $bench=0;' "${POKEFLEX_APP_DIR}/Tests/$(echo "${_testFile}" | perl -pe "s/^\.\///")" \
+    $bench=0;' "${POKEFLEX_CODE_DIR}/Tests/$(echo "${_testFile}" | perl -pe "s/^\.\///")" \
     > pipe0 &
     _pids+=($!)
   done
@@ -258,7 +262,7 @@ __pokeflext_list_bench_tests () {
 
 
 __pokeflext_list_unit_tests () {
-  local _testFiles=($(cd ${POKEFLEX_APP_DIR}/Tests && find . -type f -not -path "*/Benchs/*" -not -path "*/obj/*" -not -path "*/bin/*" -not -path "*.Artifacts/*" -not -path "*/ServiceDataGenerator/*" -not -name "Tests.csproj" -not -name "Program.cs" -not -name "appsettings.*.json" -not -path "*/.idea/*"))
+  local _testFiles=($(cd ${POKEFLEX_CODE_DIR}/Tests && find . -type f -not -path "*/Benchs/*" -not -path "*/obj/*" -not -path "*/bin/*" -not -path "*.Artifacts/*" -not -path "*/ServiceDataGenerator/*" -not -name "Tests.csproj" -not -name "Program.cs" -not -name "appsettings.*.json" -not -path "*/.idea/*"))
   rm pipe0; mkfifo pipe0
   _pids=()
   for _testFile in "${_testFiles[@]}"; do
@@ -279,7 +283,7 @@ __pokeflext_list_unit_tests () {
         }
       }
     }
-    $bench=0;' "${POKEFLEX_APP_DIR}/Tests/$(echo "${_testFile}" | perl -pe "s/^\.\///")" \
+    $bench=0;' "${POKEFLEX_CODE_DIR}/Tests/$(echo "${_testFile}" | perl -pe "s/^\.\///")" \
     > pipe0 &
     _pids+=($!)
   done
