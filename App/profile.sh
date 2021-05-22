@@ -79,7 +79,7 @@ ${_pokeflex_base_options}"
       case "${_subOption}" in
         'api') docker-compose -f "${POKEFLEX_CODE_DIR}/App/docker-compose.yml" down pokeflex-api ;;
         'db') docker-compose -f "${POKEFLEX_CODE_DIR}/App/docker-compose.yml" down pokeflex-db ;;
-        'all') docker-compose -f "${POKEFLEX_CODE_DIR}/App/docker-compose.yml" down ;;
+        'all') docker-compose -f "${POKEFLEX_CODE_DIR}/App/docker-compose.yml" down; ${FUNCNAME[0]} sync -cease ;;
         ''|*) echo "'api', 'db', or 'all'"
       esac
     ;;
@@ -201,10 +201,11 @@ ${_pokeflex_base_options}"
 				else
 					fswatch -o "${POKEFLEX_CODE_DIR}/" \
 					| while read -r _; do
-			  rsync -az "${POKEFLEX_CODE_DIR}/" ${2}:~/projects/Pokeflex/ \
+			  rsync -taz "${POKEFLEX_CODE_DIR}/" ${2}:~/projects/Pokeflex/ \
 				--exclude "bin/" --exclude ".git/" --exclude "obj/" \
 				--exclude ".idea/" --exclude ".vs/" --exclude "results/" \
 				--exclude "BenchmarkDotNet.Artifacts/"
+			  ssh ${2} bash -c "'echo >> ~/projects/Pokeflex/App/Startup.cs'"
 			done \
 			&
 					export FSWATCH_PID=$!
@@ -367,7 +368,6 @@ _fzf_complete_pokeflex_post () {
   esac
   echo "${result}"
 }
-
 
 complete -F _fzf_complete_pokeflex -o default -o bashdefault pokeflex
 complete -F _fzf_complete_pokeflex -o default -o bashdefault pf
