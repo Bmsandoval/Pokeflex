@@ -47,6 +47,7 @@ _pokeflex_test_unit_options=\
 "\t\t\tAll following arguments are optional
 -inmemorydb\t:\t[default] runs tests against an inmemory sqlite database.
 -nativedb\t:\truns tests against a native db on local host (I use this against a docker db)
+-continuous\t:\twatch for changes and rerun if any changes detected
 -filter\t:\toptionally filter to specific tests
 -virtualized\t:\tRuns the tests in a docker container
 -dry\t:\tprint the resulting command instead of running it
