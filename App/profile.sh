@@ -203,7 +203,8 @@ ${_pokeflex_base_options}"
 					| while read -r _; do
 			  rsync -az "${POKEFLEX_CODE_DIR}/" ${2}:~/projects/Pokeflex/ \
 				--exclude "bin/" --exclude ".git/" --exclude "obj/" \
-				--exclude ".idea/" --exclude ".vs/" --exclude "BenchmarkDotNet.Artifacts/"
+				--exclude ".idea/" --exclude ".vs/" --exclude "results/" \
+				--exclude "BenchmarkDotNet.Artifacts/"
 			done \
 			&
 					export FSWATCH_PID=$!

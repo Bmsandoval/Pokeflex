@@ -16,10 +16,10 @@ namespace Tests.Benchs.Proofs.Db
 {
     public class QueryCompositionStrategies : SingleQueriesBase
     {
-        // [Params(5, 10, 15)] public int Groups;
-        // [Params(10, 100, 1_000)] public int Numbers;
-        [Params(5)] public override int Groups { get; set; }
-        [Params(10)] public override int Numbers { get; set; }
+        [Params(5, 10, 15)] public int Groups;
+        [Params(10, 100, 1_000)] public int Numbers;
+        // [Params(5)] public override int Groups { get; set; }
+        // [Params(10)] public override int Numbers { get; set; }
     }
     
     
