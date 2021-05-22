@@ -17,16 +17,12 @@ namespace App.Permissions
 
         // Dynamically creates a policy with a requirement that contains the permission.
         // The policy name must match the permission that is needed.
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="policyName"></param>
-        /// <returns></returns>
         public Task<AuthorizationPolicy> GetPolicyAsync(string policyName)
         {
-            if (!policyName.StartsWith("Permission", StringComparison.OrdinalIgnoreCase))
+            if (! policyName.StartsWith("Permission", StringComparison.OrdinalIgnoreCase))
             {
-                // Policy is not for permissions, try the default provider.
+                // If it doesn't start with permission, then it's a policy.
+                //  pass policies onward to default provider
                 return FallbackPolicyProvider.GetPolicyAsync(policyName);
             }
 

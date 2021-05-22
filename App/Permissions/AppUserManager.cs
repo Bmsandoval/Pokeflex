@@ -1,11 +1,8 @@
 using System;
 using System.Collections.Generic;
-using App.Models;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using static System.GC;
 
 namespace App.Permissions
 {

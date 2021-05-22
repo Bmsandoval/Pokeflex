@@ -1,7 +1,5 @@
 using System.Threading.Tasks;
 using App.Data;
-using App.Models;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace App.Services.Permissions

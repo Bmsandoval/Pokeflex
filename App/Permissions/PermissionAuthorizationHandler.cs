@@ -1,6 +1,4 @@
-﻿using System;
-using System.Data;
-using System.Linq;
+﻿using System.Data;
 using System.Threading.Tasks;
 using App.Models;
 using App.Services.Permissions;
@@ -17,16 +15,14 @@ namespace App.Permissions
             _appUserManager = (AppUserManager<AppUser>)userManager;
         }
 
-        // protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context, PermissionRequirement requirement)
-        // {
-        //     Console.WriteLine("testypoo");
-        //     var permissionsService = (PermissionService?) _appUserManager.Services.GetService(typeof(PermissionService))
-        //                              ?? throw new NoNullAllowedException("Null found when accessing PermissionService");
-        //     context.Succeed(requirement);
-        // }
-
-        
         #nullable enable
+        // public virtual async Task HandleAsync(AuthorizationHandlerContext context)
+        // {
+        //     foreach (var req in context.Requirements.OfType<TRequirement>())
+        //     {
+        //         await HandleRequirementAsync(context, req);
+        //     }
+        // }
         protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context, PermissionRequirement requirement)
         {
             var permissionsService = (PermissionService?) _appUserManager.Services.GetService(typeof(PermissionService))
@@ -35,14 +31,6 @@ namespace App.Permissions
             {
                 context.Succeed(requirement);
             }
-            
-            // if (context.User.Claims.
-            //     Any(x => x.Type == "Permission" &&
-            //              x.Value == requirement.Permission &&
-            //              x.Issuer == "LOCAL AUTHORITY")
-            // ){
-            //     context.Succeed(requirement);
-            // }
         }
         #nullable disable 
     }
