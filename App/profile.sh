@@ -32,7 +32,6 @@ _pokeflex_test_bench_options=\
 "\t\t\tAll following arguments are optional
 -inmemorydb\t:\t[default] runs tests against an inmemory sqlite database.
 -nativedb\t:\truns tests against a native db on local host (I use this against a docker db)
--verbose\t:\t[default] no holes barred
 -quiet\t:\tparses output using perl regex for more concise output
 -save\t:\t[default=false]save a record of this run
 -filter-any\t:\tRuns tests that are in ANY of the provided categories
@@ -48,6 +47,7 @@ _pokeflex_test_unit_options=\
 -inmemorydb\t:\t[default] runs tests against an inmemory sqlite database.
 -nativedb\t:\truns tests against a native db on local host (I use this against a docker db)
 -continuous\t:\twatch for changes and rerun if any changes detected
+-quiet\t:\tparses output using perl regex for more concise output
 -filter\t:\toptionally filter to specific tests
 -virtualized\t:\tRuns the tests in a docker container
 -dry\t:\tprint the resulting command instead of running it
@@ -107,7 +107,7 @@ ${_pokeflex_base_options}"
       local start=$(date +%s)
       case "${_subOption}" in
         'unit') 
-          local db help dryrun filtering filter continuous virtualized save
+          local db help dryrun filtering filter continuous virtualized save verbosity
           db="inmemory"
           while shift; do
             if [[ "${1}" == "--" ]]; then 
@@ -125,6 +125,7 @@ ${_pokeflex_base_options}"
             '-d'|'dry') dryrun=1; filtering=0 ;;
             '-f'|'-filter') filter="--filter '"; filtering=1 ;;
             '-v'|'-virtualized') virtualized=1 ;;
+            '-q'|'-quiet') verbosity="| perl -wlne 'print if /^Passed!|Failed!|watch :|Starting test execution|A total of [0-9]+ test files matched the specified pattern/'" && filtering=0 ;;
             '-h'|'-help') help=1; echo -e "${_pokeflex_test_unit_options}"; filtering=0 ;;
             *) [[ $filtering == 1 ]] && filter+="${1}|" ;;
             esac
@@ -132,7 +133,7 @@ ${_pokeflex_base_options}"
           [ -n "${filter}" ] && filter=${filter%?} && filter+="'"
           local appDir
           [ $virtualized ] && appDir="/src" || appDir="${POKEFLEX_CODE_DIR}"
-          local command="export DotnetTestDbType=${db} && \$(which dotnet) ${continuous} test ${appDir}/Tests/Tests.csproj ${filter} ${@}" 
+          local command="export DotnetTestDbType=${db} && \$(which dotnet) ${continuous} test ${appDir}/Tests/Tests.csproj ${filter} ${@} ${verbosity}" 
           case 1 in
           "${dryrun}") echo "${command}" ;;
           "${help}") eval "\$(which dotnet) test ${POKEFLEX_CODE_DIR}/Tests/Tests.csproj --help" ;;
@@ -199,6 +200,10 @@ ${_pokeflex_base_options}"
 				if [[ -n "${FSWATCH_PID}" ]]; then
 					echo "already syncing"
 				else
+                      rsync -taz "${POKEFLEX_CODE_DIR}/" ${2}:~/projects/Pokeflex/ \
+                        --exclude "bin/" --exclude ".git/" --exclude "obj/" \
+                        --exclude ".idea/" --exclude ".vs/" --exclude "results/" \
+                        --exclude "BenchmarkDotNet.Artifacts/"
 					fswatch -o "${POKEFLEX_CODE_DIR}/" -e ".*" -i "\\.cs$" \
 					| while read -r _; do
 			  rsync -taz "${POKEFLEX_CODE_DIR}/" ${2}:~/projects/Pokeflex/ \
