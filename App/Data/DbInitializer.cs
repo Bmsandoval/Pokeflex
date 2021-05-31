@@ -8,6 +8,7 @@ namespace App.Data
         public static void Initialize(PokeflexContext context)
         {
             context.Database.EnsureCreated();
+            UdfMigrations.MigrateUdfs(context);
         }
     }
 }

@@ -30,15 +30,12 @@ namespace Tests.ServiceDataGenerator
                 Environment.GetEnvironmentVariable("DotnetTestDbType", EnvironmentVariableTarget.Process)
                 ?? "";
 
-            switch (contextType)
+            return contextType switch
             {
-                case "inmemory":
-                    return new InMemoryDbContext(callingClassName, mocker);
-                case "native":
-                    return new NativeDbContext(callingClassName,  mocker);
-                default:
-                    throw new ArgumentException("invalid option for env var PokeflexTestDbType %s", contextType);
-            }
+                "inmemory" => new InMemoryDbContext(callingClassName, mocker),
+                "native" => new NativeDbContext(callingClassName, mocker),
+                _ => throw new ArgumentException("invalid option for env var PokeflexTestDbType %s", contextType)
+            };
         }
     }
 
@@ -84,6 +81,8 @@ namespace Tests.ServiceDataGenerator
                 PokeflexContext.Groups.Add(group);
             }
             PokeflexContext.SaveChanges();
+            
+            UdfMigrations.MigrateUdfs(PokeflexContext);
         }
     }
     
@@ -133,6 +132,8 @@ namespace Tests.ServiceDataGenerator
                 PokeflexContext.Groups.Add(group);
             }
             PokeflexContext.SaveChanges();
+            
+            UdfMigrations.MigrateUdfs(PokeflexContext);
         }
     }
 }

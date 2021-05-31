@@ -18,7 +18,7 @@ namespace Tests.Benchs.PokeflexServiceBenchmarks
     public class PokeflexServiceListBase
     {
         [Params( 5, 15)] public int Groups;
-        [Params(100, 1_000, 5_000)] public int Numbers;
+        [Params(10, 100, 1_000)] public int Numbers;
         [Params(0.10, 0.30)] public double LimitAsPctNumbers;
         // [Params( 15)] public int Groups;
         // [Params(100)] public int Numbers;

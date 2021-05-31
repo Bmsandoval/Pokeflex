@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using App.Engines;
 using Microsoft.AspNetCore.Mvc;
 using App.Models;
 using App.Services.ExtPokeApis.ApiFactoryBase;
@@ -17,12 +18,14 @@ namespace App.Controllers
     {
         private readonly ExtPokeApiServiceFactoryProduct _svcExtExtPokeApiApi;
         private readonly PokeflexService _svcPokeflexDb;
+        private readonly PokeflexEngine _engPokeflex;
         private readonly GroupService _svcGroupDb;
-        public PokemonsController(ExtPokeApiServiceFactoryProduct extExtPokeApiApi, PokeflexService pokeflexService, GroupService groupService)
+        public PokemonsController(ExtPokeApiServiceFactoryProduct extExtPokeApiApi, PokeflexService pokeflexService, PokeflexEngine pokeflexEngine, GroupService groupService)
         {
             _svcExtExtPokeApiApi = extExtPokeApiApi ?? throw new ArgumentNullException(nameof(extExtPokeApiApi));
             _svcPokeflexDb = pokeflexService ?? throw new ArgumentNullException(nameof(pokeflexService));
             _svcGroupDb = groupService ?? throw new ArgumentNullException(nameof(groupService));
+            _engPokeflex = pokeflexEngine ?? throw new ArgumentNullException(nameof(pokeflexEngine));
         }
 
         [HttpGet] public async Task<IActionResult> List([FromQuery]int offset=0, [FromQuery]int limit=5, [FromQuery]int? group=null) 
@@ -42,21 +45,22 @@ namespace App.Controllers
         }
         
         [Route("{num:int}")]
-        [HttpGet] public async Task<IActionResult> Select(int num, [FromQuery]int? group=null)
+        [HttpGet] public IActionResult Select(int num, [FromQuery]int? group=null)
         {
-            var pokemon = await _svcPokeflexDb.Select(num, group);
-            if (pokemon != null) return Ok(pokemon);
-            var ipokemon = _svcExtExtPokeApiApi.GetByNumber(num);
-            if (ipokemon == null) return NoContent();
-            pokemon = new Pokemon(ipokemon);
-            int count;
-            try {
-                count = await _svcPokeflexDb.Insert(pokemon);
-            } catch (DbUpdateException e) {
-                return BadRequest("specified group doesn't exist");
-            }
-            if (count < 1) return BadRequest();
-            return Ok(pokemon);
+            return Ok(_engPokeflex.SelectPokemonInsertMissing(num, group));
+            // var pokemon = await _svcPokeflexDb.Select(num, group);
+            // if (pokemon != null) return Ok(pokemon);
+            // var ipokemon = _svcExtExtPokeApiApi.GetByNumber(num);
+            // if (ipokemon == null) return NoContent();
+            // pokemon = new Pokemon(ipokemon);
+            // int count;
+            // try {
+            //     count = await _svcPokeflexDb.Insert(pokemon);
+            // } catch (DbUpdateException e) {
+            //     return BadRequest("specified group doesn't exist");
+            // }
+            // if (count < 1) return BadRequest();
+            // return Ok(pokemon);
         }
         
         [HttpPost] public async Task<IActionResult> Insert([FromBody]Pokemon pokemon)

@@ -15,7 +15,8 @@ namespace App.Services.Permissions
 
         public virtual async Task<bool> Permitted(string permission)
         {
-            return await _dbContext.AppUsers.AnyAsync();
+            // return await _dbContext.AppUsers.AnyAsync();
+            return true;
         }
     }
 }

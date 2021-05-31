@@ -1,4 +1,7 @@
-﻿using App.Models;
+﻿using System;
+using System.Linq;
+using System.Linq.Expressions;
+using App.Models;
 using App.Services.Pokeflex;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -33,6 +36,19 @@ namespace App.Data
                 .HasOne<AppUser>(ug=>ug.AppUser)
                 .WithMany(u => u.UserGroups)
                 .HasForeignKey(ug => ug.AppUserId);
+
+            modelBuilder.HasDbFunction(() => Udfs.MakeRange(default, default)).HasName("MakeRange");
+            // !!KLUGE!! The following code is supposed to work but is broken, documentation:
+            //      https://docs.microsoft.com/en-us/ef/core/querying/user-defined-function-mapping
+            //      https://github.com/dotnet/efcore/issues/23408
+            modelBuilder.HasDbFunction(() => SelectFlexmon(default, default)).HasName("SelectFlexmon");
+            // BEGIN KLUGE
+            modelBuilder.Entity<Pokemon>().ToTable("Pokemons");
+            // END KLUGE
+            
         }
+
+        public IQueryable<Pokemon> SelectFlexmon(int group, int number) =>
+            FromExpression(() => SelectFlexmon(group, number));
     }
 }

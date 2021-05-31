@@ -9,6 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using App.Data;
+using App.Engines;
 using App.Models;
 using App.Permissions;
 using App.Services;
@@ -39,6 +40,7 @@ namespace App
             services.AddTransient<PokeflexService>();
             services.AddTransient<UserService>();
             services.AddTransient<GroupService>();
+            services.AddTransient<PokeflexEngine>();
             services.AddTransient<PermissionService>();
             
             services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
