@@ -65,5 +65,17 @@ namespace Tests.Units.ServiceTests.PokeflexServiceTests.PokemonTests
             Assert.NotNull(resultmon);
             Assert.Equal(poke, resultmon);
         }
+
+
+        [Theory]
+        [MemberData(nameof(Seeder.FlexPokeOnlyDb), MemberType = typeof(Seeder))]
+        public Pokemon Sample(Mocker mocks)
+        {
+            var pokeflexContext = DbContextFactory.NewUniqueContext(GetType().Name, mocks).PokeflexContext;
+            var poke = pokeflexContext.Pokemons.First();
+            var pokemon = pokeflexContext.MakeRange(10, 20).FirstOrDefault();
+            Console.WriteLine(pokemon.Number);
+            return pokemon;
+        }
     }
 }

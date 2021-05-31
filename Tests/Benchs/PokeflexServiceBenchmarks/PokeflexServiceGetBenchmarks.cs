@@ -175,7 +175,7 @@ WHERE ([p].[GroupId] = @p0) AND ([p].[Number] = @p1)";
             return pokemon;
         }
         
-        [Benchmark] public async Task<Pokemon> UDF()
+        [Benchmark] public async Task<Pokemon> SqlServerStoredFunction()
         {
             var service = new PokeflexService(DbContext.PokeflexContext);
             var pokeflexContext=DbContext.PokeflexContext;

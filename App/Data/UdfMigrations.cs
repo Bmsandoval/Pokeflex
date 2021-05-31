@@ -52,14 +52,16 @@ order by function_name;";
         
         private static Dictionary<string, string> udfs =>
             new()
-            {
+            { // [Id], [ApiSource], [GroupId], [Name], [Number]
+                // MAKE RANGE
                 {"MakeRange", @"
 CREATE FUNCTION MakeRange (@Min int, @Max int)
 RETURNS TABLE AS
  RETURN (
-SELECT TOP((@Max-@Min)+1) (ROW_NUMBER() OVER (ORDER BY number))-1+@Min as number
+SELECT TOP((@Max-@Min)+1) CAST((ROW_NUMBER() OVER (ORDER BY number))-1+@Min AS INT) AS Number, CAST(0 AS INT) AS Id, NULL AS ApiSource, CAST(0 AS INT) AS GroupId, NULL AS Name
 FROM [master]..spt_values
 )"},
+                // SELECT FLEXMON
                 {"SelectFlexmon", @"
 CREATE FUNCTION SelectFlexmon (@GroupId int, @Number int)
 RETURNS TABLE AS
@@ -67,8 +69,8 @@ RETURN (
     SELECT * 
     FROM [Pokemons] AS [p]
     WHERE ([p].[GroupId] = @GroupId) AND ([p].[Number] = @Number)
-)
-"}
+)"}
+                
             };
     }
 }

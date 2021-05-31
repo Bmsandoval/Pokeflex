@@ -37,12 +37,13 @@ namespace App.Data
                 .WithMany(u => u.UserGroups)
                 .HasForeignKey(ug => ug.AppUserId);
 
-            modelBuilder.HasDbFunction(() => Udfs.MakeRange(default, default)).HasName("MakeRange");
             // !!KLUGE!! The following code is supposed to work but is broken, documentation:
             //      https://docs.microsoft.com/en-us/ef/core/querying/user-defined-function-mapping
             //      https://github.com/dotnet/efcore/issues/23408
+            modelBuilder.HasDbFunction(() => MakeRange(default, default)).HasName("MakeRange");
             modelBuilder.HasDbFunction(() => SelectFlexmon(default, default)).HasName("SelectFlexmon");
             // BEGIN KLUGE
+            // To fix this, we must manually register entities to a table after adding a db function that returns a queryable of that entity
             modelBuilder.Entity<Pokemon>().ToTable("Pokemons");
             // END KLUGE
             
@@ -50,5 +51,8 @@ namespace App.Data
 
         public IQueryable<Pokemon> SelectFlexmon(int group, int number) =>
             FromExpression(() => SelectFlexmon(group, number));
+        
+        public IQueryable<Pokemon> MakeRange(int min, int max) =>
+            FromExpression(() => MakeRange(min, max));
     }
 }

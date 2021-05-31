@@ -52,7 +52,7 @@ namespace Tests.Units.ControllerTests
             var controller = new PokemonsController(mockExtPokeApisService.Object, mockPokeflexService.Object, pokeflexEngine, mockGroupService.Object);
         
             // Act
-            var result = controller.Select(42);
+            var result = await controller.Select(42);
         
             // Assert
             var apiResult = Assert.IsType<OkObjectResult>(result);

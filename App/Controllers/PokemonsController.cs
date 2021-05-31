@@ -45,9 +45,9 @@ namespace App.Controllers
         }
         
         [Route("{num:int}")]
-        [HttpGet] public IActionResult Select(int num, [FromQuery]int? group=null)
+        [HttpGet] public async Task<IActionResult> Select(int num, [FromQuery]int? group=null)
         {
-            return Ok(_engPokeflex.SelectPokemonInsertMissing(num, group));
+            return Ok(await _engPokeflex.SelectPokemonInsertMissing(num, group));
             // var pokemon = await _svcPokeflexDb.Select(num, group);
             // if (pokemon != null) return Ok(pokemon);
             // var ipokemon = _svcExtExtPokeApiApi.GetByNumber(num);
