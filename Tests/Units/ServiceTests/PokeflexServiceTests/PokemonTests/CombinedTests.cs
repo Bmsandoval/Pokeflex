@@ -49,16 +49,16 @@ namespace Tests.Units.ServiceTests.PokeflexServiceTests.PokemonTests
             testmon = await pokeflexService.Select(1, 1);
             Assert.Null(testmon);
         }
-        
-        // TEST MANY TO MANY
-        [Theory]
-        [MemberData(nameof(Seeder.EmptyDb), MemberType = typeof(Seeder))]
-        public async void TestManyToMany(Mocker mocks)
-        {
-            var context = DbContextFactory.NewUniqueContext(GetType().Name, mocks).PokeflexContext;
-            var service = new PokeflexService(context);
-            var result = await service.Testy();
-            Assert.NotEmpty(result);
-        }
+        //
+        // // TEST MANY TO MANY
+        // [Theory]
+        // [MemberData(nameof(Seeder.EmptyDb), MemberType = typeof(Seeder))]
+        // public async void TestManyToMany(Mocker mocks)
+        // {
+        //     var context = DbContextFactory.NewUniqueContext(GetType().Name, mocks).PokeflexContext;
+        //     var service = new PokeflexService(context);
+        //     var result = await service.Testy();
+        //     Assert.NotEmpty(result);
+        // }
     }
 }

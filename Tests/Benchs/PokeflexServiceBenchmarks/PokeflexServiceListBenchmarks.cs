@@ -86,6 +86,33 @@ namespace Tests.Benchs.PokeflexServiceBenchmarks
             var service = new PokeflexService(pokeflexContext);
             return await service.GetRange(Offset, Limit, Group);
         }
+
+        [Benchmark] public List<Pokemon> SqlServerFuncInLinqQuery()
+        {
+            var pokeflexContext=DbContext.PokeflexContext;
+            var pokemons = (from ps in pokeflexContext.MakeRange(Offset+1, Offset+Limit)
+                join fs in pokeflexContext.Pokemons.Where(pok=>pok.GroupId==Group) on ps.Number equals fs.Number
+                join bs in pokeflexContext.Pokemons.Where(pok=>pok.GroupId==0) on new{name=fs.Name,num=ps.Number} equals new{name="",num=bs.Number}
+                select fs ?? bs).ToList();
+            return pokemons;
+        }
+        
+        [Benchmark] public List<Pokemon> SqlServerFuncInLinqQueryCoalesced()
+        {
+            var pokeflexContext=DbContext.PokeflexContext;
+            var pokemons = (from ps in pokeflexContext.MakeRange(Offset+1, Offset+Limit)
+                join fs in pokeflexContext.Pokemons.Where(pok=>pok.GroupId==Group) on ps.Number equals fs.Number
+                join bs in pokeflexContext.Pokemons.Where(pok=>pok.GroupId==0) on new{name=fs.Name,num=ps.Number} equals new{name="",num=bs.Number}
+                select new Pokemon(){
+                    Id= fs != null? fs.Id: bs.Id,
+                    Number= fs != null? fs.Number: bs.Number,
+                    GroupId= fs != null? fs.GroupId: bs.GroupId,
+                    ApiSource= fs != null? fs.ApiSource: bs.ApiSource,
+                    Name= fs != null? fs.Name: bs.Name
+                }).ToList();
+            return pokemons;
+        }
+        
         
         [Benchmark] public async Task<List<Pokemon>> Coalesce()
         {
@@ -128,7 +155,26 @@ namespace Tests.Benchs.PokeflexServiceBenchmarks
                 .Take(Limit)
                 .ToListAsync();
         }
-
+        
+        [Benchmark] public Pokemon UnionWhereNotExists()
+        {
+            var pokeflexContext=DbContext.PokeflexContext;
+            string sql = @"
+SELECT [p].[Id], [p].[ApiSource], [p].[GroupId], [p].[Name], [p].[Number]
+FROM pokemons AS [p]
+WHERE [p].[GroupId] = @p0 AND [p].[Number] > @p1 AND [p].[Number] <= @p2
+    UNION ALL
+SELECT [p0].[Id], [p0].[ApiSource], [p0].[GroupId], [p0].[Name], [p0].[Number]
+FROM pokemons AS [p0]
+WHERE NOT EXISTS (
+    SELECT TOP 1 1
+    FROM pokemons 
+    WHERE [GroupId]=@p0 AND [Number]=[p0].[NUMBER]
+)";
+            var pokemon = pokeflexContext.Pokemons.FromSqlRaw(sql, Group, Offset, Offset+Limit).AsEnumerable();
+            return pokemon.FirstOrDefault();
+        }
+        
         [Benchmark] public Pokemon UnionWhereNotExistsCte()
         {
             var pokeflexContext=DbContext.PokeflexContext;

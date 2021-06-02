@@ -61,56 +61,34 @@ namespace App.Services.Pokeflex
                 .ToListAsync();
         }
         
-        public virtual async Task<List<AppUser>> Testy()
+        public virtual List<Pokemon> Testy()
         {
-            // var mathClass = new Class { Name = "Math" };
-            // mathClass.Students.Add(new Student { Name = "Alice" });
-            // mathClass.Students.Add(new Student { Name = "Bob" });
-            // context.AddToClasses(mathClass);
-            // context.SaveChanges();
-            // return await _dbContext.Users
+            // var user = new AppUser();
+            // var usergroup = new UserGroup();
+            // var group = new Group();
+            // var pokemon = new Pokemon();
+            //
+            // user.UserGroups = new List<UserGroup>{usergroup};
+            // group.UserGroups=new List<UserGroup>{usergroup};
+            // group.Pokemons = new List<Pokemon>{pokemon};
+            //
+            // _dbContext.UserGroups.Add(usergroup);
+            // _dbContext.AppUsers.Add(user);
+            // _dbContext.Groups.Add(group);
+            // _dbContext.Pokemons.Add(pokemon);
+            //
+            // await _dbContext.SaveChangesAsync();
+            // return await _dbContext.AppUsers
             //     .Include(u => u.UserGroups)
             //     .ThenInclude(ug => ug.Group)
             //     .ToListAsync();
+            Console.WriteLine((
+                from ps in _dbContext.MakeRange(10, 20)
+                join fs in _dbContext.Pokemons on ps.Number equals fs.Number
+                join bs in _dbContext.Pokemons on new{name=fs.Name,num=ps.Number} equals new{name="", num=bs.Number}
+                select fs ?? bs).ToQueryString());
 
-            // var usergroup = new UserGroup();
-            // usergroup.User = new User(); 
-            // usergroup.Group = new Group();
-            // usergroup.Group.Pokemons = new List<Pokemon>
-            // {
-            //     new () {
-            //         ApiSource = "1",
-            //         GroupId = 1,
-            //         Name = "testy",
-            //         Number = 1
-            //     },
-            // };
-            // _dbContext.UserGroups.Add(usergroup);
-            // await _dbContext.SaveChangesAsync();
-            // return await _dbContext.Users.ToListAsync();
-            // // .Include(u => u.UserGroups)
-            // // .ThenInclude(ug => ug.Group)
-            // // .ToListAsync();
-            
-            var user = new AppUser();
-            var usergroup = new UserGroup();
-            var group = new Group();
-            var pokemon = new Pokemon();
-            
-            user.UserGroups = new List<UserGroup>{usergroup};
-            group.UserGroups=new List<UserGroup>{usergroup};
-            group.Pokemons = new List<Pokemon>{pokemon};
-            
-            _dbContext.UserGroups.Add(usergroup);
-            _dbContext.AppUsers.Add(user);
-            _dbContext.Groups.Add(group);
-            _dbContext.Pokemons.Add(pokemon);
-            
-            await _dbContext.SaveChangesAsync();
-            return await _dbContext.AppUsers
-                .Include(u => u.UserGroups)
-                .ThenInclude(ug => ug.Group)
-                .ToListAsync();
+            return _dbContext.MakeRange(10, 20).ToList();
         }
     }
 }

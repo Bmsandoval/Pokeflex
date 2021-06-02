@@ -179,9 +179,35 @@ WHERE ([p].[GroupId] = @p0) AND ([p].[Number] = @p1)";
         {
             var service = new PokeflexService(DbContext.PokeflexContext);
             var pokeflexContext=DbContext.PokeflexContext;
-            var pokemons = await pokeflexContext.SelectFlexmon(1, 1).FirstOrDefaultAsync();
+            var pokemons = await pokeflexContext.SelectFlexmon(Group, Number).FirstOrDefaultAsync();
             return pokemons;
         }
+        
+//         [BenchmarkCategory("fakeyfakey")]
+//         [Benchmark] public List<Pokemon> LeftJoinOnNumList()
+//         {
+//             var pokeflexContext=DbContext.PokeflexContext;
+//             string sql = @"
+// DECLARE @__min_1 int = 10;
+// DECLARE @__max_2 int = 20;
+// WITH fmons AS (
+//     SELECT [p].[Id], [p].[ApiSource], [p].[GroupId], [p].[Name], [p].[Number], [m].[Number] AS seeking
+//     FROM [dbo].[MakeRange](@__min_1, @__max_2) AS [m]
+//     LEFT JOIN [Pokemons] AS [p] ON [m].[Number] = [p].[Number]
+// )
+// SELECT [p].[Id], [p].[ApiSource], [p].[GroupId], [p].[Name], [p].[Number]
+//     FROM fmons AS [p]
+//     WHERE [p].[Number] IS NOT NULL
+// UNION ALL
+// SELECT [p].*
+//     FROM fmons AS [f]
+//     LEFT JOIN [Pokemons] AS [p] ON ([f].[Name] = N'') AND ([f].[seeking] = [p].[Number])
+//     WHERE [f].[Number] IS NULL
+// ";
+//             var pokemon = pokeflexContext.Pokemons.FromSqlRaw(sql, Group, Number).AsEnumerable();
+//             return pokemon.ToList();
+//         }
+
         
         [Benchmark] public Pokemon UnionWhereNotExistsCte()
         {

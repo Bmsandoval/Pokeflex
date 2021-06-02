@@ -87,5 +87,24 @@ namespace App.Controllers
             if (count < 1) return NotFound("Flexmon with number not found");
             return Ok(pokemon);
         }
+        
+        [Route("test")]
+        [HttpGet] public IActionResult Test()
+        {
+            return Ok(_svcPokeflexDb.Testy());
+            // var pokemon = await _svcPokeflexDb.Select(num, group);
+            // if (pokemon != null) return Ok(pokemon);
+            // var ipokemon = _svcExtExtPokeApiApi.GetByNumber(num);
+            // if (ipokemon == null) return NoContent();
+            // pokemon = new Pokemon(ipokemon);
+            // int count;
+            // try {
+            //     count = await _svcPokeflexDb.Insert(pokemon);
+            // } catch (DbUpdateException e) {
+            //     return BadRequest("specified group doesn't exist");
+            // }
+            // if (count < 1) return BadRequest();
+            // return Ok(pokemon);
+        }
     }
 }
