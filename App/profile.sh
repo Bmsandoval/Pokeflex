@@ -33,10 +33,10 @@ _pokeflex_test_bench_options=\
 -inmemorydb\t:\t[default] runs tests against an inmemory sqlite database.
 -nativedb\t:\truns tests against a native db on local host (I use this against a docker db)
 -quiet\t:\tparses output using perl regex for more concise output
--save\t:\t[default=false]save a record of this run
 -filter-any\t:\tRuns tests that are in ANY of the provided categories
 -filter-all\t:\tRuns tests that are in ALL of the provided categories
 -rapid\t:\tRuns benchmarks in fastest possible setting. bad benchmarks, but good for testing/debugging broken benchmarks
+-slow\t:\tRuns benchmarks in long job mode. This will take forever but gives accurate benchmarks
 -virtualized\t:\tRuns the tests in a docker container
 -dry\t:\tprint the resulting command instead of running it
 -help\t:\tdisplays this menu"
@@ -146,7 +146,7 @@ ${_pokeflex_base_options}"
           esac
           ;;
         'bench')
-          local db verbosity dryrun help filter filtering rapid virtualized save
+          local db verbosity dryrun help filter filtering speed virtualized save
           # defaults
           db="inmemory"
           while shift; do
@@ -162,7 +162,8 @@ ${_pokeflex_base_options}"
             '-q'|'-quiet') verbosity="| perl -wlne 'print if /^[|]|\/\/ Benchmark: |\/\/ [*]{5} |\s+[-]{3}|\s+at\s+/'" && filtering=0 ;;
             '-fl'|'-filter-all') filter="--allCategories " && filtering=1 ;;
             '-fy'|'-filter-any') filter="--anyCategories " && filtering=1 ;;
-            '-r'|'-rapid') rapid="-j short --warmupCount 1 --iterationCount 1 --invocationCount 1 --unrollFactor 1 --runOncePerIteration true" ;; # short run job, with in-process benchmarks
+            '-r'|'-rapid') speed="-j short --warmupCount 1 --iterationCount 1 --invocationCount 1 --unrollFactor 1 --runOncePerIteration true" ;; # short run job, with in-process benchmarks
+            '-s'|'-slow') speed="-j long"
             '-v'|'-virtualized') virtualized=1 ;;
             '-d'|'-dry') dryrun=1 && filtering=0 ;;
             '-h'|'-help') help=1 && echo -e "${_pokeflex_test_bench_options}" && filtering=false ;;
@@ -170,7 +171,7 @@ ${_pokeflex_base_options}"
             esac
           done
           [ ${virtualized} ] && appDir="/src" || appDir="${POKEFLEX_CODE_DIR}"
-          local command="export DotnetTestDbType=${db} && sudo -E \$(which dotnet) run -c Release -p ${appDir}/Tests/Tests.csproj -- --stopOnFirstError -i -m -a ${appDir}/Tests/Benchs/ ${save} ${filter} ${rapid} ${@} ${verbosity}" 
+          local command="export DotnetTestDbType=${db} && sudo -E \$(which dotnet) run -c Release -p ${appDir}/Tests/Tests.csproj -- --stopOnFirstError ${speed} -i -m -a ${appDir}/Tests/Benchs/ ${save} ${filter} ${rapid} ${@} ${verbosity}" 
           case "1" in
           "${dryrun}") echo "${command}" ;;
           "${help}") eval "\$(which dotnet) run -p ${POKEFLEX_CODE_DIR}/Tests/Tests.csproj -- --help" ;;
