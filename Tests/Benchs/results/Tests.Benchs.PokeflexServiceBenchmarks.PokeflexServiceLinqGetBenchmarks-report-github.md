@@ -2,91 +2,84 @@
 
 BenchmarkDotNet=v0.12.1, OS=macOS 11.2.3 (20D91) [Darwin 20.3.0]
 Intel Core i7-9750H CPU 2.60GHz, 1 CPU, 12 logical and 6 physical cores
-.NET Core SDK=5.0.201
-  [Host] : .NET Core 5.0.4 (CoreCLR 5.0.421.11614, CoreFX 5.0.421.11614), X64 RyuJIT
+.NET Core SDK=5.0.203
+  [Host] : .NET Core 5.0.6 (CoreCLR 5.0.621.22011, CoreFX 5.0.621.22011), X64 RyuJIT
 
 Toolchain=InProcessEmitToolchain  InvocationCount=1  UnrollFactor=1  
+Categories=All,Service,Pokeflex,Linq,Get  
 
 ```
-|                                     Method |                                Categories | Groups | Numbers |       Mean |     Error |      StdDev |     Median | Ratio | RatioSD | Gen 0 | Gen 1 | Gen 2 | Allocated |
-|------------------------------------------- |------------------------------------------ |------- |-------- |-----------:|----------:|------------:|-----------:|------:|--------:|------:|------:|------:|----------:|
-|                          **LinqQueryBaseline** |   **LinqQuery,All,Service,Pokeflex,Linq,Get** |      **5** |      **10** | **2,585.5 μs** |  **58.16 μs** |   **169.66 μs** | **2,575.4 μs** |  **1.00** |    **0.00** |     **-** |     **-** |     **-** |  **22.05 KB** |
-|                         LinqMethodBaseline |  LinqMethod,All,Service,Pokeflex,Linq,Get |      5 |      10 |   241.3 μs |  19.78 μs |    58.01 μs |   234.2 μs |  0.09 |    0.02 |     - |     - |     - |  11.68 KB |
-|                                   Proposal |             All,Service,Pokeflex,Linq,Get |      5 |      10 | 2,627.3 μs |  90.34 μs |   266.38 μs | 2,588.4 μs |  1.02 |    0.12 |     - |     - |     - |   41.8 KB |
-| UnionWhereNotExistsWithoutExtensionMethods |             All,Service,Pokeflex,Linq,Get |      5 |      10 | 2,676.7 μs |  94.82 μs |   278.10 μs | 2,651.3 μs |  1.04 |    0.12 |     - |     - |     - |  34.65 KB |
-|                        UnionWhereNotExists | ActiveState,All,Service,Pokeflex,Linq,Get |      5 |      10 | 2,501.6 μs | 104.88 μs |   309.24 μs | 2,512.4 μs |  0.97 |    0.14 |     - |     - |     - |  23.64 KB |
-|                                   Coalesce |             All,Service,Pokeflex,Linq,Get |      5 |      10 | 2,559.5 μs |  61.79 μs |   177.28 μs | 2,556.9 μs |  0.99 |    0.09 |     - |     - |     - |  44.12 KB |
-|                       SequentialWhereNotIn |             All,Service,Pokeflex,Linq,Get |      5 |      10 | 4,507.7 μs | 151.72 μs |   447.34 μs | 4,470.2 μs |  1.75 |    0.19 |     - |     - |     - |   45.8 KB |
-|                        SequentialWorstCase |             All,Service,Pokeflex,Linq,Get |      5 |      10 | 4,681.5 μs | 344.49 μs |   988.39 μs | 4,267.4 μs |  1.82 |    0.42 |     - |     - |     - |  39.62 KB |
-|                                            |                                           |        |         |            |           |             |            |       |         |       |       |       |           |
-|                          **LinqQueryBaseline** |   **LinqQuery,All,Service,Pokeflex,Linq,Get** |      **5** |    **1000** | **2,650.4 μs** |  **89.12 μs** |   **258.56 μs** | **2,613.5 μs** |  **1.00** |    **0.00** |     **-** |     **-** |     **-** |  **21.43 KB** |
-|                         LinqMethodBaseline |  LinqMethod,All,Service,Pokeflex,Linq,Get |      5 |    1000 |   266.7 μs |  14.35 μs |    41.64 μs |   258.1 μs |  0.10 |    0.02 |     - |     - |     - |  21.38 KB |
-|                                   Proposal |             All,Service,Pokeflex,Linq,Get |      5 |    1000 | 3,008.4 μs |  82.75 μs |   241.40 μs | 2,968.1 μs |  1.15 |    0.14 |     - |     - |     - |  42.49 KB |
-| UnionWhereNotExistsWithoutExtensionMethods |             All,Service,Pokeflex,Linq,Get |      5 |    1000 | 2,689.0 μs |  73.89 μs |   214.37 μs | 2,679.9 μs |  1.02 |    0.12 |     - |     - |     - |  35.16 KB |
-|                        UnionWhereNotExists | ActiveState,All,Service,Pokeflex,Linq,Get |      5 |    1000 | 2,549.9 μs |  66.65 μs |   195.48 μs | 2,577.4 μs |  0.97 |    0.10 |     - |     - |     - |  23.81 KB |
-|                                   Coalesce |             All,Service,Pokeflex,Linq,Get |      5 |    1000 | 2,981.2 μs |  67.28 μs |   194.12 μs | 2,980.6 μs |  1.14 |    0.13 |     - |     - |     - |  43.66 KB |
-|                       SequentialWhereNotIn |             All,Service,Pokeflex,Linq,Get |      5 |    1000 | 4,686.3 μs |  93.26 μs |   264.55 μs | 4,690.1 μs |  1.79 |    0.20 |     - |     - |     - |  46.42 KB |
-|                        SequentialWorstCase |             All,Service,Pokeflex,Linq,Get |      5 |    1000 | 4,443.1 μs | 100.23 μs |   293.95 μs | 4,453.2 μs |  1.69 |    0.16 |     - |     - |     - |  41.17 KB |
-|                                            |                                           |        |         |            |           |             |            |       |         |       |       |       |           |
-|                          **LinqQueryBaseline** |   **LinqQuery,All,Service,Pokeflex,Linq,Get** |      **5** |   **10000** | **2,811.6 μs** |  **55.63 μs** |   **139.56 μs** | **2,813.5 μs** |  **1.00** |    **0.00** |     **-** |     **-** |     **-** |  **21.43 KB** |
-|                         LinqMethodBaseline |  LinqMethod,All,Service,Pokeflex,Linq,Get |      5 |   10000 |   307.1 μs |  16.08 μs |    47.16 μs |   303.8 μs |  0.11 |    0.02 |     - |     - |     - |  21.38 KB |
-|                                   Proposal |             All,Service,Pokeflex,Linq,Get |      5 |   10000 | 2,743.6 μs |  73.99 μs |   218.15 μs | 2,746.8 μs |  0.99 |    0.09 |     - |     - |     - |  42.49 KB |
-| UnionWhereNotExistsWithoutExtensionMethods |             All,Service,Pokeflex,Linq,Get |      5 |   10000 | 2,989.1 μs |  67.44 μs |   196.72 μs | 2,987.8 μs |  1.07 |    0.09 |     - |     - |     - |  35.16 KB |
-|                        UnionWhereNotExists | ActiveState,All,Service,Pokeflex,Linq,Get |      5 |   10000 | 2,802.5 μs |  68.59 μs |   200.08 μs | 2,801.3 μs |  0.99 |    0.09 |     - |     - |     - |  23.81 KB |
-|                                   Coalesce |             All,Service,Pokeflex,Linq,Get |      5 |   10000 | 4,079.4 μs | 208.62 μs |   615.13 μs | 4,033.4 μs |  1.46 |    0.22 |     - |     - |     - |  43.66 KB |
-|                       SequentialWhereNotIn |             All,Service,Pokeflex,Linq,Get |      5 |   10000 | 4,895.2 μs | 129.36 μs |   381.41 μs | 4,869.1 μs |  1.75 |    0.16 |     - |     - |     - |  46.07 KB |
-|                        SequentialWorstCase |             All,Service,Pokeflex,Linq,Get |      5 |   10000 | 4,963.8 μs | 136.88 μs |   401.44 μs | 4,985.8 μs |  1.75 |    0.15 |     - |     - |     - |  40.64 KB |
-|                                            |                                           |        |         |            |           |             |            |       |         |       |       |       |           |
-|                          **LinqQueryBaseline** |   **LinqQuery,All,Service,Pokeflex,Linq,Get** |     **10** |      **10** | **2,434.3 μs** |  **79.13 μs** |   **232.08 μs** | **2,391.8 μs** |  **1.00** |    **0.00** |     **-** |     **-** |     **-** |  **21.43 KB** |
-|                         LinqMethodBaseline |  LinqMethod,All,Service,Pokeflex,Linq,Get |     10 |      10 |   262.5 μs |  16.84 μs |    49.38 μs |   270.6 μs |  0.11 |    0.02 |     - |     - |     - |  17.39 KB |
-|                                   Proposal |             All,Service,Pokeflex,Linq,Get |     10 |      10 | 2,648.7 μs |  72.89 μs |   210.30 μs | 2,647.4 μs |  1.10 |    0.13 |     - |     - |     - |  42.49 KB |
-| UnionWhereNotExistsWithoutExtensionMethods |             All,Service,Pokeflex,Linq,Get |     10 |      10 | 2,634.1 μs |  78.05 μs |   226.45 μs | 2,636.4 μs |  1.09 |    0.15 |     - |     - |     - |  35.16 KB |
-|                        UnionWhereNotExists | ActiveState,All,Service,Pokeflex,Linq,Get |     10 |      10 | 2,562.7 μs |  57.69 μs |   170.10 μs | 2,553.4 μs |  1.06 |    0.11 |     - |     - |     - |  23.81 KB |
-|                                   Coalesce |             All,Service,Pokeflex,Linq,Get |     10 |      10 | 2,830.0 μs |  70.44 μs |   199.83 μs | 2,834.7 μs |  1.17 |    0.13 |     - |     - |     - |  44.35 KB |
-|                       SequentialWhereNotIn |             All,Service,Pokeflex,Linq,Get |     10 |      10 | 4,873.8 μs |  97.40 μs |   237.08 μs | 4,860.7 μs |  1.98 |    0.24 |     - |     - |     - |  46.07 KB |
-|                        SequentialWorstCase |             All,Service,Pokeflex,Linq,Get |     10 |      10 | 4,477.3 μs | 114.47 μs |   335.73 μs | 4,492.8 μs |  1.86 |    0.22 |     - |     - |     - |  39.62 KB |
-|                                            |                                           |        |         |            |           |             |            |       |         |       |       |       |           |
-|                          **LinqQueryBaseline** |   **LinqQuery,All,Service,Pokeflex,Linq,Get** |     **10** |    **1000** | **2,702.3 μs** |  **79.35 μs** |   **233.96 μs** | **2,668.4 μs** |  **1.00** |    **0.00** |     **-** |     **-** |     **-** |  **21.43 KB** |
-|                         LinqMethodBaseline |  LinqMethod,All,Service,Pokeflex,Linq,Get |     10 |    1000 |   287.6 μs |  17.25 μs |    50.03 μs |   300.9 μs |  0.11 |    0.02 |     - |     - |     - |  17.52 KB |
-|                                   Proposal |             All,Service,Pokeflex,Linq,Get |     10 |    1000 | 2,839.4 μs |  61.68 μs |   180.89 μs | 2,847.0 μs |  1.06 |    0.13 |     - |     - |     - |  42.49 KB |
-| UnionWhereNotExistsWithoutExtensionMethods |             All,Service,Pokeflex,Linq,Get |     10 |    1000 | 2,691.4 μs |  61.22 μs |   179.54 μs | 2,700.2 μs |  1.01 |    0.13 |     - |     - |     - |  35.16 KB |
-|                        UnionWhereNotExists | ActiveState,All,Service,Pokeflex,Linq,Get |     10 |    1000 | 2,558.2 μs |  58.47 μs |   170.56 μs | 2,581.1 μs |  0.95 |    0.10 |     - |     - |     - |  23.81 KB |
-|                                   Coalesce |             All,Service,Pokeflex,Linq,Get |     10 |    1000 | 3,020.6 μs |  74.99 μs |   221.10 μs | 2,997.9 μs |  1.13 |    0.14 |     - |     - |     - |  43.66 KB |
-|                       SequentialWhereNotIn |             All,Service,Pokeflex,Linq,Get |     10 |    1000 | 5,171.3 μs | 119.68 μs |   349.10 μs | 5,170.0 μs |  1.93 |    0.23 |     - |     - |     - |   45.8 KB |
-|                        SequentialWorstCase |             All,Service,Pokeflex,Linq,Get |     10 |    1000 | 4,559.2 μs | 108.03 μs |   313.42 μs | 4,574.3 μs |  1.70 |    0.21 |     - |     - |     - |  39.62 KB |
-|                                            |                                           |        |         |            |           |             |            |       |         |       |       |       |           |
-|                          **LinqQueryBaseline** |   **LinqQuery,All,Service,Pokeflex,Linq,Get** |     **10** |   **10000** | **3,247.4 μs** | **191.39 μs** |   **530.33 μs** | **3,141.0 μs** |  **1.00** |    **0.00** |     **-** |     **-** |     **-** |  **21.43 KB** |
-|                         LinqMethodBaseline |  LinqMethod,All,Service,Pokeflex,Linq,Get |     10 |   10000 |   266.7 μs |   8.29 μs |    23.12 μs |   267.4 μs |  0.08 |    0.01 |     - |     - |     - |  20.57 KB |
-|                                   Proposal |             All,Service,Pokeflex,Linq,Get |     10 |   10000 | 3,001.8 μs |  67.32 μs |   194.25 μs | 3,014.6 μs |  0.95 |    0.16 |     - |     - |     - |  42.49 KB |
-| UnionWhereNotExistsWithoutExtensionMethods |             All,Service,Pokeflex,Linq,Get |     10 |   10000 | 2,517.3 μs |  65.17 μs |   191.13 μs | 2,544.6 μs |  0.79 |    0.14 |     - |     - |     - |  35.16 KB |
-|                        UnionWhereNotExists | ActiveState,All,Service,Pokeflex,Linq,Get |     10 |   10000 | 2,880.4 μs |  56.85 μs |   116.12 μs | 2,884.5 μs |  0.91 |    0.17 |     - |     - |     - |  23.81 KB |
-|                                   Coalesce |             All,Service,Pokeflex,Linq,Get |     10 |   10000 | 4,299.9 μs | 201.71 μs |   591.58 μs | 4,314.6 μs |  1.37 |    0.29 |     - |     - |     - |  43.66 KB |
-|                       SequentialWhereNotIn |             All,Service,Pokeflex,Linq,Get |     10 |   10000 | 5,359.7 μs | 119.76 μs |   353.12 μs | 5,360.8 μs |  1.71 |    0.29 |     - |     - |     - |  46.07 KB |
-|                        SequentialWorstCase |             All,Service,Pokeflex,Linq,Get |     10 |   10000 | 4,359.0 μs |  87.15 μs |   244.39 μs | 4,373.7 μs |  1.38 |    0.23 |     - |     - |     - |  39.62 KB |
-|                                            |                                           |        |         |            |           |             |            |       |         |       |       |       |           |
-|                          **LinqQueryBaseline** |   **LinqQuery,All,Service,Pokeflex,Linq,Get** |     **15** |      **10** | **2,329.3 μs** | **119.27 μs** |   **347.91 μs** | **2,248.7 μs** |  **1.00** |    **0.00** |     **-** |     **-** |     **-** |  **21.43 KB** |
-|                         LinqMethodBaseline |  LinqMethod,All,Service,Pokeflex,Linq,Get |     15 |      10 |   217.9 μs |  10.60 μs |    30.25 μs |   210.1 μs |  0.10 |    0.02 |     - |     - |     - |  21.25 KB |
-|                                   Proposal |             All,Service,Pokeflex,Linq,Get |     15 |      10 | 2,492.3 μs | 119.64 μs |   350.88 μs | 2,494.4 μs |  1.09 |    0.18 |     - |     - |     - |  43.15 KB |
-| UnionWhereNotExistsWithoutExtensionMethods |             All,Service,Pokeflex,Linq,Get |     15 |      10 | 2,456.9 μs |  86.67 μs |   252.81 μs | 2,481.4 μs |  1.08 |    0.18 |     - |     - |     - |  35.16 KB |
-|                        UnionWhereNotExists | ActiveState,All,Service,Pokeflex,Linq,Get |     15 |      10 | 2,193.6 μs |  82.53 μs |   242.04 μs | 2,166.4 μs |  0.96 |    0.17 |     - |     - |     - |  23.81 KB |
-|                                   Coalesce |             All,Service,Pokeflex,Linq,Get |     15 |      10 | 2,412.2 μs |  79.57 μs |   233.37 μs | 2,375.4 μs |  1.06 |    0.19 |     - |     - |     - |  43.66 KB |
-|                       SequentialWhereNotIn |             All,Service,Pokeflex,Linq,Get |     15 |      10 | 4,205.2 μs | 122.54 μs |   355.52 μs | 4,168.7 μs |  1.85 |    0.32 |     - |     - |     - |  46.07 KB |
-|                        SequentialWorstCase |             All,Service,Pokeflex,Linq,Get |     15 |      10 | 3,680.7 μs | 120.15 μs |   338.89 μs | 3,666.5 μs |  1.60 |    0.24 |     - |     - |     - |  40.64 KB |
-|                                            |                                           |        |         |            |           |             |            |       |         |       |       |       |           |
-|                          **LinqQueryBaseline** |   **LinqQuery,All,Service,Pokeflex,Linq,Get** |     **15** |    **1000** | **2,373.7 μs** |  **76.05 μs** |   **220.63 μs** | **2,328.0 μs** |  **1.00** |    **0.00** |     **-** |     **-** |     **-** |  **21.43 KB** |
-|                         LinqMethodBaseline |  LinqMethod,All,Service,Pokeflex,Linq,Get |     15 |    1000 |   254.1 μs |  13.35 μs |    38.93 μs |   247.7 μs |  0.11 |    0.02 |     - |     - |     - |  18.51 KB |
-|                                   Proposal |             All,Service,Pokeflex,Linq,Get |     15 |    1000 | 2,555.1 μs |  75.10 μs |   220.27 μs | 2,512.0 μs |  1.09 |    0.15 |     - |     - |     - |  42.49 KB |
-| UnionWhereNotExistsWithoutExtensionMethods |             All,Service,Pokeflex,Linq,Get |     15 |    1000 | 2,701.2 μs |  62.63 μs |   181.71 μs | 2,703.0 μs |  1.15 |    0.13 |     - |     - |     - |  35.16 KB |
-|                        UnionWhereNotExists | ActiveState,All,Service,Pokeflex,Linq,Get |     15 |    1000 | 2,399.4 μs |  78.57 μs |   230.43 μs | 2,375.7 μs |  1.02 |    0.16 |     - |     - |     - |  24.14 KB |
-|                                   Coalesce |             All,Service,Pokeflex,Linq,Get |     15 |    1000 | 2,502.0 μs |  87.70 μs |   254.43 μs | 2,526.7 μs |  1.06 |    0.13 |     - |     - |     - |  43.66 KB |
-|                       SequentialWhereNotIn |             All,Service,Pokeflex,Linq,Get |     15 |    1000 | 5,016.3 μs | 126.58 μs |   373.21 μs | 4,967.5 μs |  2.14 |    0.27 |     - |     - |     - |  46.43 KB |
-|                        SequentialWorstCase |             All,Service,Pokeflex,Linq,Get |     15 |    1000 | 4,295.0 μs | 134.87 μs |   395.55 μs | 4,310.2 μs |  1.83 |    0.24 |     - |     - |     - |  41.25 KB |
-|                                            |                                           |        |         |            |           |             |            |       |         |       |       |       |           |
-|                          **LinqQueryBaseline** |   **LinqQuery,All,Service,Pokeflex,Linq,Get** |     **15** |   **10000** | **4,277.8 μs** | **574.08 μs** | **1,656.34 μs** | **3,976.3 μs** |  **1.00** |    **0.00** |     **-** |     **-** |     **-** |  **21.43 KB** |
-|                         LinqMethodBaseline |  LinqMethod,All,Service,Pokeflex,Linq,Get |     15 |   10000 |   287.1 μs |  12.20 μs |    35.21 μs |   278.4 μs |  0.08 |    0.03 |     - |     - |     - |  20.34 KB |
-|                                   Proposal |             All,Service,Pokeflex,Linq,Get |     15 |   10000 | 4,344.9 μs | 294.48 μs |   849.63 μs | 4,347.6 μs |  1.17 |    0.51 |     - |     - |     - |  42.49 KB |
-| UnionWhereNotExistsWithoutExtensionMethods |             All,Service,Pokeflex,Linq,Get |     15 |   10000 | 3,279.7 μs | 233.82 μs |   655.67 μs | 3,187.8 μs |  0.89 |    0.38 |     - |     - |     - |  35.16 KB |
-|                        UnionWhereNotExists | ActiveState,All,Service,Pokeflex,Linq,Get |     15 |   10000 | 3,356.8 μs | 222.03 μs |   644.16 μs | 3,268.5 μs |  0.91 |    0.38 |     - |     - |     - |  23.81 KB |
-|                                   Coalesce |             All,Service,Pokeflex,Linq,Get |     15 |   10000 | 4,613.6 μs | 291.04 μs |   835.06 μs | 4,571.4 μs |  1.23 |    0.46 |     - |     - |     - |  43.66 KB |
-|                       SequentialWhereNotIn |             All,Service,Pokeflex,Linq,Get |     15 |   10000 | 5,753.2 μs | 226.85 μs |   661.74 μs | 5,716.5 μs |  1.55 |    0.58 |     - |     - |     - |  46.07 KB |
-|                        SequentialWorstCase |             All,Service,Pokeflex,Linq,Get |     15 |   10000 | 5,532.4 μs | 251.69 μs |   734.19 μs | 5,483.6 μs |  1.49 |    0.57 |     - |     - |     - |  40.98 KB |
+|                  Method | Groups | Numbers |     Mean |     Error |    StdDev |   Median | Gen 0 | Gen 1 | Gen 2 | Allocated |
+|------------------------ |------- |-------- |---------:|----------:|----------:|---------:|------:|------:|------:|----------:|
+|          **BasicLinqQuery** |      **5** |      **10** | **2.288 ms** | **0.0687 ms** | **0.2004 ms** | **2.279 ms** |     **-** |     **-** |     **-** |  **24.84 KB** |
+|         BasicLinqMethod |      5 |      10 | 2.069 ms | 0.0533 ms | 0.1546 ms | 2.063 ms |     - |     - |     - |  23.34 KB |
+|                Proposal |      5 |      10 | 2.175 ms | 0.0744 ms | 0.2183 ms | 2.143 ms |     - |     - |     - |  48.52 KB |
+|     UnionWhereNotExists |      5 |      10 | 2.133 ms | 0.0568 ms | 0.1638 ms | 2.120 ms |     - |     - |     - |  43.08 KB |
+|                Coalesce |      5 |      10 | 2.432 ms | 0.0768 ms | 0.2215 ms | 2.400 ms |     - |     - |     - |  81.23 KB |
+|    SequentialWhereNotIn |      5 |      10 | 4.080 ms | 0.1022 ms | 0.2982 ms | 4.060 ms |     - |     - |     - |  51.16 KB |
+|     SequentialWorstCase |      5 |      10 | 3.513 ms | 0.1111 ms | 0.3242 ms | 3.473 ms |     - |     - |     - |  43.41 KB |
+| SqlServerStoredFunction |      5 |      10 | 2.071 ms | 0.0625 ms | 0.1783 ms | 2.063 ms |     - |     - |     - |  18.63 KB |
+|          **BasicLinqQuery** |      **5** |     **100** | **2.147 ms** | **0.0598 ms** | **0.1726 ms** | **2.157 ms** |     **-** |     **-** |     **-** |  **23.34 KB** |
+|         BasicLinqMethod |      5 |     100 | 2.118 ms | 0.0657 ms | 0.1907 ms | 2.137 ms |     - |     - |     - |  23.34 KB |
+|                Proposal |      5 |     100 | 2.254 ms | 0.0653 ms | 0.1904 ms | 2.249 ms |     - |     - |     - |  49.36 KB |
+|     UnionWhereNotExists |      5 |     100 | 2.147 ms | 0.0543 ms | 0.1577 ms | 2.117 ms |     - |     - |     - |  43.92 KB |
+|                Coalesce |      5 |     100 | 2.487 ms | 0.0779 ms | 0.2285 ms | 2.470 ms |     - |     - |     - |  81.05 KB |
+|    SequentialWhereNotIn |      5 |     100 | 4.104 ms | 0.1381 ms | 0.3986 ms | 4.109 ms |     - |     - |     - |  51.16 KB |
+|     SequentialWorstCase |      5 |     100 | 3.631 ms | 0.1077 ms | 0.3107 ms | 3.624 ms |     - |     - |     - |  43.41 KB |
+| SqlServerStoredFunction |      5 |     100 | 2.284 ms | 0.0912 ms | 0.2646 ms | 2.206 ms |     - |     - |     - |  18.83 KB |
+|          **BasicLinqQuery** |      **5** |    **1000** | **2.401 ms** | **0.0715 ms** | **0.2108 ms** | **2.402 ms** |     **-** |     **-** |     **-** |  **24.18 KB** |
+|         BasicLinqMethod |      5 |    1000 | 2.188 ms | 0.0666 ms | 0.1942 ms | 2.168 ms |     - |     - |     - |  23.34 KB |
+|                Proposal |      5 |    1000 | 2.559 ms | 0.0714 ms | 0.2073 ms | 2.578 ms |     - |     - |     - |  48.52 KB |
+|     UnionWhereNotExists |      5 |    1000 | 2.615 ms | 0.0594 ms | 0.1750 ms | 2.635 ms |     - |     - |     - |  43.08 KB |
+|                Coalesce |      5 |    1000 | 2.615 ms | 0.0921 ms | 0.2701 ms | 2.609 ms |     - |     - |     - |  81.05 KB |
+|    SequentialWhereNotIn |      5 |    1000 | 4.291 ms | 0.1361 ms | 0.3949 ms | 4.240 ms |     - |     - |     - |  51.69 KB |
+|     SequentialWorstCase |      5 |    1000 | 3.961 ms | 0.1305 ms | 0.3829 ms | 3.910 ms |     - |     - |     - |  43.41 KB |
+| SqlServerStoredFunction |      5 |    1000 | 2.155 ms | 0.0745 ms | 0.2149 ms | 2.130 ms |     - |     - |     - |  18.63 KB |
+|          **BasicLinqQuery** |     **10** |      **10** | **2.169 ms** | **0.0518 ms** | **0.1528 ms** | **2.177 ms** |     **-** |     **-** |     **-** |  **23.34 KB** |
+|         BasicLinqMethod |     10 |      10 | 2.098 ms | 0.0569 ms | 0.1613 ms | 2.120 ms |     - |     - |     - |  23.34 KB |
+|                Proposal |     10 |      10 | 2.251 ms | 0.0619 ms | 0.1785 ms | 2.258 ms |     - |     - |     - |  48.52 KB |
+|     UnionWhereNotExists |     10 |      10 | 2.195 ms | 0.0489 ms | 0.1420 ms | 2.193 ms |     - |     - |     - |  43.08 KB |
+|                Coalesce |     10 |      10 | 2.368 ms | 0.0618 ms | 0.1784 ms | 2.356 ms |     - |     - |     - |  81.05 KB |
+|    SequentialWhereNotIn |     10 |      10 | 4.118 ms | 0.1012 ms | 0.2889 ms | 4.129 ms |     - |     - |     - |  51.85 KB |
+|     SequentialWorstCase |     10 |      10 | 4.100 ms | 0.1070 ms | 0.3138 ms | 4.089 ms |     - |     - |     - |  43.41 KB |
+| SqlServerStoredFunction |     10 |      10 | 2.187 ms | 0.0887 ms | 0.2603 ms | 2.173 ms |     - |     - |     - |  18.63 KB |
+|          **BasicLinqQuery** |     **10** |     **100** | **2.232 ms** | **0.0819 ms** | **0.2376 ms** | **2.185 ms** |     **-** |     **-** |     **-** |  **23.34 KB** |
+|         BasicLinqMethod |     10 |     100 | 2.173 ms | 0.0600 ms | 0.1750 ms | 2.138 ms |     - |     - |     - |  23.34 KB |
+|                Proposal |     10 |     100 | 2.428 ms | 0.0832 ms | 0.2453 ms | 2.371 ms |     - |     - |     - |  48.52 KB |
+|     UnionWhereNotExists |     10 |     100 | 2.305 ms | 0.0878 ms | 0.2590 ms | 2.277 ms |     - |     - |     - |  43.08 KB |
+|                Coalesce |     10 |     100 | 2.618 ms | 0.1012 ms | 0.2935 ms | 2.581 ms |     - |     - |     - |  81.05 KB |
+|    SequentialWhereNotIn |     10 |     100 | 3.992 ms | 0.0950 ms | 0.2756 ms | 4.000 ms |     - |     - |     - |  51.16 KB |
+|     SequentialWorstCase |     10 |     100 | 3.795 ms | 0.0938 ms | 0.2735 ms | 3.774 ms |     - |     - |     - |  43.41 KB |
+| SqlServerStoredFunction |     10 |     100 | 2.157 ms | 0.0682 ms | 0.1979 ms | 2.153 ms |     - |     - |     - |  18.63 KB |
+|          **BasicLinqQuery** |     **10** |    **1000** | **2.413 ms** | **0.0804 ms** | **0.2370 ms** | **2.444 ms** |     **-** |     **-** |     **-** |  **23.34 KB** |
+|         BasicLinqMethod |     10 |    1000 | 2.502 ms | 0.0663 ms | 0.1934 ms | 2.499 ms |     - |     - |     - |  23.34 KB |
+|                Proposal |     10 |    1000 | 2.740 ms | 0.0695 ms | 0.2050 ms | 2.732 ms |     - |     - |     - |  48.52 KB |
+|     UnionWhereNotExists |     10 |    1000 | 2.616 ms | 0.0756 ms | 0.2217 ms | 2.621 ms |     - |     - |     - |  43.08 KB |
+|                Coalesce |     10 |    1000 | 2.733 ms | 0.0996 ms | 0.2921 ms | 2.707 ms |     - |     - |     - |   81.9 KB |
+|    SequentialWhereNotIn |     10 |    1000 | 4.639 ms | 0.1268 ms | 0.3739 ms | 4.649 ms |     - |     - |     - |  51.16 KB |
+|     SequentialWorstCase |     10 |    1000 | 4.224 ms | 0.1180 ms | 0.3423 ms | 4.218 ms |     - |     - |     - |  43.41 KB |
+| SqlServerStoredFunction |     10 |    1000 | 2.521 ms | 0.0733 ms | 0.2162 ms | 2.505 ms |     - |     - |     - |  18.63 KB |
+|          **BasicLinqQuery** |     **15** |      **10** | **2.243 ms** | **0.1039 ms** | **0.3047 ms** | **2.209 ms** |     **-** |     **-** |     **-** |  **23.34 KB** |
+|         BasicLinqMethod |     15 |      10 | 2.171 ms | 0.0742 ms | 0.2177 ms | 2.118 ms |     - |     - |     - |  23.34 KB |
+|                Proposal |     15 |      10 | 2.247 ms | 0.0780 ms | 0.2224 ms | 2.233 ms |     - |     - |     - |  48.52 KB |
+|     UnionWhereNotExists |     15 |      10 | 2.191 ms | 0.0646 ms | 0.1894 ms | 2.197 ms |     - |     - |     - |  43.08 KB |
+|                Coalesce |     15 |      10 | 2.558 ms | 0.0797 ms | 0.2313 ms | 2.505 ms |     - |     - |     - |  81.05 KB |
+|    SequentialWhereNotIn |     15 |      10 | 3.903 ms | 0.0987 ms | 0.2833 ms | 3.892 ms |     - |     - |     - |   50.3 KB |
+|     SequentialWorstCase |     15 |      10 | 3.677 ms | 0.0969 ms | 0.2718 ms | 3.659 ms |     - |     - |     - |  43.41 KB |
+| SqlServerStoredFunction |     15 |      10 | 2.110 ms | 0.0786 ms | 0.2281 ms | 2.066 ms |     - |     - |     - |  18.63 KB |
+|          **BasicLinqQuery** |     **15** |     **100** | **2.178 ms** | **0.0770 ms** | **0.2257 ms** | **2.157 ms** |     **-** |     **-** |     **-** |  **24.18 KB** |
+|         BasicLinqMethod |     15 |     100 | 2.275 ms | 0.0815 ms | 0.2390 ms | 2.286 ms |     - |     - |     - |  23.34 KB |
+|                Proposal |     15 |     100 | 2.291 ms | 0.0680 ms | 0.1994 ms | 2.287 ms |     - |     - |     - |  48.52 KB |
+|     UnionWhereNotExists |     15 |     100 | 2.277 ms | 0.0902 ms | 0.2616 ms | 2.253 ms |     - |     - |     - |  43.08 KB |
+|                Coalesce |     15 |     100 | 2.571 ms | 0.0874 ms | 0.2562 ms | 2.554 ms |     - |     - |     - |  81.05 KB |
+|    SequentialWhereNotIn |     15 |     100 | 3.932 ms | 0.0874 ms | 0.2480 ms | 3.909 ms |     - |     - |     - |   50.3 KB |
+|     SequentialWorstCase |     15 |     100 | 3.702 ms | 0.1165 ms | 0.3381 ms | 3.636 ms |     - |     - |     - |  43.41 KB |
+| SqlServerStoredFunction |     15 |     100 | 2.141 ms | 0.0597 ms | 0.1712 ms | 2.149 ms |     - |     - |     - |  18.63 KB |
+|          **BasicLinqQuery** |     **15** |    **1000** | **2.538 ms** | **0.0665 ms** | **0.1951 ms** | **2.516 ms** |     **-** |     **-** |     **-** |  **23.34 KB** |
+|         BasicLinqMethod |     15 |    1000 | 2.536 ms | 0.0718 ms | 0.2083 ms | 2.500 ms |     - |     - |     - |  23.34 KB |
+|                Proposal |     15 |    1000 | 2.799 ms | 0.1008 ms | 0.2843 ms | 2.763 ms |     - |     - |     - |  48.52 KB |
+|     UnionWhereNotExists |     15 |    1000 | 2.659 ms | 0.0903 ms | 0.2532 ms | 2.630 ms |     - |     - |     - |  43.08 KB |
+|                Coalesce |     15 |    1000 | 2.872 ms | 0.1061 ms | 0.3111 ms | 2.866 ms |     - |     - |     - |   81.9 KB |
+|    SequentialWhereNotIn |     15 |    1000 | 5.036 ms | 0.1208 ms | 0.3542 ms | 5.019 ms |     - |     - |     - |   50.3 KB |
+|     SequentialWorstCase |     15 |    1000 | 4.337 ms | 0.1272 ms | 0.3608 ms | 4.351 ms |     - |     - |     - |  43.41 KB |
+| SqlServerStoredFunction |     15 |    1000 | 2.431 ms | 0.0991 ms | 0.2922 ms | 2.418 ms |     - |     - |     - |  18.63 KB |
