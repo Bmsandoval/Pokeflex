@@ -5,69 +5,57 @@ Intel Core i7-9750H CPU 2.60GHz, 1 CPU, 12 logical and 6 physical cores
 .NET Core SDK=5.0.203
   [Host] : .NET Core 5.0.6 (CoreCLR 5.0.621.22011, CoreFX 5.0.621.22011), X64 RyuJIT
 
-Toolchain=InProcessEmitToolchain  InvocationCount=1  IterationCount=100  
-LaunchCount=3  UnrollFactor=1  WarmupCount=15  
-Categories=Service,Pokeflex,Raw,List  
+Toolchain=InProcessEmitToolchain  InvocationCount=1  IterationCount=1  
+LaunchCount=1  UnrollFactor=1  WarmupCount=1  
 
 ```
-|                 Method | Groups | Numbers | LimitAsPctNumbers |      Mean |     Error |    StdDev |    Median | Ratio | RatioSD | Gen 0 | Gen 1 | Gen 2 | Allocated |
-|----------------------- |------- |-------- |------------------ |----------:|----------:|----------:|----------:|------:|--------:|------:|------:|------:|----------:|
-|               **Baseline** |      **5** |      **10** |               **0.1** |  **2.095 ms** | **0.0379 ms** | **0.1942 ms** |  **2.074 ms** |  **1.00** |    **0.00** |     **-** |     **-** |     **-** |  **27.96 KB** |
-|    UnionWhereNotExists |      5 |      10 |               0.1 |  2.057 ms | 0.0343 ms | 0.1765 ms |  2.050 ms |  0.99 |    0.12 |     - |     - |     - |  23.22 KB |
-| UnionWhereNotExistsCte |      5 |      10 |               0.1 |  2.139 ms | 0.0409 ms | 0.2098 ms |  2.117 ms |  1.03 |    0.13 |     - |     - |     - |   28.6 KB |
-|               Coalesce |      5 |      10 |               0.1 |  1.992 ms | 0.0321 ms | 0.1626 ms |  1.994 ms |  0.96 |    0.12 |     - |     - |     - |  33.01 KB |
-|                        |        |         |                   |           |           |           |           |       |         |       |       |       |           |
-|               **Baseline** |      **5** |      **10** |               **0.3** |  **2.080 ms** | **0.0366 ms** | **0.1861 ms** |  **2.063 ms** |  **1.00** |    **0.00** |     **-** |     **-** |     **-** |  **30.27 KB** |
-|    UnionWhereNotExists |      5 |      10 |               0.3 |  1.959 ms | 0.0319 ms | 0.1630 ms |  1.962 ms |  0.95 |    0.12 |     - |     - |     - |  23.47 KB |
-| UnionWhereNotExistsCte |      5 |      10 |               0.3 |  2.112 ms | 0.0329 ms | 0.1690 ms |  2.112 ms |  1.02 |    0.13 |     - |     - |     - |   28.6 KB |
-|               Coalesce |      5 |      10 |               0.3 |  1.986 ms | 0.0310 ms | 0.1564 ms |  1.979 ms |  0.96 |    0.12 |     - |     - |     - |  32.73 KB |
-|                        |        |         |                   |           |           |           |           |       |         |       |       |       |           |
-|               **Baseline** |      **5** |     **100** |               **0.1** |  **2.207 ms** | **0.0335 ms** | **0.1698 ms** |  **2.202 ms** |  **1.00** |    **0.00** |     **-** |     **-** |     **-** |  **34.05 KB** |
-|    UnionWhereNotExists |      5 |     100 |               0.1 |  2.724 ms | 0.0392 ms | 0.1954 ms |  2.709 ms |  1.24 |    0.13 |     - |     - |     - |  23.63 KB |
-| UnionWhereNotExistsCte |      5 |     100 |               0.1 |  4.409 ms | 0.0673 ms | 0.3453 ms |  4.387 ms |  2.01 |    0.22 |     - |     - |     - |   38.8 KB |
-|               Coalesce |      5 |     100 |               0.1 |  2.026 ms | 0.0356 ms | 0.1819 ms |  2.019 ms |  0.92 |    0.11 |     - |     - |     - |  33.01 KB |
-|                        |        |         |                   |           |           |           |           |       |         |       |       |       |           |
-|               **Baseline** |      **5** |     **100** |               **0.3** |  **2.174 ms** | **0.0354 ms** | **0.1792 ms** |  **2.155 ms** |  **1.00** |    **0.00** |     **-** |     **-** |     **-** |   **47.8 KB** |
-|    UnionWhereNotExists |      5 |     100 |               0.3 |  2.777 ms | 0.0376 ms | 0.1899 ms |  2.758 ms |  1.28 |    0.13 |     - |     - |     - |  26.97 KB |
-| UnionWhereNotExistsCte |      5 |     100 |               0.3 |  3.655 ms | 0.0707 ms | 0.3603 ms |  3.630 ms |  1.70 |    0.22 |     - |     - |     - |  43.73 KB |
-|               Coalesce |      5 |     100 |               0.3 |  2.011 ms | 0.0416 ms | 0.2135 ms |  2.008 ms |  0.93 |    0.12 |     - |     - |     - |  33.01 KB |
-|                        |        |         |                   |           |           |           |           |       |         |       |       |       |           |
-|               **Baseline** |      **5** |    **1000** |               **0.1** |  **3.183 ms** | **0.0752 ms** | **0.3825 ms** |  **3.164 ms** |  **1.00** |    **0.00** |     **-** |     **-** |     **-** |  **81.96 KB** |
-|    UnionWhereNotExists |      5 |    1000 |               0.1 |  5.643 ms | 0.1003 ms | 0.5040 ms |  5.433 ms |  1.80 |    0.28 |     - |     - |     - |  30.97 KB |
-| UnionWhereNotExistsCte |      5 |    1000 |               0.1 | 29.535 ms | 0.5300 ms | 2.7385 ms | 29.417 ms |  9.42 |    1.46 |     - |     - |     - |  94.06 KB |
-|               Coalesce |      5 |    1000 |               0.1 |  2.193 ms | 0.0454 ms | 0.2332 ms |  2.184 ms |  0.70 |    0.11 |     - |     - |     - |  33.01 KB |
-|                        |        |         |                   |           |           |           |           |       |         |       |       |       |           |
-|               **Baseline** |      **5** |    **1000** |               **0.3** |  **3.566 ms** | **0.0591 ms** | **0.2992 ms** |  **3.555 ms** |  **1.00** |    **0.00** |     **-** |     **-** |     **-** |  **224.3 KB** |
-|    UnionWhereNotExists |      5 |    1000 |               0.3 |  5.971 ms | 0.0826 ms | 0.4096 ms |  5.904 ms |  1.68 |    0.18 |     - |     - |     - |  38.11 KB |
-| UnionWhereNotExistsCte |      5 |    1000 |               0.3 | 23.865 ms | 0.4130 ms | 2.1231 ms | 23.620 ms |  6.74 |    0.85 |     - |     - |     - |  85.73 KB |
-|               Coalesce |      5 |    1000 |               0.3 |  2.268 ms | 0.0463 ms | 0.2361 ms |  2.271 ms |  0.64 |    0.09 |     - |     - |     - |  33.01 KB |
-|                        |        |         |                   |           |           |           |           |       |         |       |       |       |           |
-|               **Baseline** |     **15** |      **10** |               **0.1** |  **2.227 ms** | **0.0352 ms** | **0.1792 ms** |  **2.209 ms** |  **1.00** |    **0.00** |     **-** |     **-** |     **-** |  **27.96 KB** |
-|    UnionWhereNotExists |     15 |      10 |               0.1 |  2.613 ms | 0.0464 ms | 0.2330 ms |  2.566 ms |  1.18 |    0.14 |     - |     - |     - |  23.22 KB |
-| UnionWhereNotExistsCte |     15 |      10 |               0.1 |  2.796 ms | 0.0558 ms | 0.2831 ms |  2.745 ms |  1.26 |    0.17 |     - |     - |     - |  34.14 KB |
-|               Coalesce |     15 |      10 |               0.1 |  2.155 ms | 0.0446 ms | 0.2297 ms |  2.133 ms |  0.98 |    0.13 |     - |     - |     - |  32.68 KB |
-|                        |        |         |                   |           |           |           |           |       |         |       |       |       |           |
-|               **Baseline** |     **15** |      **10** |               **0.3** |  **2.247 ms** | **0.0354 ms** | **0.1808 ms** |  **2.226 ms** |  **1.00** |    **0.00** |     **-** |     **-** |     **-** |  **29.66 KB** |
-|    UnionWhereNotExists |     15 |      10 |               0.3 |  2.571 ms | 0.0467 ms | 0.2381 ms |  2.565 ms |  1.15 |    0.14 |     - |     - |     - |  23.47 KB |
-| UnionWhereNotExistsCte |     15 |      10 |               0.3 |  2.754 ms | 0.0513 ms | 0.2614 ms |  2.689 ms |  1.23 |    0.15 |     - |     - |     - |   32.6 KB |
-|               Coalesce |     15 |      10 |               0.3 |  2.033 ms | 0.0388 ms | 0.1993 ms |  2.011 ms |  0.91 |    0.11 |     - |     - |     - |  33.01 KB |
-|                        |        |         |                   |           |           |           |           |       |         |       |       |       |           |
-|               **Baseline** |     **15** |     **100** |               **0.1** |  **2.343 ms** | **0.0502 ms** | **0.2554 ms** |  **2.319 ms** |  **1.00** |    **0.00** |     **-** |     **-** |     **-** |  **34.05 KB** |
-|    UnionWhereNotExists |     15 |     100 |               0.1 |  3.179 ms | 0.0418 ms | 0.2102 ms |  3.151 ms |  1.38 |    0.16 |     - |     - |     - |  22.95 KB |
-| UnionWhereNotExistsCte |     15 |     100 |               0.1 |  8.622 ms | 0.1507 ms | 0.7626 ms |  8.542 ms |  3.72 |    0.47 |     - |     - |     - |  40.77 KB |
-|               Coalesce |     15 |     100 |               0.1 |  2.093 ms | 0.0334 ms | 0.1709 ms |  2.073 ms |  0.90 |    0.12 |     - |     - |     - |  32.68 KB |
-|                        |        |         |                   |           |           |           |           |       |         |       |       |       |           |
-|               **Baseline** |     **15** |     **100** |               **0.3** |  **2.379 ms** | **0.0429 ms** | **0.2201 ms** |  **2.361 ms** |  **1.00** |    **0.00** |     **-** |     **-** |     **-** |   **47.8 KB** |
-|    UnionWhereNotExists |     15 |     100 |               0.3 |  3.160 ms | 0.0433 ms | 0.2137 ms |  3.134 ms |  1.34 |    0.15 |     - |     - |     - |  26.97 KB |
-| UnionWhereNotExistsCte |     15 |     100 |               0.3 |  7.256 ms | 0.1452 ms | 0.7397 ms |  7.175 ms |  3.08 |    0.43 |     - |     - |     - |  56.99 KB |
-|               Coalesce |     15 |     100 |               0.3 |  2.072 ms | 0.0357 ms | 0.1840 ms |  2.055 ms |  0.88 |    0.12 |     - |     - |     - |  33.01 KB |
-|                        |        |         |                   |           |           |           |           |       |         |       |       |       |           |
-|               **Baseline** |     **15** |    **1000** |               **0.1** |  **4.365 ms** | **0.1886 ms** | **0.9796 ms** |  **4.234 ms** |  **1.00** |    **0.00** |     **-** |     **-** |     **-** |  **81.96 KB** |
-|    UnionWhereNotExists |     15 |    1000 |               0.1 | 10.557 ms | 0.2098 ms | 1.0763 ms | 10.661 ms |  2.54 |    0.66 |     - |     - |     - |  30.97 KB |
-| UnionWhereNotExistsCte |     15 |    1000 |               0.1 | 75.953 ms | 1.1550 ms | 6.0095 ms | 75.981 ms | 18.31 |    4.45 |     - |     - |     - | 210.41 KB |
-|               Coalesce |     15 |    1000 |               0.1 |  2.304 ms | 0.0490 ms | 0.2551 ms |  2.319 ms |  0.55 |    0.14 |     - |     - |     - |  33.01 KB |
-|                        |        |         |                   |           |           |           |           |       |         |       |       |       |           |
-|               **Baseline** |     **15** |    **1000** |               **0.3** |  **4.723 ms** | **0.1768 ms** | **0.9151 ms** |  **4.611 ms** |  **1.00** |    **0.00** |     **-** |     **-** |     **-** | **223.69 KB** |
-|    UnionWhereNotExists |     15 |    1000 |               0.3 | 10.697 ms | 0.2004 ms | 1.0247 ms | 10.753 ms |  2.34 |    0.47 |     - |     - |     - |  38.11 KB |
-| UnionWhereNotExistsCte |     15 |    1000 |               0.3 | 59.418 ms | 0.9027 ms | 4.6485 ms | 59.464 ms | 13.07 |    2.75 |     - |     - |     - | 164.55 KB |
-|               Coalesce |     15 |    1000 |               0.3 |  2.350 ms | 0.0502 ms | 0.2581 ms |  2.350 ms |  0.52 |    0.11 |     - |     - |     - |  33.01 KB |
+|                 Method |                        Categories | Groups | Numbers | LimitAsPctNumbers |      Mean | Error |     Gen 0 | Gen 1 | Gen 2 |  Allocated |
+|----------------------- |---------------------------------- |------- |-------- |------------------ |----------:|------:|----------:|------:|------:|-----------:|
+|      **LeftJoinOnNumList** | **koolcat,Service,Pokeflex,Raw,List** |      **5** |      **10** |               **0.1** |  **2.092 ms** |    **NA** |         **-** |     **-** |     **-** |   **36.98 KB** |
+|    UnionWhereNotExists |         Service,Pokeflex,Raw,List |      5 |      10 |               0.1 |  2.825 ms |    NA |         - |     - |     - |   31.42 KB |
+| UnionWhereNotExistsCte |         Service,Pokeflex,Raw,List |      5 |      10 |               0.1 |  2.277 ms |    NA |         - |     - |     - |    64.2 KB |
+|               Coalesce |         Service,Pokeflex,Raw,List |      5 |      10 |               0.1 |  1.993 ms |    NA |         - |     - |     - |   33.88 KB |
+|      **LeftJoinOnNumList** | **koolcat,Service,Pokeflex,Raw,List** |      **5** |      **10** |               **0.3** |  **3.702 ms** |    **NA** |         **-** |     **-** |     **-** |    **39.4 KB** |
+|    UnionWhereNotExists |         Service,Pokeflex,Raw,List |      5 |      10 |               0.3 |  2.126 ms |    NA |         - |     - |     - |   33.22 KB |
+| UnionWhereNotExistsCte |         Service,Pokeflex,Raw,List |      5 |      10 |               0.3 |  3.023 ms |    NA |         - |     - |     - |   58.88 KB |
+|               Coalesce |         Service,Pokeflex,Raw,List |      5 |      10 |               0.3 |  2.759 ms |    NA |         - |     - |     - |   33.03 KB |
+|      **LeftJoinOnNumList** | **koolcat,Service,Pokeflex,Raw,List** |      **5** |     **100** |               **0.1** |  **2.947 ms** |    **NA** |         **-** |     **-** |     **-** |   **43.27 KB** |
+|    UnionWhereNotExists |         Service,Pokeflex,Raw,List |      5 |     100 |               0.1 |  2.735 ms |    NA |         - |     - |     - |   36.98 KB |
+| UnionWhereNotExistsCte |         Service,Pokeflex,Raw,List |      5 |     100 |               0.1 |  5.301 ms |    NA |         - |     - |     - |  397.72 KB |
+|               Coalesce |         Service,Pokeflex,Raw,List |      5 |     100 |               0.1 |  2.256 ms |    NA |         - |     - |     - |   32.98 KB |
+|      **LeftJoinOnNumList** | **koolcat,Service,Pokeflex,Raw,List** |      **5** |     **100** |               **0.3** |  **2.586 ms** |    **NA** |         **-** |     **-** |     **-** |   **54.88 KB** |
+|    UnionWhereNotExists |         Service,Pokeflex,Raw,List |      5 |     100 |               0.3 |  2.693 ms |    NA |         - |     - |     - |   50.72 KB |
+| UnionWhereNotExistsCte |         Service,Pokeflex,Raw,List |      5 |     100 |               0.3 |  4.261 ms |    NA |         - |     - |     - |  319.73 KB |
+|               Coalesce |         Service,Pokeflex,Raw,List |      5 |     100 |               0.3 |  2.530 ms |    NA |         - |     - |     - |   34.19 KB |
+|      **LeftJoinOnNumList** | **koolcat,Service,Pokeflex,Raw,List** |      **5** |    **1000** |               **0.1** |  **6.497 ms** |    **NA** |         **-** |     **-** |     **-** |   **89.05 KB** |
+|    UnionWhereNotExists |         Service,Pokeflex,Raw,List |      5 |    1000 |               0.1 |  3.695 ms |    NA |         - |     - |     - |   85.49 KB |
+| UnionWhereNotExistsCte |         Service,Pokeflex,Raw,List |      5 |    1000 |               0.1 | 35.443 ms |    NA |         - |     - |     - |  3582.3 KB |
+|               Coalesce |         Service,Pokeflex,Raw,List |      5 |    1000 |               0.1 |  3.035 ms |    NA |         - |     - |     - |   32.98 KB |
+|      **LeftJoinOnNumList** | **koolcat,Service,Pokeflex,Raw,List** |      **5** |    **1000** |               **0.3** |  **6.446 ms** |    **NA** |         **-** |     **-** |     **-** |  **228.27 KB** |
+|    UnionWhereNotExists |         Service,Pokeflex,Raw,List |      5 |    1000 |               0.3 |  4.521 ms |    NA |         - |     - |     - |  228.56 KB |
+| UnionWhereNotExistsCte |         Service,Pokeflex,Raw,List |      5 |    1000 |               0.3 | 34.022 ms |    NA |         - |     - |     - | 2940.76 KB |
+|               Coalesce |         Service,Pokeflex,Raw,List |      5 |    1000 |               0.3 |  2.412 ms |    NA |         - |     - |     - |   32.98 KB |
+|      **LeftJoinOnNumList** | **koolcat,Service,Pokeflex,Raw,List** |     **15** |      **10** |               **0.1** |  **2.901 ms** |    **NA** |         **-** |     **-** |     **-** |   **35.45 KB** |
+|    UnionWhereNotExists |         Service,Pokeflex,Raw,List |     15 |      10 |               0.1 |  2.846 ms |    NA |         - |     - |     - |   31.28 KB |
+| UnionWhereNotExistsCte |         Service,Pokeflex,Raw,List |     15 |      10 |               0.1 |  3.522 ms |    NA |         - |     - |     - |  120.47 KB |
+|               Coalesce |         Service,Pokeflex,Raw,List |     15 |      10 |               0.1 |  2.076 ms |    NA |         - |     - |     - |   32.98 KB |
+|      **LeftJoinOnNumList** | **koolcat,Service,Pokeflex,Raw,List** |     **15** |      **10** |               **0.3** |  **2.842 ms** |    **NA** |         **-** |     **-** |     **-** |   **37.35 KB** |
+|    UnionWhereNotExists |         Service,Pokeflex,Raw,List |     15 |      10 |               0.3 |  3.198 ms |    NA |         - |     - |     - |   33.28 KB |
+| UnionWhereNotExistsCte |         Service,Pokeflex,Raw,List |     15 |      10 |               0.3 |  2.922 ms |    NA |         - |     - |     - |   92.47 KB |
+|               Coalesce |         Service,Pokeflex,Raw,List |     15 |      10 |               0.3 |  2.424 ms |    NA |         - |     - |     - |   32.98 KB |
+|      **LeftJoinOnNumList** | **koolcat,Service,Pokeflex,Raw,List** |     **15** |     **100** |               **0.1** |  **2.187 ms** |    **NA** |         **-** |     **-** |     **-** |   **41.14 KB** |
+|    UnionWhereNotExists |         Service,Pokeflex,Raw,List |     15 |     100 |               0.1 |  2.392 ms |    NA |         - |     - |     - |   36.98 KB |
+| UnionWhereNotExistsCte |         Service,Pokeflex,Raw,List |     15 |     100 |               0.1 |  7.707 ms |    NA |         - |     - |     - |  980.16 KB |
+|               Coalesce |         Service,Pokeflex,Raw,List |     15 |     100 |               0.1 |  2.363 ms |    NA |         - |     - |     - |   32.98 KB |
+|      **LeftJoinOnNumList** | **koolcat,Service,Pokeflex,Raw,List** |     **15** |     **100** |               **0.3** |  **2.899 ms** |    **NA** |         **-** |     **-** |     **-** |   **54.88 KB** |
+|    UnionWhereNotExists |         Service,Pokeflex,Raw,List |     15 |     100 |               0.3 |  2.464 ms |    NA |         - |     - |     - |   50.72 KB |
+| UnionWhereNotExistsCte |         Service,Pokeflex,Raw,List |     15 |     100 |               0.3 |  9.558 ms |    NA |         - |     - |     - |  790.91 KB |
+|               Coalesce |         Service,Pokeflex,Raw,List |     15 |     100 |               0.3 |  2.254 ms |    NA |         - |     - |     - |   32.98 KB |
+|      **LeftJoinOnNumList** | **koolcat,Service,Pokeflex,Raw,List** |     **15** |    **1000** |               **0.1** |  **7.182 ms** |    **NA** |         **-** |     **-** |     **-** |   **89.05 KB** |
+|    UnionWhereNotExists |         Service,Pokeflex,Raw,List |     15 |    1000 |               0.1 |  6.145 ms |    NA |         - |     - |     - |   84.88 KB |
+| UnionWhereNotExistsCte |         Service,Pokeflex,Raw,List |     15 |    1000 |               0.1 | 69.862 ms |    NA | 1000.0000 |     - |     - | 9348.19 KB |
+|               Coalesce |         Service,Pokeflex,Raw,List |     15 |    1000 |               0.1 |  2.624 ms |    NA |         - |     - |     - |   33.92 KB |
+|      **LeftJoinOnNumList** | **koolcat,Service,Pokeflex,Raw,List** |     **15** |    **1000** |               **0.3** | **11.432 ms** |    **NA** |         **-** |     **-** |     **-** |  **220.02 KB** |
+|    UnionWhereNotExists |         Service,Pokeflex,Raw,List |     15 |    1000 |               0.3 |  6.416 ms |    NA |         - |     - |     - |  228.08 KB |
+| UnionWhereNotExistsCte |         Service,Pokeflex,Raw,List |     15 |    1000 |               0.3 | 61.713 ms |    NA | 1000.0000 |     - |     - | 7352.77 KB |
+|               Coalesce |         Service,Pokeflex,Raw,List |     15 |    1000 |               0.3 |  2.571 ms |    NA |         - |     - |     - |   32.98 KB |

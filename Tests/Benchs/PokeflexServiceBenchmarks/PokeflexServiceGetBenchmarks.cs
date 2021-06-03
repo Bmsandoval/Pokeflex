@@ -48,41 +48,39 @@ namespace Tests.Benchs.PokeflexServiceBenchmarks
     [BenchmarkCategory("All", "Service", "Pokeflex", "Linq", "Get")][CategoriesColumn]
     public class PokeflexServiceLinqGetBenchmarks : PokeflexServiceGetBase
     {
-        [BenchmarkCategory("LinqQuery")]
-        [Benchmark(Baseline = true)] public async Task<Pokemon> LinqQueryBaseline()
+        [Benchmark] public async Task<Pokemon> BasicLinqQuery()
         {
-            var service = new PokeflexService(DbContext.PokeflexContext);
             var pokeflexContext=DbContext.PokeflexContext;
-            return await (
+            var pokemon = await (
                     from p in pokeflexContext.Pokemons
                     where p.GroupId == Group && p.Number == Number select p)
                 .FirstOrDefaultAsync();
+            return pokemon;
         }
-        [BenchmarkCategory("LinqMethod")]
-        [Benchmark] public void LinqMethodBaseline()
+        
+        [Benchmark] public async Task<Pokemon> BasicLinqMethod()
         {
-            var service = new PokeflexService(DbContext.PokeflexContext);
             var pokeflexContext=DbContext.PokeflexContext;
-            pokeflexContext
+            var pokemons = await pokeflexContext
                 .Pokemons
                 .Where(p => p.GroupId == Group && p.Number == Number)
                 .FirstOrDefaultAsync();
+            return pokemons;
         }
         
-        [Benchmark] public async Task<List<Pokemon>> Proposal()
+        [Benchmark] public async Task<Pokemon> Proposal()
         {
             var pokeCtx=DbContext.PokeflexContext.Pokemons;
-            return await pokeCtx
+            var pokemon = await pokeCtx
                 .AFlexmons(Group,Number)
                 .AIncludeBasemons(pokeCtx,Group,Number)
-                .AOrderByNumber()
-                .ToListAsync();
+                .FirstOrDefaultAsync();
+            return pokemon;
         }
 
-        [Benchmark] public async Task<Pokemon> UnionWhereNotExistsWithoutExtensionMethods()
+        [Benchmark] public async Task<Pokemon> UnionWhereNotExists()
         {
-            var service = new PokeflexService(DbContext.PokeflexContext);
-            return await DbContext.PokeflexContext.Pokemons
+            var pokemon = await DbContext.PokeflexContext.Pokemons
                 .Where(p => p.GroupId == Group && p.Number == Number)
                 .Concat(
                     from p in DbContext.PokeflexContext.Pokemons
@@ -90,26 +88,18 @@ namespace Tests.Benchs.PokeflexServiceBenchmarks
                     where ! DbContext.PokeflexContext.Pokemons
                         .Any(f => f.GroupId == Group && f.Number == p.Number)
                     select p).FirstOrDefaultAsync();
-        }
-        
-        [BenchmarkCategory("ActiveState")]
-        [Benchmark] public async Task<Pokemon> UnionWhereNotExists()
-        {
-            var service = new PokeflexService(DbContext.PokeflexContext);
-            var pokemon = await service.Select(Number, Group);
             return pokemon;
         }
         
         [Benchmark] public async Task<Pokemon> Coalesce()
         {
-            var service = new PokeflexService(DbContext.PokeflexContext);
             var pokeflexContext = DbContext.PokeflexContext;
             var pokemon =
                 from bse in pokeflexContext.Pokemons
                 join flx in pokeflexContext.Pokemons on bse.Number equals flx.Number into flx
                 from f in flx.DefaultIfEmpty()
                 where bse.GroupId==Group && bse.Number==Number
-                select new Pokemon(){
+                select new Pokemon {
                     Id= f != null? f.Id: bse.Id,
                     Number= f != null? f.Number: bse.Number,
                     Group= f != null? f.Group: bse.Group,
@@ -121,7 +111,6 @@ namespace Tests.Benchs.PokeflexServiceBenchmarks
 
         [Benchmark] public async Task<Pokemon> SequentialWhereNotIn()
         {
-            var service = new PokeflexService(DbContext.PokeflexContext);
             var pokeflexContext = DbContext.PokeflexContext;
             var pokemon = await (
                 from pk in pokeflexContext.Pokemons
@@ -141,7 +130,6 @@ namespace Tests.Benchs.PokeflexServiceBenchmarks
         
         [Benchmark] public async Task<Pokemon> SequentialWorstCase()
         {
-            var service = new PokeflexService(DbContext.PokeflexContext);
             var pokeflexContext = DbContext.PokeflexContext;
             var pokemon = await (
                 from pk in pokeflexContext.Pokemons
@@ -157,6 +145,14 @@ namespace Tests.Benchs.PokeflexServiceBenchmarks
                 
             return pokemon;
         }
+        
+        [Benchmark] public async Task<Pokemon> SqlServerStoredFunction()
+        {
+            var pokeflexContext=DbContext.PokeflexContext;
+            var pokemons = await pokeflexContext.SelectFlexmon(Group, Number).FirstOrDefaultAsync();
+            return pokemons;
+        }
+        
     }
     
     
@@ -165,100 +161,70 @@ namespace Tests.Benchs.PokeflexServiceBenchmarks
     {
         [Benchmark(Baseline = true)] public async Task<Pokemon> BaselineSimpleSelect()
         {
-            var service = new PokeflexService(DbContext.PokeflexContext);
             var pokeflexContext=DbContext.PokeflexContext;
             string sql = @"
 SELECT [p].[Id], [p].[ApiSource], [p].[GroupId], [p].[Name], [p].[Number]
 FROM [Pokemons] AS [p]
 WHERE ([p].[GroupId] = @p0) AND ([p].[Number] = @p1)";
-            var pokemon = await pokeflexContext.Pokemons.FromSqlRaw(sql, Group, Number).FirstOrDefaultAsync();
+            var pokemon = await pokeflexContext.Pokemons
+                .FromSqlRaw(sql, Group, Number)
+                .FirstOrDefaultAsync();
             return pokemon;
         }
         
-        [Benchmark] public async Task<Pokemon> SqlServerStoredFunction()
+        [Benchmark] public Pokemon CteUnionWhereNotExists()
         {
-            var service = new PokeflexService(DbContext.PokeflexContext);
-            var pokeflexContext=DbContext.PokeflexContext;
-            var pokemons = await pokeflexContext.SelectFlexmon(Group, Number).FirstOrDefaultAsync();
-            return pokemons;
-        }
-        
-//         [BenchmarkCategory("fakeyfakey")]
-//         [Benchmark] public List<Pokemon> LeftJoinOnNumList()
-//         {
-//             var pokeflexContext=DbContext.PokeflexContext;
-//             string sql = @"
-// DECLARE @__min_1 int = 10;
-// DECLARE @__max_2 int = 20;
-// WITH fmons AS (
-//     SELECT [p].[Id], [p].[ApiSource], [p].[GroupId], [p].[Name], [p].[Number], [m].[Number] AS seeking
-//     FROM [dbo].[MakeRange](@__min_1, @__max_2) AS [m]
-//     LEFT JOIN [Pokemons] AS [p] ON [m].[Number] = [p].[Number]
-// )
-// SELECT [p].[Id], [p].[ApiSource], [p].[GroupId], [p].[Name], [p].[Number]
-//     FROM fmons AS [p]
-//     WHERE [p].[Number] IS NOT NULL
-// UNION ALL
-// SELECT [p].*
-//     FROM fmons AS [f]
-//     LEFT JOIN [Pokemons] AS [p] ON ([f].[Name] = N'') AND ([f].[seeking] = [p].[Number])
-//     WHERE [f].[Number] IS NULL
-// ";
-//             var pokemon = pokeflexContext.Pokemons.FromSqlRaw(sql, Group, Number).AsEnumerable();
-//             return pokemon.ToList();
-//         }
-
-        
-        [Benchmark] public Pokemon UnionWhereNotExistsCte()
-        {
-            var service = new PokeflexService(DbContext.PokeflexContext);
             var pokeflexContext=DbContext.PokeflexContext;
             string sql = @"
-WITH fnums ([Number]) AS ( 
+WITH fnums AS ( 
     SELECT [Number]
     FROM pokemons
     WHERE [GroupId] = @p0 AND [Number] = @p1
 )
 SELECT [Id], [ApiSource], [GroupId], [Name], [Number]
 FROM pokemons
-WHERE [GroupId] = @p0 AND [Number] = @p1
+WHERE [GroupId] = @p0 AND EXISTS  (
+    SELECT TOP 1 1
+    FROM fnums
+    WHERE fnums.Number = pokemons.Number
+)
     UNION ALL
 SELECT [Id], [ApiSource], [GroupId], [Name], [Number]
 FROM pokemons
 WHERE NOT EXISTS (
-    SELECT 1
+    SELECT TOP 1 1
     FROM fnums
     WHERE fnums.Number = pokemons.Number
 )";
-            var pokemon = pokeflexContext.Pokemons.FromSqlRaw(sql, Group, Number).AsEnumerable().FirstOrDefault();
+            var pokemon = pokeflexContext.Pokemons
+                .FromSqlRaw(sql, Group, Number)
+                .AsEnumerable().FirstOrDefault();
             return pokemon;
         }
         
         [Benchmark] public async Task<Pokemon> UnionWhereNotExists()
         {
-            var service = new PokeflexService(DbContext.PokeflexContext);
             var pokeflexContext=DbContext.PokeflexContext;
             string sql = @"
-SELECT [t].[Id], [t].[ApiSource], [t].[GroupId], [t].[Name], [t].[Number]
-FROM (
-    SELECT [p].[Id], [p].[ApiSource], [p].[GroupId], [p].[Name], [p].[Number]
-    FROM [Pokemons] AS [p]
-    WHERE ([p].[GroupId] = @p0) AND ([p].[Number] = @p1)
-    UNION ALL
-    SELECT [p0].[Id], [p0].[ApiSource], [p0].[GroupId], [p0].[Name], [p0].[Number]
-    FROM [Pokemons] AS [p0]
-    WHERE (([p0].[GroupId] = 0) AND ([p0].[Number] = @p1)) AND NOT (EXISTS (
-        SELECT 1
-        FROM [Pokemons] AS [p1]
-        WHERE ([p1].[GroupId] = 1) AND ([p1].[Number] = [p0].[Number])))
-) AS [t]";
-            var pokemon = await pokeflexContext.Pokemons.FromSqlRaw(sql, Group, Number).FirstOrDefaultAsync();
+SELECT [p].[Id], [p].[ApiSource], [p].[GroupId], [p].[Name], [p].[Number]
+FROM [Pokemons] AS [p]
+WHERE ([p].[GroupId] = @p0) AND ([p].[Number] = @p1)
+UNION ALL
+SELECT [p0].[Id], [p0].[ApiSource], [p0].[GroupId], [p0].[Name], [p0].[Number]
+FROM [Pokemons] AS [p0]
+WHERE (([p0].[GroupId] IS NULL) AND ([p0].[Number] = @p1)) AND NOT (EXISTS (
+    SELECT TOP 1 1
+    FROM [Pokemons] AS [p1]
+    WHERE ([p1].[GroupId] = @p0) AND ([p1].[Number] = [p0].[Number])))
+";
+            var pokemon = await pokeflexContext.Pokemons
+                .FromSqlRaw(sql, Group, Number)
+                .FirstOrDefaultAsync();
             return pokemon;
         }
         
         [Benchmark] public async Task<Pokemon> Coalesce()
         {
-            var service = new PokeflexService(DbContext.PokeflexContext);
             var pokeflexContext=DbContext.PokeflexContext;
             string sql = @"
 SELECT 
@@ -270,7 +236,9 @@ SELECT
 FROM pokemons AS pk_base
 LEFT JOIN pokemons AS pk_flex ON pk_flex.Number=pk_base.Number
 WHERE pk_base.Number=@p0 AND pk_flex.[GroupId]=@p1 AND pk_base.[GroupId]=0";
-            var pokemon = await pokeflexContext.Pokemons.FromSqlRaw(sql, Group, Number).FirstOrDefaultAsync();
+            var pokemon = await pokeflexContext.Pokemons
+                .FromSqlRaw(sql, Group, Number)
+                .FirstOrDefaultAsync();
             return pokemon;
         }
     }

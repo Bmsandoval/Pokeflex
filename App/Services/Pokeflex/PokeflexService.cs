@@ -82,12 +82,13 @@ namespace App.Services.Pokeflex
             //     .Include(u => u.UserGroups)
             //     .ThenInclude(ug => ug.Group)
             //     .ToListAsync();
+            
             Console.WriteLine((
                 from ps in _dbContext.MakeRange(10, 20)
                 join fs in _dbContext.Pokemons on ps.Number equals fs.Number
                 join bs in _dbContext.Pokemons on new{name=fs.Name,num=ps.Number} equals new{name="", num=bs.Number}
                 select fs ?? bs).ToQueryString());
-
+            
             return _dbContext.MakeRange(10, 20).ToList();
         }
     }
