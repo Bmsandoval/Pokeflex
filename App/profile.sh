@@ -163,9 +163,9 @@ ${_pokeflex_base_options}"
             '-fl'|'-filter-all') filter="--allCategories " && filtering=1 ;;
             '-fy'|'-filter-any') filter="--anyCategories " && filtering=1 ;;
             '-r'|'-rapid') speed="-j short --warmupCount 1 --iterationCount 1 --invocationCount 1 --unrollFactor 1 --runOncePerIteration true" ;; # short run job, with in-process benchmarks
-            '-s'|'-slow') speed="-j long"
+            '-s'|'-slow') speed="-j long" ;;
             '-v'|'-virtualized') virtualized=1 ;;
-            '-d'|'-dry') dryrun=1 && filtering=0 ;;
+			'-d'|'-dry') dryrun=1 && filtering=0 ;;
             '-h'|'-help') help=1 && echo -e "${_pokeflex_test_bench_options}" && filtering=false ;;
             *) [[ $filtering ]] && filter+=" ${1}" ;;
             esac
